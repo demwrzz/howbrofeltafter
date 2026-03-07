@@ -1,1 +1,1950 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BloxCrush Coinflip</title>
+  <style>
+    :root{
+      --bg:#07111f;
+      --bg2:#0c1a2d;
+      --panel:#0f2038;
+      --panel2:#122743;
+      --line:rgba(255,255,255,.08);
+      --text:#eef4ff;
+      --muted:#8fa6c8;
+      --blue:#4f8dff;
+      --blue2:#8bc0ff;
+      --red:#ff5c7f;
+      --red2:#ff9ab0;
+      --green:#35d59a;
+      --gold:#f5c05a;
+      --shadow:0 12px 35px rgba(0,0,0,.35);
+      --radius:18px;
+    }
 
+    *{box-sizing:border-box}
+    html,body{
+      margin:0;
+      padding:0;
+      min-height:100%;
+      background:
+        radial-gradient(circle at top left, rgba(79,141,255,.13), transparent 28%),
+        radial-gradient(circle at top right, rgba(255,92,127,.09), transparent 24%),
+        linear-gradient(180deg, #08111d 0%, #0a1628 100%);
+      color:var(--text);
+      font-family:Inter, Arial, Helvetica, sans-serif;
+      overflow:hidden;
+    }
+
+    button,input,select{
+      font:inherit;
+    }
+
+    .app{
+      height:100vh;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .topbar{
+      height:72px;
+      border-bottom:1px solid var(--line);
+      background:rgba(7,17,31,.82);
+      backdrop-filter:blur(14px);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:0 18px;
+      position:relative;
+      z-index:20;
+      box-shadow:0 8px 28px rgba(0,0,0,.18);
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+
+    .brand-logo{
+      width:44px;
+      height:44px;
+      border-radius:14px;
+      background:linear-gradient(135deg, var(--blue), var(--red));
+      display:grid;
+      place-items:center;
+      font-weight:900;
+      box-shadow:var(--shadow);
+    }
+
+    .brand h1{
+      margin:0;
+      font-size:20px;
+      letter-spacing:.4px;
+    }
+
+    .brand small{
+      color:var(--muted);
+      display:block;
+      margin-top:2px;
+      font-size:12px;
+    }
+
+    .top-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .pill{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      background:rgba(255,255,255,.04);
+      border:1px solid var(--line);
+      color:var(--text);
+      padding:10px 14px;
+      border-radius:14px;
+    }
+
+    .btn{
+      border:none;
+      border-radius:14px;
+      padding:12px 16px;
+      cursor:pointer;
+      color:white;
+      transition:.2s transform,.2s opacity,.2s box-shadow,.2s background;
+      box-shadow:var(--shadow);
+    }
+
+    .btn:hover{ transform:translateY(-1px) }
+    .btn:active{ transform:translateY(1px) }
+    .btn:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      transform:none;
+    }
+
+    .btn-blue{
+      background:linear-gradient(135deg, var(--blue), #2d67ff);
+    }
+
+    .btn-red{
+      background:linear-gradient(135deg, var(--red), #ff3d66);
+    }
+
+    .btn-dark{
+      background:#152842;
+      border:1px solid var(--line);
+      color:var(--text);
+      box-shadow:none;
+    }
+
+    .btn-green{
+      background:linear-gradient(135deg, var(--green), #14b97b);
+    }
+
+    .btn-gold{
+      background:linear-gradient(135deg, #ffd980, #e7a937);
+      color:#1d1404;
+      font-weight:700;
+    }
+
+    .content{
+      flex:1;
+      display:flex;
+      min-height:0;
+    }
+
+    .chat-panel{
+      width:320px;
+      min-width:320px;
+      max-width:320px;
+      border-right:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+      display:flex;
+      flex-direction:column;
+      position:relative;
+    }
+
+    .chat-header{
+      padding:18px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+
+    .chat-header h2{
+      margin:0;
+      font-size:18px;
+    }
+
+    .chat-header span{
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .chat-messages{
+      flex:1;
+      overflow:auto;
+      padding:14px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .msg{
+      background:rgba(255,255,255,.035);
+      border:1px solid rgba(255,255,255,.05);
+      border-radius:14px;
+      padding:10px 12px;
+      animation:fadeUp .22s ease;
+      word-break:break-word;
+    }
+
+    .msg .head{
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      margin-bottom:5px;
+      font-size:12px;
+    }
+
+    .msg .name{
+      font-weight:700;
+      color:#dfe9ff;
+    }
+
+    .msg .time{
+      color:var(--muted);
+    }
+
+    .msg .body{
+      color:#f1f6ff;
+      font-size:14px;
+      line-height:1.35;
+    }
+
+    .chat-send{
+      padding:14px;
+      border-top:1px solid var(--line);
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .chat-send input{
+      width:100%;
+      background:#0a1830;
+      border:1px solid var(--line);
+      color:white;
+      outline:none;
+      padding:12px 14px;
+      border-radius:14px;
+    }
+
+    .main{
+      flex:1;
+      min-width:0;
+      overflow:auto;
+      padding:22px;
+    }
+
+    .hero{
+      display:grid;
+      grid-template-columns:1.3fr 1fr;
+      gap:18px;
+      margin-bottom:18px;
+    }
+
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+
+    .hero-left{
+      padding:22px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .hero-left::before{
+      content:"";
+      position:absolute;
+      inset:auto -40px -40px auto;
+      width:180px;
+      height:180px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(79,141,255,.24), transparent 65%);
+      pointer-events:none;
+    }
+
+    .hero-left h2{
+      margin:0 0 8px;
+      font-size:28px;
+    }
+
+    .hero-left p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.55;
+      max-width:650px;
+    }
+
+    .stats{
+      margin-top:18px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+    }
+
+    .stat{
+      min-width:160px;
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+    }
+
+    .stat .label{
+      color:var(--muted);
+      font-size:12px;
+      margin-bottom:5px;
+    }
+
+    .stat .value{
+      font-size:24px;
+      font-weight:800;
+    }
+
+    .hero-right{
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      justify-content:center;
+    }
+
+    .wallet-preview{
+      display:flex;
+      gap:14px;
+      align-items:center;
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:16px;
+    }
+
+    .axe-icon{
+      width:72px;
+      height:72px;
+      border-radius:18px;
+      background:
+        radial-gradient(circle at 35% 35%, rgba(255,255,255,.15), transparent 32%),
+        linear-gradient(135deg, #2a1e13, #5a3418);
+      position:relative;
+      flex:0 0 auto;
+      overflow:hidden;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.05);
+    }
+
+    .axe-icon::before{
+      content:"🪓";
+      position:absolute;
+      inset:0;
+      display:grid;
+      place-items:center;
+      font-size:36px;
+      filter:drop-shadow(0 4px 10px rgba(0,0,0,.35));
+    }
+
+    .wallet-preview h3{
+      margin:0 0 4px;
+      font-size:18px;
+    }
+
+    .wallet-preview p{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .create-area{
+      display:grid;
+      grid-template-columns:380px 1fr;
+      gap:18px;
+    }
+
+    .create-card, .matches-card{
+      padding:18px;
+    }
+
+    .section-title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:14px;
+    }
+
+    .section-title h3{
+      margin:0;
+      font-size:20px;
+    }
+
+    .section-title span{
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .form-grid{
+      display:grid;
+      gap:12px;
+    }
+
+    .field label{
+      display:block;
+      margin-bottom:6px;
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .field input, .field select{
+      width:100%;
+      background:#0b1830;
+      border:1px solid var(--line);
+      color:white;
+      outline:none;
+      border-radius:14px;
+      padding:12px 14px;
+    }
+
+    .side-picker{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
+    .side-btn{
+      background:#0b1830;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+      cursor:pointer;
+      color:white;
+      transition:.2s;
+    }
+
+    .side-btn.active{
+      outline:2px solid rgba(255,255,255,.12);
+      transform:translateY(-1px);
+    }
+
+    .side-btn.blue.active{
+      background:linear-gradient(135deg, rgba(79,141,255,.28), rgba(79,141,255,.14));
+      border-color:rgba(79,141,255,.45);
+    }
+
+    .side-btn.red.active{
+      background:linear-gradient(135deg, rgba(255,92,127,.28), rgba(255,92,127,.12));
+      border-color:rgba(255,92,127,.45);
+    }
+
+    .side-chip-preview{
+      width:50px;
+      height:50px;
+      margin-bottom:10px;
+    }
+
+    .note{
+      font-size:13px;
+      color:var(--muted);
+      line-height:1.45;
+      background:rgba(255,255,255,.025);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px;
+    }
+
+    .matches-list{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .match{
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      animation:fadeUp .2s ease;
+    }
+
+    .match-left{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      min-width:0;
+    }
+
+    .match-info{
+      min-width:0;
+    }
+
+    .match-info h4{
+      margin:0 0 6px;
+      font-size:16px;
+    }
+
+    .match-info p{
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.4;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:7px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      border:1px solid var(--line);
+      white-space:nowrap;
+    }
+
+    .badge.blue{
+      background:rgba(79,141,255,.12);
+      color:#bfd7ff;
+    }
+
+    .badge.red{
+      background:rgba(255,92,127,.12);
+      color:#ffd1dc;
+    }
+
+    .badge.gray{
+      background:rgba(255,255,255,.06);
+      color:#e9efff;
+    }
+
+    .match-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .chip{
+      width:72px;
+      height:72px;
+      border-radius:50%;
+      position:relative;
+      display:grid;
+      place-items:center;
+      font-weight:900;
+      font-size:34px;
+      color:white;
+      text-shadow:0 2px 8px rgba(0,0,0,.3);
+      box-shadow:
+        inset 0 6px 12px rgba(255,255,255,.14),
+        inset 0 -6px 12px rgba(0,0,0,.18),
+        0 12px 24px rgba(0,0,0,.35);
+      flex:0 0 auto;
+    }
+
+    .chip::before{
+      content:"";
+      position:absolute;
+      inset:8px;
+      border-radius:50%;
+      border:4px solid rgba(255,255,255,.16);
+    }
+
+    .chip::after{
+      content:"";
+      position:absolute;
+      inset:16px;
+      border-radius:50%;
+      background:rgba(255,255,255,.08);
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
+    }
+
+    .chip span{
+      position:relative;
+      z-index:1;
+    }
+
+    .chip-blue{
+      background:
+        radial-gradient(circle at 30% 30%, #9fd0ff, transparent 18%),
+        linear-gradient(135deg, #6ab5ff, #2767ff);
+    }
+
+    .chip-red{
+      background:
+        radial-gradient(circle at 30% 30%, #ffc1ce, transparent 18%),
+        linear-gradient(135deg, #ff8da8, #ff4169);
+    }
+
+    .modal-wrap{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.55);
+      backdrop-filter:blur(10px);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:40;
+      padding:20px;
+    }
+
+    .modal-wrap.show{
+      display:flex;
+      animation:fadeIn .22s ease;
+    }
+
+    .modal{
+      width:min(560px, 100%);
+      background:linear-gradient(180deg, #11233d, #0c1b31);
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:0 30px 60px rgba(0,0,0,.45);
+      overflow:hidden;
+    }
+
+    .modal-head{
+      padding:18px 20px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+    }
+
+    .modal-head h3{
+      margin:0;
+      font-size:20px;
+    }
+
+    .modal-body{
+      padding:20px;
+    }
+
+    .close-x{
+      width:38px;
+      height:38px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#132742;
+      color:white;
+      cursor:pointer;
+    }
+
+    .verify-box{
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px;
+      margin:14px 0;
+    }
+
+    .verify-code{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      background:#0b1830;
+      border:1px dashed rgba(255,255,255,.16);
+      border-radius:16px;
+      padding:12px 14px;
+      font-weight:800;
+      letter-spacing:.5px;
+      margin-top:10px;
+      word-break:break-all;
+    }
+
+    .inv-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+      gap:14px;
+    }
+
+    .inv-item{
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px;
+    }
+
+    .inv-item h4{
+      margin:12px 0 6px;
+      font-size:17px;
+    }
+
+    .inv-item p{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.45;
+    }
+
+    .toast{
+      position:fixed;
+      top:16px;
+      left:50%;
+      transform:translateX(-50%) translateY(-12px);
+      z-index:80;
+      background:linear-gradient(135deg, var(--green), #17b97b);
+      color:#06281c;
+      padding:14px 18px;
+      border-radius:14px;
+      font-weight:800;
+      box-shadow:0 20px 40px rgba(0,0,0,.3);
+      opacity:0;
+      pointer-events:none;
+      transition:.28s;
+    }
+
+    .toast.show{
+      opacity:1;
+      transform:translateX(-50%) translateY(0);
+    }
+
+    .coinflip-overlay{
+      position:fixed;
+      inset:0;
+      background:
+        radial-gradient(circle at center, rgba(79,141,255,.12), transparent 35%),
+        radial-gradient(circle at center, rgba(255,92,127,.09), transparent 48%),
+        rgba(2,8,18,.88);
+      backdrop-filter:blur(10px);
+      z-index:70;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      overflow:hidden;
+      padding:20px;
+    }
+
+    .coinflip-overlay.show{
+      display:flex;
+      animation:fadeIn .25s ease;
+    }
+
+    .battle-head{
+      text-align:center;
+      margin-bottom:20px;
+    }
+
+    .battle-head h2{
+      margin:0 0 8px;
+      font-size:32px;
+    }
+
+    .battle-head p{
+      margin:0;
+      color:#c9d8f6;
+      font-size:15px;
+    }
+
+    .battle-stage{
+      width:min(1100px, 95vw);
+      min-height:360px;
+      border-radius:28px;
+      border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      box-shadow:0 30px 90px rgba(0,0,0,.45);
+      position:relative;
+      overflow:hidden;
+      padding:20px;
+    }
+
+    .battle-stage::before{
+      content:"";
+      position:absolute;
+      left:50%;
+      top:0;
+      transform:translateX(-50%);
+      width:1px;
+      height:100%;
+      background:linear-gradient(180deg, transparent, rgba(255,255,255,.18), transparent);
+    }
+
+    .battle-lanes{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:0 90px;
+      pointer-events:none;
+    }
+
+    .lane-side{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:12px;
+      width:180px;
+    }
+
+    .lane-label{
+      font-weight:800;
+      letter-spacing:.4px;
+      font-size:18px;
+    }
+
+    .lane-label.blue{ color:#b6d5ff; }
+    .lane-label.red{ color:#ffd0db; }
+
+    .stop-slot{
+      width:132px;
+      height:132px;
+      border-radius:50%;
+      border:2px dashed rgba(255,255,255,.16);
+      box-shadow:inset 0 0 0 8px rgba(255,255,255,.02);
+    }
+
+    .battle-track{
+      position:relative;
+      height:320px;
+    }
+
+    .coin-runner{
+      position:absolute;
+      top:50%;
+      left:50%;
+      width:170px;
+      height:170px;
+      transform:translate(-50%,-50%);
+      transition:1.2s cubic-bezier(.18,.83,.18,1);
+      filter:drop-shadow(0 22px 40px rgba(0,0,0,.5));
+    }
+
+    .coin-runner.spinning{
+      animation:spinCoin .75s linear infinite;
+    }
+
+    .coin-runner.to-blue{
+      left:18%;
+      transform:translate(-50%,-50%) rotate(0deg);
+    }
+
+    .coin-runner.to-red{
+      left:82%;
+      transform:translate(-50%,-50%) rotate(0deg);
+    }
+
+    .coin-runner .chip{
+      width:170px;
+      height:170px;
+      font-size:76px;
+    }
+
+    .battle-vs{
+      position:absolute;
+      left:50%;
+      top:28px;
+      transform:translateX(-50%);
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:999px;
+      padding:10px 18px;
+      font-weight:900;
+      letter-spacing:.8px;
+    }
+
+    .battle-users{
+      position:absolute;
+      bottom:20px;
+      left:0;
+      right:0;
+      display:flex;
+      justify-content:space-between;
+      padding:0 40px;
+      gap:20px;
+    }
+
+    .battle-user{
+      width:240px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:20px;
+      padding:14px;
+      text-align:center;
+    }
+
+    .battle-user h4{
+      margin:0 0 6px;
+      font-size:18px;
+    }
+
+    .battle-user p{
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .result-text{
+      margin-top:18px;
+      font-size:20px;
+      font-weight:800;
+      text-align:center;
+      min-height:30px;
+    }
+
+    .mini{
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    @keyframes spinCoin{
+      from{ transform:translate(-50%,-50%) rotate(0deg) }
+      to{ transform:translate(-50%,-50%) rotate(360deg) }
+    }
+
+    @keyframes fadeUp{
+      from{ opacity:0; transform:translateY(10px) }
+      to{ opacity:1; transform:translateY(0) }
+    }
+
+    @keyframes fadeIn{
+      from{ opacity:0 }
+      to{ opacity:1 }
+    }
+
+    @media (max-width: 1200px){
+      .hero, .create-area{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width: 980px){
+      .chat-panel{
+        width:280px;
+        min-width:280px;
+        max-width:280px;
+      }
+      .battle-lanes{
+        padding:0 30px;
+      }
+      .battle-users{
+        padding:0 14px;
+      }
+      .battle-user{
+        width:calc(50% - 10px);
+      }
+    }
+
+    @media (max-width: 800px){
+      body{ overflow:auto; }
+      .app{ height:auto; min-height:100vh; }
+      .content{
+        flex-direction:column;
+      }
+      .chat-panel{
+        width:100%;
+        min-width:100%;
+        max-width:100%;
+        height:360px;
+        border-right:none;
+        border-bottom:1px solid var(--line);
+      }
+      .main{
+        overflow:visible;
+      }
+      .topbar{
+        height:auto;
+        padding:14px;
+        gap:12px;
+        flex-direction:column;
+        align-items:stretch;
+      }
+      .top-actions{
+        justify-content:space-between;
+        flex-wrap:wrap;
+      }
+      .battle-stage{
+        min-height:520px;
+      }
+      .battle-track{
+        height:420px;
+      }
+      .battle-users{
+        flex-direction:column;
+        align-items:center;
+      }
+      .battle-user{
+        width:min(320px, 90%);
+      }
+      .coin-runner.to-blue{
+        left:22%;
+      }
+      .coin-runner.to-red{
+        left:78%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="toast" id="toast"></div>
+
+  <div class="coinflip-overlay" id="coinflipOverlay">
+    <div class="battle-head">
+      <h2>Coinflip Battle</h2>
+      <p id="battleSubtitle">Maç sonucu belirleniyor...</p>
+    </div>
+
+    <div class="battle-stage">
+      <div class="battle-vs">VS</div>
+
+      <div class="battle-lanes">
+        <div class="lane-side">
+          <div class="lane-label blue">HEADS</div>
+          <div class="stop-slot"></div>
+        </div>
+        <div class="lane-side">
+          <div class="lane-label red">TAILS</div>
+          <div class="stop-slot"></div>
+        </div>
+      </div>
+
+      <div class="battle-track">
+        <div class="coin-runner spinning" id="coinRunner">
+          <div class="chip chip-blue" id="runnerChip">
+            <span id="runnerFace">H</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="battle-users">
+        <div class="battle-user">
+          <h4 id="battleUser1">-</h4>
+          <p id="battleUser1Side">Creator</p>
+        </div>
+        <div class="battle-user">
+          <h4 id="battleUser2">-</h4>
+          <p id="battleUser2Side">Joiner</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="result-text" id="battleResult"></div>
+  </div>
+
+  <div class="modal-wrap" id="loginModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>Roblox ile Giriş</h3>
+        <button class="close-x" onclick="closeLoginModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label>Roblox kullanıcı adın</label>
+          <input type="text" id="loginUsername" placeholder="Örn: demwrzz" />
+        </div>
+
+        <div class="verify-box">
+          <div><strong>Doğrulama adımı</strong></div>
+          <div class="mini" style="margin-top:8px">
+            Bu tek dosyalık sürüm bir demo olduğu için gerçek Roblox bio kontrolü yapmaz. Yine de aynı mantıkla çalışır:
+            kullanıcı adını yaz, kod oluştur, sonra “Doğrulamayı Tamamla” ile giriş yap.
+          </div>
+
+          <div class="verify-code" id="verifyCodeBox">
+            <span id="verifyCodeText">Henüz kod oluşturulmadı</span>
+            <button class="btn btn-dark" type="button" onclick="copyVerifyCode()">Kopyala</button>
+          </div>
+
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px">
+            <button class="btn btn-blue" type="button" onclick="generateVerifyCode()">Kod Oluştur</button>
+            <button class="btn btn-green" type="button" onclick="completeLogin()">Doğrulamayı Tamamla</button>
+          </div>
+        </div>
+
+        <div class="note">
+          Akış senin istediğin gibi kuruldu:
+          kullanıcı adını gir → kod oluşur → kullanıcı tekrar logine basar → üstte başarılı giriş yazısı çıkar ve kaybolur.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-wrap" id="walletModal">
+    <div class="modal" style="width:min(760px,100%)">
+      <div class="modal-head">
+        <h3>Wallet / Envanter</h3>
+        <button class="close-x" onclick="closeWalletModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="section-title">
+          <h3>Başlangıç Envanteri</h3>
+          <span id="walletUserName">-</span>
+        </div>
+        <div class="inv-grid">
+          <div class="inv-item">
+            <div class="axe-icon"></div>
+            <h4>Travellers Axe</h4>
+            <p>Değer: <strong>8.000 Value</strong></p>
+            <p>Adet: <strong id="axeCount">20</strong></p>
+            <p>Toplam Değer: <strong id="axeTotal">160.000</strong></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-logo">BC</div>
+        <div>
+          <h1>BloxCrush</h1>
+          <small>Smooth Roblox Coinflip Demo</small>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <div class="pill">
+          <span>👤</span>
+          <strong id="topUser">Misafir</strong>
+        </div>
+
+        <div class="pill">
+          <span>💰</span>
+          <strong id="topBalance">0</strong>
+        </div>
+
+        <button class="btn btn-gold" onclick="openWalletModal()">Wallet</button>
+        <button class="btn btn-blue" id="loginBtn" onclick="openLoginModal()">Login</button>
+        <button class="btn btn-dark" id="logoutBtn" style="display:none" onclick="logout()">Çıkış Yap</button>
+      </div>
+    </header>
+
+    <div class="content">
+      <aside class="chat-panel">
+        <div class="chat-header">
+          <div>
+            <h2>Live Chat</h2>
+            <span>Tüm sekmeler arasında canlı demo</span>
+          </div>
+          <div class="badge gray" id="onlineBadge">Online Demo</div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages"></div>
+
+        <div class="chat-send">
+          <input type="text" id="chatInput" placeholder="Mesaj yaz..." maxlength="180" />
+          <button class="btn btn-blue" onclick="sendChat()">Gönder</button>
+        </div>
+      </aside>
+
+      <main class="main">
+        <section class="hero">
+          <div class="card hero-left">
+            <h2>Roblox Coinflip Maçları</h2>
+            <p>
+              Maç oluştur, taraf seç, rakibin katılsın ve tüm ekranı kaplayan smooth coinflip animasyonu başlasın.
+              Heads için mavi, tails için kırmızı tarafa duran akış eklendi.
+            </p>
+
+            <div class="stats">
+              <div class="stat">
+                <div class="label">Aktif Maç</div>
+                <div class="value" id="activeMatchCount">0</div>
+              </div>
+              <div class="stat">
+                <div class="label">Toplam Kullanıcı</div>
+                <div class="value" id="totalUserCount">0</div>
+              </div>
+              <div class="stat">
+                <div class="label">Toplam Chat Mesajı</div>
+                <div class="value" id="messageCount">0</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card hero-right">
+            <div class="wallet-preview">
+              <div class="axe-icon"></div>
+              <div>
+                <h3>Travellers Axe</h3>
+                <p>Başlangıçta giriş yapan herkese 20 adet verilir.</p>
+                <p><strong>8.000 Value</strong> / adet</p>
+              </div>
+            </div>
+
+            <div class="note">
+              Bu sürüm tamamen tek dosyalık çalışsın diye hazırlanmıştır.
+              Veriler tarayıcıda tutulur ve aynı tarayıcıdaki sekmeler arasında canlı görünür.
+            </div>
+          </div>
+        </section>
+
+        <section class="create-area">
+          <div class="card create-card">
+            <div class="section-title">
+              <h3>Maç Oluştur</h3>
+              <span>Önce giriş yap</span>
+            </div>
+
+            <div class="form-grid">
+              <div class="field">
+                <label>Bahis Miktarı</label>
+                <input type="number" id="betAmount" min="1" step="1" value="1000" />
+              </div>
+
+              <div class="field">
+                <label>Taraf Seç</label>
+                <div class="side-picker">
+                  <button class="side-btn blue active" id="sideHeads" onclick="selectSide('heads')">
+                    <div class="chip chip-blue side-chip-preview"><span>H</span></div>
+                    <strong>Heads</strong>
+                  </button>
+                  <button class="side-btn red" id="sideTails" onclick="selectSide('tails')">
+                    <div class="chip chip-red side-chip-preview"><span>T</span></div>
+                    <strong>Tails</strong>
+                  </button>
+                </div>
+              </div>
+
+              <button class="btn btn-blue" onclick="createMatch()">Maç Oluştur</button>
+
+              <div class="note">
+                Maç oluşturan kişinin bakiyesinden miktar anında düşer.
+                Katılan kişi de aynı miktarı yatırır.
+                Kazanan toplam potu alır.
+              </div>
+            </div>
+          </div>
+
+          <div class="card matches-card">
+            <div class="section-title">
+              <h3>Canlı Maçlar</h3>
+              <span>Herkes tarafından görülebilir ve katılınabilir</span>
+            </div>
+            <div class="matches-list" id="matchesList"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEYS = {
+      users: "bloxcrush_users_v1",
+      matches: "bloxcrush_matches_v1",
+      chat: "bloxcrush_chat_v1",
+      session: "bloxcrush_current_user_v1",
+      verify: "bloxcrush_verify_pending_v1"
+    };
+
+    const START_BALANCE = 25000;
+    const AXE_COUNT = 20;
+    const AXE_VALUE = 8000;
+
+    let currentSide = "heads";
+    let broadcast = null;
+    let activeBattleMatchId = null;
+
+    init();
+
+    function init() {
+      try {
+        broadcast = new BroadcastChannel("bloxcrush_channel");
+        broadcast.onmessage = () => {
+          renderAll();
+        };
+      } catch (e) {}
+
+      window.addEventListener("storage", (e) => {
+        if (Object.values(STORAGE_KEYS).includes(e.key)) {
+          renderAll();
+        }
+      });
+
+      document.getElementById("chatInput").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") sendChat();
+      });
+
+      seedDemoData();
+      renderAll();
+    }
+
+    function seedDemoData() {
+      if (!localStorage.getItem(STORAGE_KEYS.users)) {
+        saveUsers({});
+      }
+
+      if (!localStorage.getItem(STORAGE_KEYS.matches)) {
+        saveMatches([]);
+      }
+
+      if (!localStorage.getItem(STORAGE_KEYS.chat)) {
+        const demoChat = [
+          makeChatMessage("System", "BloxCrush canlı sohbete hoş geldin."),
+          makeChatMessage("System", "Login olup maç oluşturabilirsin."),
+        ];
+        saveChat(demoChat);
+      }
+    }
+
+    function notifyUpdate() {
+      if (broadcast) {
+        broadcast.postMessage({ type: "refresh", t: Date.now() });
+      }
+    }
+
+    function getUsers() {
+      return JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || "{}");
+    }
+
+    function saveUsers(users) {
+      localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(users));
+      notifyUpdate();
+    }
+
+    function getMatches() {
+      return JSON.parse(localStorage.getItem(STORAGE_KEYS.matches) || "[]");
+    }
+
+    function saveMatches(matches) {
+      localStorage.setItem(STORAGE_KEYS.matches, JSON.stringify(matches));
+      notifyUpdate();
+    }
+
+    function getChat() {
+      return JSON.parse(localStorage.getItem(STORAGE_KEYS.chat) || "[]");
+    }
+
+    function saveChat(messages) {
+      localStorage.setItem(STORAGE_KEYS.chat, JSON.stringify(messages));
+      notifyUpdate();
+    }
+
+    function getCurrentUsername() {
+      return localStorage.getItem(STORAGE_KEYS.session) || "";
+    }
+
+    function setCurrentUsername(username) {
+      localStorage.setItem(STORAGE_KEYS.session, username);
+      notifyUpdate();
+    }
+
+    function getCurrentUser() {
+      const username = getCurrentUsername();
+      if (!username) return null;
+      const users = getUsers();
+      return users[username] || null;
+    }
+
+    function setPendingVerify(data) {
+      localStorage.setItem(STORAGE_KEYS.verify, JSON.stringify(data));
+    }
+
+    function getPendingVerify() {
+      return JSON.parse(localStorage.getItem(STORAGE_KEYS.verify) || "null");
+    }
+
+    function clearPendingVerify() {
+      localStorage.removeItem(STORAGE_KEYS.verify);
+    }
+
+    function formatNumber(num) {
+      return Number(num || 0).toLocaleString("tr-TR");
+    }
+
+    function nowTime() {
+      return new Date().toLocaleTimeString("tr-TR", {
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    function makeId(prefix = "id") {
+      return prefix + "_" + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    }
+
+    function showToast(text) {
+      const toast = document.getElementById("toast");
+      toast.textContent = text;
+      toast.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2400);
+    }
+
+    function openLoginModal() {
+      document.getElementById("loginModal").classList.add("show");
+      const pending = getPendingVerify();
+      if (pending?.username) {
+        document.getElementById("loginUsername").value = pending.username;
+        document.getElementById("verifyCodeText").textContent = pending.code;
+      }
+    }
+
+    function closeLoginModal() {
+      document.getElementById("loginModal").classList.remove("show");
+    }
+
+    function openWalletModal() {
+      const user = getCurrentUser();
+      if (!user) {
+        showToast("Önce giriş yapman gerekiyor.");
+        return;
+      }
+      document.getElementById("walletUserName").textContent = user.username;
+      document.getElementById("axeCount").textContent = user.inventory.travellersAxe;
+      document.getElementById("axeTotal").textContent = formatNumber(user.inventory.travellersAxe * AXE_VALUE);
+      document.getElementById("walletModal").classList.add("show");
+    }
+
+    function closeWalletModal() {
+      document.getElementById("walletModal").classList.remove("show");
+    }
+
+    function generateVerifyCode() {
+      const username = document.getElementById("loginUsername").value.trim();
+      if (!username) {
+        showToast("Önce Roblox kullanıcı adını yaz.");
+        return;
+      }
+
+      const code = "BLOXCRUSH-" + Math.random().toString(36).slice(2, 8).toUpperCase();
+      setPendingVerify({ username, code, createdAt: Date.now() });
+      document.getElementById("verifyCodeText").textContent = code;
+      showToast("Doğrulama kodu oluşturuldu.");
+    }
+
+    function copyVerifyCode() {
+      const code = document.getElementById("verifyCodeText").textContent.trim();
+      if (!code || code === "Henüz kod oluşturulmadı") {
+        showToast("Kopyalanacak kod yok.");
+        return;
+      }
+      navigator.clipboard.writeText(code).then(() => {
+        showToast("Kod kopyalandı.");
+      }).catch(() => {
+        showToast("Kod kopyalanamadı.");
+      });
+    }
+
+    function ensureUser(username) {
+      const users = getUsers();
+
+      if (!users[username]) {
+        users[username] = {
+          username,
+          balance: START_BALANCE,
+          inventory: {
+            travellersAxe: AXE_COUNT
+          },
+          createdAt: Date.now()
+        };
+      } else {
+        if (!users[username].inventory) {
+          users[username].inventory = { travellersAxe: AXE_COUNT };
+        }
+        if (typeof users[username].inventory.travellersAxe !== "number") {
+          users[username].inventory.travellersAxe = AXE_COUNT;
+        }
+        if (typeof users[username].balance !== "number") {
+          users[username].balance = START_BALANCE;
+        }
+      }
+
+      saveUsers(users);
+      return users[username];
+    }
+
+    function completeLogin() {
+      const pending = getPendingVerify();
+      const usernameInput = document.getElementById("loginUsername").value.trim();
+
+      if (!usernameInput) {
+        showToast("Kullanıcı adını yaz.");
+        return;
+      }
+
+      if (!pending || pending.username !== usernameInput || !pending.code) {
+        showToast("Önce kod oluşturman gerekiyor.");
+        return;
+      }
+
+      ensureUser(usernameInput);
+      setCurrentUsername(usernameInput);
+      clearPendingVerify();
+      closeLoginModal();
+      showToast("Başarıyla giriş yaptın: " + usernameInput);
+      renderAll();
+    }
+
+    function logout() {
+      setCurrentUsername("");
+      showToast("Çıkış yapıldı.");
+      renderAll();
+    }
+
+    function selectSide(side) {
+      currentSide = side;
+      document.getElementById("sideHeads").classList.toggle("active", side === "heads");
+      document.getElementById("sideTails").classList.toggle("active", side === "tails");
+    }
+
+    function createMatch() {
+      const user = getCurrentUser();
+      if (!user) {
+        showToast("Maç oluşturmak için giriş yap.");
+        return;
+      }
+
+      const amount = Number(document.getElementById("betAmount").value);
+      if (!amount || amount <= 0) {
+        showToast("Geçerli bir bahis miktarı gir.");
+        return;
+      }
+
+      const matches = getMatches();
+      const hasOpenMatch = matches.some(m =>
+        m.status === "waiting" &&
+        (m.creator === user.username || m.joiner === user.username)
+      );
+
+      if (hasOpenMatch) {
+        showToast("Zaten açık bir maçın var.");
+        return;
+      }
+
+      const users = getUsers();
+      if (users[user.username].balance < amount) {
+        showToast("Yetersiz bakiye.");
+        return;
+      }
+
+      users[user.username].balance -= amount;
+      saveUsers(users);
+
+      const match = {
+        id: makeId("match"),
+        creator: user.username,
+        creatorSide: currentSide,
+        joiner: null,
+        amount,
+        status: "waiting",
+        createdAt: Date.now(),
+        result: null,
+        winner: null,
+        resolvedAt: null
+      };
+
+      matches.unshift(match);
+      saveMatches(matches);
+
+      const chat = getChat();
+      chat.push(makeChatMessage("System", `${user.username}, ${formatNumber(amount)} bakiye ile bir maç oluşturdu.`));
+      saveChat(chat);
+
+      showToast("Maç oluşturuldu.");
+      renderAll();
+    }
+
+    function joinMatch(matchId) {
+      const user = getCurrentUser();
+      if (!user) {
+        showToast("Katılmak için giriş yap.");
+        return;
+      }
+
+      const matches = getMatches();
+      const match = matches.find(m => m.id === matchId);
+
+      if (!match) {
+        showToast("Maç bulunamadı.");
+        return;
+      }
+
+      if (match.status !== "waiting") {
+        showToast("Bu maça artık katılamazsın.");
+        return;
+      }
+
+      if (match.creator === user.username) {
+        showToast("Kendi maçına katılamazsın.");
+        return;
+      }
+
+      const users = getUsers();
+      if (users[user.username].balance < match.amount) {
+        showToast("Yetersiz bakiye.");
+        return;
+      }
+
+      users[user.username].balance -= match.amount;
+      saveUsers(users);
+
+      match.joiner = user.username;
+      match.status = "rolling";
+      match.startedAt = Date.now();
+      saveMatches(matches);
+
+      const creatorSideText = match.creatorSide === "heads" ? "heads" : "tails";
+      const joinerSideText = creatorSideText === "heads" ? "tails" : "heads";
+
+      const chat = getChat();
+      chat.push(makeChatMessage("System", `${user.username}, ${match.creator} adlı oyuncunun maçına katıldı. (${creatorSideText} vs ${joinerSideText})`));
+      saveChat(chat);
+
+      maybeShowBattle(match.id);
+      simulateCoinflip(match.id);
+    }
+
+    function cancelMatch(matchId) {
+      const user = getCurrentUser();
+      if (!user) return;
+
+      const matches = getMatches();
+      const idx = matches.findIndex(m => m.id === matchId);
+      if (idx === -1) return;
+
+      const match = matches[idx];
+      if (match.creator !== user.username || match.status !== "waiting") {
+        showToast("Bu maçı iptal edemezsin.");
+        return;
+      }
+
+      const users = getUsers();
+      users[user.username].balance += match.amount;
+      saveUsers(users);
+
+      matches.splice(idx, 1);
+      saveMatches(matches);
+
+      const chat = getChat();
+      chat.push(makeChatMessage("System", `${user.username} oluşturduğu maçı iptal etti.`));
+      saveChat(chat);
+
+      showToast("Maç iptal edildi.");
+    }
+
+    function simulateCoinflip(matchId) {
+      const matches = getMatches();
+      const match = matches.find(m => m.id === matchId);
+      if (!match || match.status !== "rolling") return;
+
+      const result = Math.random() < 0.5 ? "heads" : "tails";
+
+      setTimeout(() => {
+        resolveMatch(matchId, result);
+      }, 4500);
+    }
+
+    function resolveMatch(matchId, result) {
+      const matches = getMatches();
+      const match = matches.find(m => m.id === matchId);
+      if (!match || match.status !== "rolling") return;
+
+      const creatorWins = match.creatorSide === result;
+      const winner = creatorWins ? match.creator : match.joiner;
+      const pot = match.amount * 2;
+
+      match.result = result;
+      match.winner = winner;
+      match.status = "finished";
+      match.resolvedAt = Date.now();
+
+      const users = getUsers();
+      if (users[winner]) {
+        users[winner].balance += pot;
+      }
+      saveUsers(users);
+      saveMatches(matches);
+
+      const resultText = result === "heads" ? "HEADS" : "TAILS";
+      const chat = getChat();
+      chat.push(makeChatMessage("System", `Maç bitti! Sonuç ${resultText}. Kazanan: ${winner}. Kazanç: ${formatNumber(pot)}`));
+      saveChat(chat);
+
+      maybeShowBattle(matchId, true);
+      renderAll();
+    }
+
+    function maybeShowBattle(matchId, finalRefresh = false) {
+      const current = getCurrentUsername();
+      if (!current) return;
+
+      const matches = getMatches();
+      const match = matches.find(m => m.id === matchId);
+      if (!match) return;
+
+      const isPlayer = match.creator === current || match.joiner === current;
+      if (!isPlayer) return;
+
+      activeBattleMatchId = matchId;
+      showBattle(match);
+
+      if (finalRefresh && match.status === "finished") {
+        setTimeout(() => {
+          hideBattle();
+          renderAll();
+        }, 2400);
+      }
+    }
+
+    function showBattle(match) {
+      const overlay = document.getElementById("coinflipOverlay");
+      const runner = document.getElementById("coinRunner");
+      const runnerChip = document.getElementById("runnerChip");
+      const runnerFace = document.getElementById("runnerFace");
+      const battleResult = document.getElementById("battleResult");
+      const subtitle = document.getElementById("battleSubtitle");
+
+      const creatorSide = match.creatorSide;
+      const joinerSide = creatorSide === "heads" ? "tails" : "heads";
+
+      document.getElementById("battleUser1").textContent = match.creator || "-";
+      document.getElementById("battleUser2").textContent = match.joiner || "-";
+      document.getElementById("battleUser1Side").textContent = `Creator • ${creatorSide.toUpperCase()}`;
+      document.getElementById("battleUser2Side").textContent = `Joiner • ${joinerSide.toUpperCase()}`;
+
+      overlay.classList.add("show");
+      battleResult.textContent = "";
+      runner.classList.remove("to-blue", "to-red");
+      runner.classList.add("spinning");
+
+      if (match.status === "rolling") {
+        subtitle.textContent = "Coin dönüyor...";
+        runnerChip.className = "chip chip-blue";
+        runnerFace.textContent = "H";
+      }
+
+      if (match.status === "finished") {
+        subtitle.textContent = "Maç sonucu açıklandı";
+        const isHeads = match.result === "heads";
+
+        runnerChip.className = isHeads ? "chip chip-blue" : "chip chip-red";
+        runnerFace.textContent = isHeads ? "H" : "T";
+
+        setTimeout(() => {
+          runner.classList.remove("spinning");
+          runner.classList.add(isHeads ? "to-blue" : "to-red");
+        }, 80);
+
+        battleResult.textContent =
+          `Sonuç: ${isHeads ? "HEADS" : "TAILS"} • Kazanan: ${match.winner}`;
+        return;
+      }
+
+      setTimeout(() => {
+        const latestMatch = getMatches().find(m => m.id === match.id);
+        if (!latestMatch || latestMatch.status !== "finished") return;
+
+        const isHeads = latestMatch.result === "heads";
+        runnerChip.className = isHeads ? "chip chip-blue" : "chip chip-red";
+        runnerFace.textContent = isHeads ? "H" : "T";
+
+        setTimeout(() => {
+          runner.classList.remove("spinning");
+          runner.classList.add(isHeads ? "to-blue" : "to-red");
+          battleResult.textContent =
+            `Sonuç: ${isHeads ? "HEADS" : "TAILS"} • Kazanan: ${latestMatch.winner}`;
+          subtitle.textContent = "Maç sonucu açıklandı";
+        }, 140);
+      }, 4300);
+    }
+
+    function hideBattle() {
+      document.getElementById("coinflipOverlay").classList.remove("show");
+      activeBattleMatchId = null;
+    }
+
+    function makeChatMessage(name, body) {
+      return {
+        id: makeId("msg"),
+        name,
+        body,
+        time: nowTime()
+      };
+    }
+
+    function sendChat() {
+      const user = getCurrentUser();
+      if (!user) {
+        showToast("Chat için önce giriş yap.");
+        return;
+      }
+
+      const input = document.getElementById("chatInput");
+      const text = input.value.trim();
+      if (!text) return;
+
+      const chat = getChat();
+      chat.push(makeChatMessage(user.username, text));
+      saveChat(chat);
+
+      input.value = "";
+      renderChat();
+    }
+
+    function renderAll() {
+      renderTopbar();
+      renderStats();
+      renderChat();
+      renderMatches();
+      restoreBattleIfNeeded();
+    }
+
+    function renderTopbar() {
+      const user = getCurrentUser();
+      document.getElementById("topUser").textContent = user ? user.username : "Misafir";
+      document.getElementById("topBalance").textContent = user ? formatNumber(user.balance) : "0";
+      document.getElementById("loginBtn").style.display = user ? "none" : "inline-flex";
+      document.getElementById("logoutBtn").style.display = user ? "inline-flex" : "none";
+    }
+
+    function renderStats() {
+      const matches = getMatches();
+      const users = getUsers();
+      const chat = getChat();
+
+      const activeCount = matches.filter(m => m.status === "waiting" || m.status === "rolling").length;
+      document.getElementById("activeMatchCount").textContent = activeCount;
+      document.getElementById("totalUserCount").textContent = Object.keys(users).length;
+      document.getElementById("messageCount").textContent = chat.length;
+    }
+
+    function renderChat() {
+      const wrap = document.getElementById("chatMessages");
+      const chat = getChat();
+
+      wrap.innerHTML = chat.map(msg => `
+        <div class="msg">
+          <div class="head">
+            <span class="name">${escapeHtml(msg.name)}</span>
+            <span class="time">${escapeHtml(msg.time)}</span>
+          </div>
+          <div class="body">${escapeHtml(msg.body)}</div>
+        </div>
+      `).join("");
+
+      wrap.scrollTop = wrap.scrollHeight;
+    }
+
+    function renderMatches() {
+      const list = document.getElementById("matchesList");
+      const matches = getMatches();
+      const current = getCurrentUsername();
+
+      if (!matches.length) {
+        list.innerHTML = `
+          <div class="note">
+            Henüz maç yok. İlk maçı sen oluştur.
+          </div>
+        `;
+        return;
+      }
+
+      list.innerHTML = matches.map(match => {
+        const creatorSideBadge = match.creatorSide === "heads"
+          ? `<span class="badge blue">HEADS</span>`
+          : `<span class="badge red">TAILS</span>`;
+
+        const oppositeSide = match.creatorSide === "heads" ? "tails" : "heads";
+        const oppositeBadge = oppositeSide === "heads"
+          ? `<span class="badge blue">HEADS</span>`
+          : `<span class="badge red">TAILS</span>`;
+
+        const creatorChip = match.creatorSide === "heads"
+          ? `<div class="chip chip-blue"><span>H</span></div>`
+          : `<div class="chip chip-red"><span>T</span></div>`;
+
+        let actions = "";
+
+        if (match.status === "waiting") {
+          if (current && current === match.creator) {
+            actions = `<button class="btn btn-red" onclick="cancelMatch('${match.id}')">Cancel Match</button>`;
+          } else {
+            actions = `<button class="btn btn-blue" onclick="joinMatch('${match.id}')">Join Match</button>`;
+          }
+        } else if (match.status === "rolling") {
+          actions = `<span class="badge gray">Coin dönüyor...</span>`;
+        } else {
+          actions = `
+            <span class="badge gray">Sonuç: ${match.result === "heads" ? "HEADS" : "TAILS"}</span>
+            <span class="badge gray">Kazanan: ${escapeHtml(match.winner || "-")}</span>
+          `;
+        }
+
+        return `
+          <div class="match">
+            <div class="match-left">
+              ${creatorChip}
+              <div class="match-info">
+                <h4>${escapeHtml(match.creator)} vs ${escapeHtml(match.joiner || "Bekleniyor...")}</h4>
+                <p>
+                  Bahis: <strong>${formatNumber(match.amount)}</strong> •
+                  Creator: ${creatorSideBadge}
+                  ${match.joiner ? ` • Joiner: ${oppositeBadge}` : ""}
+                </p>
+              </div>
+            </div>
+            <div class="match-actions">
+              ${actions}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function restoreBattleIfNeeded() {
+      const current = getCurrentUsername();
+      if (!current) {
+        hideBattle();
+        return;
+      }
+
+      const matches = getMatches();
+      const relevant = matches.find(m =>
+        (m.creator === current || m.joiner === current) &&
+        (m.status === "rolling" || (m.status === "finished" && activeBattleMatchId === m.id))
+      );
+
+      if (relevant) {
+        showBattle(relevant);
+      } else {
+        hideBattle();
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    document.getElementById("loginModal").addEventListener("click", (e) => {
+      if (e.target.id === "loginModal") closeLoginModal();
+    });
+
+    document.getElementById("walletModal").addEventListener("click", (e) => {
+      if (e.target.id === "walletModal") closeWalletModal();
+    });
+  </script>
+</body>
+</html>
