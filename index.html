@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ali Beyin Esprileri</title>
+    <title>Canım Annem Sinem</title>
     <style>
-        /* Genel Sayfa Tasarımı */
+        /* Yumuşak ve Sıcak Renk Geçişleri */
         body {
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #1e1e2f, #252542);
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffe3e3, #ffd1d1);
+            color: #4a4a4a;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -21,75 +21,95 @@
             position: relative;
         }
 
+        /* Cam Efektli Ana Kart */
         .container {
             text-align: center;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-            max-width: 600px;
-            width: 90%;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 40px 30px;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(255, 154, 154, 0.3);
+            max-width: 550px;
+            width: 85%;
             z-index: 10;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: scale(1.02);
         }
 
         h1 {
-            color: #ffdf00;
+            color: #ff4d6d;
             font-size: 2.5rem;
-            margin-bottom: 30px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
-
-        .espri-kutusu {
-            background: rgba(0, 0, 0, 0.4);
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 25px;
-            border-left: 5px solid #ff4757;
-        }
-
-        .soru {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: #ff4757;
             margin-bottom: 10px;
+            font-weight: 800;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
         }
 
-        .cevap {
-            font-size: 1.5rem;
-            color: #2ed573;
-            font-weight: bold;
+        .sub-title {
+            font-size: 1.2rem;
+            color: #ff758f;
+            margin-bottom: 30px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
         }
 
-        .random-text {
-            font-style: italic;
-            color: #a4b0be;
-            margin-top: 20px;
+        /* Mektup Alanı */
+        .mektup-kutusu {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 25px;
+            border-radius: 18px;
+            margin-bottom: 20px;
+            border-left: 6px solid #ff4d6d;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+            text-align: left;
+            line-height: 1.6;
+        }
+
+        .mektup-kutusu p {
             font-size: 1.1rem;
-            letter-spacing: 1px;
+            margin: 0 0 12px 0;
+            color: #5c5c5c;
         }
 
-        /* Yukarıdan Düşen Emojilerin Animasyon Ayarları */
-        .emoji {
+        .mektup-kutusu p:last-child {
+            margin-bottom: 0;
+        }
+
+        .imza {
+            text-align: right;
+            font-weight: bold;
+            color: #ff4d6d !important;
+            font-size: 1.25rem !important;
+            margin-top: 20px !important;
+        }
+
+        /* Yukarıdan Pürüzsüzce Düşen Kalpler */
+        .kalp {
             position: absolute;
             top: -50px;
-            font-size: 2rem;
             user-select: none;
             pointer-events: none;
-            animation: dusme linear infinite;
+            animation: kalpHareketi linear infinite;
+            will-change: transform, opacity;
         }
 
-        @keyframes dusme {
+        @keyframes kalpHareketi {
             0% {
-                transform: translateY(0) rotate(0deg);
+                transform: translateY(0) rotate(0deg) scale(0.8);
+                opacity: 0;
+            }
+            10% {
                 opacity: 1;
             }
             90% {
                 opacity: 1;
             }
             100% {
-                transform: translateY(105vh) rotate(360deg);
+                transform: translateY(105vh) rotate(360deg) scale(1.2);
                 opacity: 0;
             }
         }
@@ -98,49 +118,53 @@
 <body>
 
     <div class="container">
-        <h1>Ali Beyin Esprileri</h1>
+        <h1>Canım Annem Sinem</h1>
+        <div class="sub-title">Dünyanın En İyi Annesine Küçük Bir Sürpriz ❤️</div>
         
-        <div class="espri-kutusu">
-            <p class="soru">Espri 1: Kadın otobüste hamile kalmış neden?</p>
-            <p class="cevap">Paso vermiş! 🚌😂</p>
-        </div>
-
-        <div class="random-text">
-            <p>Mikasaaaaaa yambalı bozzey...</p>
+        <div class="mektup-kutusu">
+            <p>Hayatımın en değerli varlığı, canım annem...</p>
+            <p>Seni ne kadar çok sevdiğimi ifade etmeye kelimeler yetmez. İyi ki varsın, iyi ki benim annemsin. Senin sevgin, güler yüzün ve sıcaklığın benim için dünyalara bedel.</p>
+            <p>Her şeyin en güzelini hak eden melek anneme kocaman bir kalp!</p>
+            <p class="imza">Seni Çok Seven Oğlun Demir</p>
         </div>
     </div>
 
-    <!-- Emojileri Yağdıran JavaScript Kodu -->
     <script>
-        const emojiler = ['😂', '🤣', '😆', '😄', '💀', '🎈'];
+        const kalpler = ['❤️', '💖', '💝', '💕', '💗'];
         
-        function emojiOlustur() {
-            const emoji = document.createElement('div');
-            emoji.classList.add('emoji');
+        function kalpOlustur() {
+            const kalp = document.createElement('div');
+            kalp.classList.add('kalp');
             
-            // Rastgele bir emoji seçimi
-            emoji.innerText = emojiler[Math.floor(Math.random() * emojiler.length)];
+            // Havuzdan rastgele bir kalp türü seçiliyor
+            kalp.innerText = kalpler[Math.floor(Math.random() * kalpler.length)];
             
-            // Ekranın rastgele bir yatay konumundan düşmesini sağla
-            emoji.style.left = Math.random() * 100 + 'vw';
+            // Ekran genişliğine göre rastgele yatay pozisyon
+            kalp.style.left = Math.random() * 100 + 'vw';
             
-            // Düşüş hızını pürüzsüzlük için rastgele ayarla (4 ile 8 saniye arası)
-            const sure = Math.random() * 4 + 4;
-            emoji.style.animationDuration = sure + 's';
+            // Çok daha yumuşak ve takılmasız (smooth) akması için süre 5-9 saniye arası
+            const sure = Math.random() * 4 + 5;
+            kalp.style.animationDuration = sure + 's';
             
-            // Emojilerin boyutunu rastgele hafifçe değiştir
-            emoji.style.fontSize = Math.random() * 1.5 + 1.5 + 'rem';
+            // Çeşitlilik için boyutları hafifçe oynatıyoruz
+            kalp.style.fontSize = Math.random() * 1.2 + 1.2 + 'rem';
             
-            document.body.appendChild(emoji);
+            // Derinlik efekti: Bazı kalpler hafif arkada ve flu kalıyor
+            if(Math.random() > 0.6) {
+                kalp.style.filter = 'blur(1px)';
+                kalp.style.opacity = '0.6';
+            }
             
-            // Ekranın altına ulaşan emojileri sil (hafızayı şişirmesin)
+            document.body.appendChild(kalp);
+            
+            // Performans için aşağı düşen kalbi DOM'dan tamamen siliyoruz
             setTimeout(() => {
-                emoji.remove();
+                kalp.remove();
             }, sure * 1000);
         }
 
-        // Her 300 milisaniyede bir yeni emoji yukarıdan düşmeye başlar
-        setInterval(emojiOlustur, 300);
+        // Her 350 milisaniyede bir yeni kalp süzülmeye başlar
+        setInterval(kalpOlustur, 350);
     </script>
 
 </body>
