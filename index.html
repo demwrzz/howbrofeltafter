@@ -16,7 +16,7 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between font-sans selection:bg-amber-500 selection:text-slate-950">
 
-    <!-- Bakım Modu Ekranı -->
+    <!-- Bakım Modu Ekranı (Sadece prodedok haricindekilere görünür) -->
     <div id="maintenance-screen" class="hidden fixed inset-0 z-[9999] bg-slate-950 flex flex-col items-center justify-center p-6 text-center space-y-4">
         <div class="text-6xl animate-bounce">🛠️</div>
         <h1 class="text-2xl sm:text-3xl font-black text-amber-400">Şuan Dedok Siteyle İlgili Bazı Şeyleri Güncelliyor Lütfen Bekleyin</h1>
@@ -64,7 +64,7 @@
                 <div class="space-y-1">
                     <span class="bg-amber-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">Yeni Çıktı!</span>
                     <h3 class="text-base font-bold text-slate-100 group-hover:text-amber-400 transition">Yeni çıkan oyunumuzu denemek ister misiniz yeğen? 🎮</h3>
-                    <p class="text-xs text-slate-400">Flappy Yeğen oyna, skorunu yap ve haftalık liderlik tablosunda zirveye yerleş!</p>
+                    <p class="text-xs text-slate-400">Flappy Yeğen oyna, skorunu yap ve liderlik tablosunda zirveye yerleş!</p>
                 </div>
                 <span class="text-2xl group-hover:translate-x-1 transition">🕹️</span>
             </div>
@@ -76,19 +76,27 @@
             </div>
         </section>
 
-        <!-- Admin Panel Section -->
+        <!-- Admin Panel Section (Sadece prodedok için) -->
         <section id="section-admin" class="page-transition hidden max-w-2xl mx-auto bg-slate-800/90 backdrop-blur-md p-8 rounded-3xl border border-slate-700/60 shadow-2xl mt-6 space-y-6">
             <div class="flex justify-between items-center border-b border-slate-700/60 pb-4">
                 <h2 class="text-xl font-bold text-amber-400 flex items-center gap-2">👑 Prodedok Admin Paneli</h2>
                 <button onclick="showSection('home')" class="px-3 py-1.5 text-xs bg-slate-700 hover:bg-slate-600 rounded-xl transition text-slate-300">Geri Dön</button>
             </div>
+
             <div class="space-y-4">
                 <div class="bg-slate-900/60 p-5 rounded-2xl border border-slate-700/50 space-y-3">
                     <h3 class="text-sm font-bold text-slate-200">Bakım Modu Kontrolü</h3>
+                    <p class="text-xs text-slate-400">Aşağıdaki butona basarak veya komut girerek bakım modunu açıp kapatabilirsin.</p>
                     <div class="flex gap-3">
                         <button onclick="toggleMaintenance(true)" class="px-4 py-2.5 bg-rose-500/20 text-rose-400 border border-rose-500/30 hover:bg-rose-500/30 font-bold text-xs rounded-xl transition">🛠️ Bakımı Aç (.bakım)</button>
                         <button onclick="toggleMaintenance(false)" class="px-4 py-2.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 font-bold text-xs rounded-xl transition">✅ Bakımı Kapat (.unbakım)</button>
                     </div>
+                </div>
+
+                <div class="bg-slate-900/60 p-5 rounded-2xl border border-slate-700/50 space-y-3">
+                    <h3 class="text-sm font-bold text-slate-200">Hızlı Komut Satırı</h3>
+                    <input type="text" id="admin-command-input" placeholder=".bakım veya .unbakım yaz..." class="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-amber-500">
+                    <button onclick="handleAdminCommand()" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl transition">Komutu Uygula</button>
                 </div>
             </div>
         </section>
@@ -109,11 +117,11 @@
                 </div>
             </div>
 
-            <!-- Leaderboard (Haftalık Sıralama) -->
+            <!-- Leaderboard (Tüm Zamanların Sıralaması) -->
             <div class="space-y-3 text-left bg-slate-900/60 p-4 rounded-2xl border border-slate-700/50">
                 <div class="flex justify-between items-center">
-                    <h3 class="text-sm font-bold text-amber-400 flex items-center gap-1.5">🏆 Haftalık Liderlik Tablosu</h3>
-                    <span class="text-[10px] text-slate-400 bg-slate-800 px-2 py-1 rounded-lg">Her Pazartesi Sıfırlanır</span>
+                    <h3 class="text-sm font-bold text-amber-400 flex items-center gap-1.5">🏆 Tüm Zamanların Liderlik Tablosu</h3>
+                    <span class="text-[10px] text-slate-400 bg-slate-800 px-2 py-1 rounded-lg">Hiç Sıfırlanmaz</span>
                 </div>
                 <div id="leaderboard-container" class="space-y-2 max-h-48 overflow-y-auto pr-1">
                     <div class="text-center text-xs text-slate-500 py-4">Skorlar yükleniyor...</div>
@@ -122,8 +130,8 @@
         </section>
 
         <!-- Login Section -->
-        <section id="section-login" class="page-transition hidden max-w-md mx-auto bg-slate-800/80 backdrop-blur-md p-8 rounded-3xl border border-slate-700/60 shadow-2xl mt-6 space-y-4">
-            <h2 class="text-2xl font-bold mb-2 text-center text-amber-400">Tekrar Hoşgeldin Yeğen!</h2>
+        <section id="section-login" class="page-transition hidden max-w-md mx-auto bg-slate-800/80 backdrop-blur-md p-8 rounded-3xl border border-slate-700/60 shadow-2xl mt-6">
+            <h2 class="text-2xl font-bold mb-6 text-center text-amber-400">Tekrar Hoşgeldin Yeğen!</h2>
             <form onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Kullanıcı Adı</label>
@@ -133,59 +141,26 @@
                     <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Şifre</label>
                     <input type="password" id="login-password" required class="w-full px-4 py-3 bg-slate-900/80 border border-slate-700 rounded-xl focus:outline-none focus:border-amber-500 text-slate-100 text-sm transition">
                 </div>
-                <div class="flex justify-between items-center text-xs">
-                    <a href="#" onclick="showSection('forgot')" class="text-amber-400 hover:underline">Şifremi Unuttum?</a>
-                </div>
-                <button type="submit" class="w-full py-3.5 bg-amber-500 hover:bg-amber-400 active:scale-[0.98] text-slate-950 font-bold rounded-xl transition shadow-lg">Giriş Yap</button>
+                <button type="submit" class="w-full py-3.5 bg-amber-500 hover:bg-amber-400 active:scale-[0.98] text-slate-950 font-bold rounded-xl transition shadow-lg shadow-amber-500/20 mt-2">Giriş Yap</button>
             </form>
-
-            <div class="relative flex py-2 items-center">
-                <div class="flex-grow border-t border-slate-700"></div>
-                <span class="flex-shrink mx-4 text-xs text-slate-500 uppercase">veya</span>
-                <div class="flex-grow border-t border-slate-700"></div>
-            </div>
-
-            <!-- Google Auth Button -->
-            <button onclick="handleGoogleLogin()" class="w-full py-3 bg-slate-700/80 hover:bg-slate-700 active:scale-[0.98] text-slate-200 font-bold text-xs rounded-xl transition border border-slate-600 flex items-center justify-center gap-2 shadow-md">
-                <span>🌐 Google ile Giriş Yap</span>
-            </button>
-
-            <p class="text-center text-sm text-slate-400 mt-4">Hesabın yok mu? <a href="#" onclick="showSection('register')" class="text-amber-400 hover:underline font-semibold">Kayıt Ol</a></p>
-        </section>
-
-        <!-- Forgot Password Section -->
-        <section id="section-forgot" class="page-transition hidden max-w-md mx-auto bg-slate-800/80 backdrop-blur-md p-8 rounded-3xl border border-slate-700/60 shadow-2xl mt-6 space-y-4">
-            <h2 class="text-2xl font-bold mb-2 text-center text-amber-400">Şifre Kurtarma</h2>
-            <p class="text-xs text-slate-400 text-center">Kayıtlı e-posta adresine şifre sıfırlama bağlantısı gönderilir.</p>
-            <form onsubmit="handleForgotPassword(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">E-posta Adresin</label>
-                    <input type="email" id="forgot-email" required placeholder="ornek@gmail.com" class="w-full px-4 py-3 bg-slate-900/80 border border-slate-700 rounded-xl focus:outline-none focus:border-amber-500 text-slate-100 text-sm transition">
-                </div>
-                <button type="submit" class="w-full py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl transition shadow-lg">Sıfırlama Bağlantısı Gönder</button>
-            </form>
-            <p class="text-center text-sm text-slate-400 mt-4"><a href="#" onclick="showSection('login')" class="text-amber-400 hover:underline font-semibold">Giriş Ekranına Dön</a></p>
+            <p class="text-center text-sm text-slate-400 mt-6">Hesabın yok mu? <a href="#" onclick="showSection('register')" class="text-amber-400 hover:underline font-semibold">Kayıt Ol</a></p>
         </section>
 
         <!-- Register Section -->
-        <section id="section-register" class="page-transition hidden max-w-md mx-auto bg-slate-800/80 backdrop-blur-md p-8 rounded-3xl border border-slate-700/60 shadow-2xl mt-6 space-y-4">
-            <h2 class="text-2xl font-bold mb-2 text-center text-amber-400">Aramıza Katıl Yeğen</h2>
+        <section id="section-register" class="page-transition hidden max-w-md mx-auto bg-slate-800/80 backdrop-blur-md p-8 rounded-3xl border border-slate-700/60 shadow-2xl mt-6">
+            <h2 class="text-2xl font-bold mb-6 text-center text-amber-400">Aramıza Katıl Yeğen</h2>
             <form onsubmit="handleRegister(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Kullanıcı Adı</label>
                     <input type="text" id="register-username" required class="w-full px-4 py-3 bg-slate-900/80 border border-slate-700 rounded-xl focus:outline-none focus:border-amber-500 text-slate-100 text-sm transition">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">E-posta</label>
-                    <input type="email" id="register-email" required class="w-full px-4 py-3 bg-slate-900/80 border border-slate-700 rounded-xl focus:outline-none focus:border-amber-500 text-slate-100 text-sm transition">
-                </div>
-                <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Şifre</label>
                     <input type="password" id="register-password" required class="w-full px-4 py-3 bg-slate-900/80 border border-slate-700 rounded-xl focus:outline-none focus:border-amber-500 text-slate-100 text-sm transition">
                 </div>
-                <button type="submit" class="w-full py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl transition shadow-lg">Kayıt Ol</button>
+                <button type="submit" class="w-full py-3.5 bg-amber-500 hover:bg-amber-400 active:scale-[0.98] text-slate-950 font-bold rounded-xl transition shadow-lg shadow-amber-500/20 mt-2">Kayıt Ol</button>
             </form>
-            <p class="text-center text-sm text-slate-400 mt-4">Zaten hesabın var mı? <a href="#" onclick="showSection('login')" class="text-amber-400 hover:underline font-semibold">Giriş Yap</a></p>
+            <p class="text-center text-sm text-slate-400 mt-6">Zaten hesabın var mı? <a href="#" onclick="showSection('login')" class="text-amber-400 hover:underline font-semibold">Giriş Yap</a></p>
         </section>
 
         <!-- Profile Section -->
@@ -197,13 +172,17 @@
                     <p class="text-xs text-slate-400 mt-0.5">Yeğenler Üyesi</p>
                 </div>
             </div>
+
+            <!-- Cihazdan Profil Fotoğrafı Yükleme Formu -->
             <form onsubmit="handleUpdateAvatar(event)" class="space-y-3">
                 <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Cihazdan Profil Fotoğrafı Seç</label>
                 <div class="flex flex-col gap-3">
                     <input type="file" id="profile-image-file" accept="image/*" class="w-full text-xs text-slate-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-amber-500/10 file:text-amber-400 hover:file:bg-amber-500/20 file:cursor-pointer bg-slate-900/80 border border-slate-700 rounded-xl p-2">
-                    <button type="submit" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm rounded-xl transition shadow-md">Fotoğrafı Güncelle</button>
+                    <button type="submit" class="w-full py-3 bg-amber-500 hover:bg-amber-400 active:scale-[0.98] text-slate-950 font-bold text-sm rounded-xl transition shadow-md">Fotoğrafı Güncelle</button>
                 </div>
             </form>
+
+            <!-- İstatistikler -->
             <div class="grid grid-cols-2 gap-4 pt-2">
                 <div class="bg-slate-900/60 border border-slate-700/50 p-4 rounded-2xl text-center">
                     <span class="block text-xs text-slate-400 uppercase tracking-wider font-semibold">Paylaştığın Espriler</span>
@@ -214,7 +193,8 @@
                     <span id="stat-total-likes" class="text-2xl font-black text-emerald-400 mt-1 block">0</span>
                 </div>
             </div>
-            <button onclick="showSection('home')" class="w-full py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-xl transition text-sm">Geri Dön</button>
+
+            <button onclick="showSection('home')" class="w-full py-3 bg-slate-700 hover:bg-slate-600 active:scale-[0.98] text-slate-200 font-bold rounded-xl transition text-sm">Geri Dön</button>
         </section>
 
         <!-- Post Joke Section -->
@@ -226,20 +206,27 @@
                     <textarea id="joke-content" rows="4" required placeholder="Esprini buraya yaz yeğen..." class="w-full px-4 py-3 bg-slate-900/80 border border-slate-700 rounded-xl focus:outline-none focus:border-amber-500 text-slate-100 text-sm transition resize-none"></textarea>
                 </div>
                 <div class="flex gap-3 pt-2">
-                    <button type="button" onclick="showSection('home')" class="w-1/2 py-3.5 bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold rounded-xl transition">İptal</button>
-                    <button type="submit" class="w-1/2 py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl transition shadow-lg">Paylaş</button>
+                    <button type="button" onclick="showSection('home')" class="w-1/2 py-3.5 bg-slate-700 hover:bg-slate-600 active:scale-[0.98] text-slate-300 font-bold rounded-xl transition">İptal</button>
+                    <button type="submit" class="w-1/2 py-3.5 bg-amber-500 hover:bg-amber-400 active:scale-[0.98] text-slate-950 font-bold rounded-xl transition shadow-lg shadow-amber-500/20">Paylaş</button>
                 </div>
             </form>
         </section>
 
+        <!-- Update Log Section -->
         <section class="mt-12 bg-slate-800/40 border border-slate-700/40 rounded-2xl p-5 text-xs text-slate-400 space-y-2">
-            <h3 class="font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">🛠️ Update Log</h3>
+            <h3 class="font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                🛠️ Update Log (Güncelleme Notları)
+            </h3>
             <ul class="list-disc list-inside space-y-1 text-slate-400">
-                <li><strong class="text-slate-300">v1.7.1:</strong> Veriler korunarak Google Auth, şifre kurtarma ve haftalık sıralama düzeltmeleri entegre edildi.</li>
+                <li><strong class="text-slate-300">v1.6.0:</strong> `prodedok` admin paneli, `.bakım` / `.unbakım` modu, kullanıcı silme/yasaklama ve kalıcı liderlik tablosu eklendi.</li>
+                <li><strong class="text-slate-300">v1.5.1:</strong> Flappy Yeğen oyunu daha kolay oynanabilir hale getirildi ve liderlik tablosundaki 1. kişinin avatarı kuş yapıldı.</li>
+                <li><strong class="text-slate-300">v1.4.0:</strong> Site tamamen "Yeğenler" konseptine uyarlandı.</li>
             </ul>
         </section>
+
     </main>
 
+    <!-- Footer -->
     <footer class="bg-slate-800/40 border-t border-slate-800 py-4 text-center text-xs text-slate-500 mt-6">
         &copy; 2026 Yeğenler - Tüm Hakları Saklıdır.
     </footer>
@@ -258,53 +245,9 @@
             checkMaintenanceMode();
             updateAuthUI();
             fetchJokes();
-            handleAuthRedirect();
         });
 
-        async function handleAuthRedirect() {
-            const { data: { session } } = await db.auth.getSession();
-            if (session && session.user) {
-                const email = session.user.email;
-                const username = email.split('@')[0];
-                
-                let { data: existingUser } = await db.from('users').select('*').eq('username', username).single();
-                if (!existingUser) {
-                    const { data: newUser } = await db.from('users').insert([{
-                        username: username,
-                        password: 'google_oauth_user',
-                        is_admin: username.toLowerCase() === 'prodedok',
-                        avatar_url: session.user.user_metadata.avatar_url || ''
-                    }]).select().single();
-                    currentUser = newUser;
-                } else {
-                    currentUser = existingUser;
-                }
-                localStorage.setItem('jp_user', JSON.stringify(currentUser));
-                updateAuthUI();
-            }
-        }
-
-        async function handleGoogleLogin() {
-            const { error } = await db.auth.signInWithOAuth({
-                provider: 'google',
-                options: { redirectTo: window.location.origin + window.location.pathname }
-            });
-            if (error) alert('Google ile giriş hatası: ' + error.message);
-        }
-
-        async function handleForgotPassword(event) {
-            event.preventDefault();
-            const email = document.getElementById('forgot-email').value.trim();
-            const { error } = await db.auth.resetPasswordForEmail(email, {
-                redirectTo: window.location.origin + window.location.pathname,
-            });
-            if (error) alert('Hata: ' + error.message);
-            else {
-                alert('Şifre sıfırlama bağlantısı e-posta adresine gönderildi yeğen!');
-                showSection('login');
-            }
-        }
-
+        // Bakım modu kontrolü (prodedok hariç herkesi kilitler)
         async function checkMaintenanceMode() {
             try {
                 const { data } = await db.from('site_settings').select('*').eq('key', 'maintenance_mode').single();
@@ -318,30 +261,59 @@
                 } else {
                     document.getElementById('maintenance-screen').classList.add('hidden');
                 }
-            } catch (err) { console.error(err); }
+            } catch (err) {
+                console.error(err);
+            }
         }
 
         async function toggleMaintenance(status) {
-            if (!currentUser || currentUser.username.toLowerCase() !== 'prodedok') return;
-            await db.from('site_settings').update({ value: status ? 'true' : 'false' }).eq('key', 'maintenance_mode');
-            alert(status ? 'Bakım modu açıldı!' : 'Bakım modu kapatıldı!');
-            checkMaintenanceMode();
+            if (!currentUser || currentUser.username.toLowerCase() !== 'prodedok') {
+                alert('Bu işlem için yetkin yok yeğen!');
+                return;
+            }
+
+            try {
+                const { error } = await db.from('site_settings').update({ value: status ? 'true' : 'false' }).eq('key', 'maintenance_mode');
+                if (error) throw error;
+                alert(status ? 'Bakım modu açıldı! (.bakım)' : 'Bakım modu kapatıldı! (.unbakım)');
+                checkMaintenanceMode();
+            } catch (err) {
+                alert('Hata oluştu: ' + err.message);
+            }
+        }
+
+        function handleAdminCommand() {
+            const val = document.getElementById('admin-command-input').value.trim().toLowerCase();
+            if (val === '.bakım') {
+                toggleMaintenance(true);
+            } else if (val === '.unbakım') {
+                toggleMaintenance(false);
+            } else {
+                alert('Geçersiz komut yeğen! .bakım veya .unbakım yaz.');
+            }
+            document.getElementById('admin-command-input').value = '';
         }
 
         function showSection(sectionId) {
-            ['home', 'login', 'register', 'post', 'profile', 'flappy', 'admin', 'forgot'].forEach(id => {
+            ['home', 'login', 'register', 'post', 'profile', 'flappy', 'admin'].forEach(id => {
                 const el = document.getElementById(`section-${id}`);
                 if (el) {
                     if (id === sectionId) {
                         el.classList.remove('hidden');
                         el.style.opacity = '0';
                         setTimeout(() => el.style.opacity = '1', 10);
-                    } else { el.classList.add('hidden'); }
+                    } else {
+                        el.classList.add('hidden');
+                    }
                 }
             });
-            if (sectionId === 'home') fetchJokes();
-            else if (sectionId === 'profile') loadProfileStats();
-            else if (sectionId === 'flappy') fetchLeaderboard();
+            if (sectionId === 'home') {
+                fetchJokes();
+            } else if (sectionId === 'profile') {
+                loadProfileStats();
+            } else if (sectionId === 'flappy') {
+                fetchLeaderboard();
+            }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -353,16 +325,30 @@
             const navAdminBtn = document.getElementById('nav-admin-btn');
 
             if (currentUser && currentUser.username) {
+                const { data } = await db.from('users').select('*').eq('username', currentUser.username).single();
+                if (data) {
+                    currentUser = data;
+                    localStorage.setItem('jp_user', JSON.stringify(currentUser));
+                }
+
                 navAuth.classList.add('hidden');
                 navUser.classList.remove('hidden');
+                
                 const isProdedok = currentUser.username.toLowerCase() === 'prodedok';
-                displayName.textContent = `${currentUser.username} ${isProdedok ? '👑' : ''}`;
-                if (isProdedok) navAdminBtn.classList.remove('hidden');
-                else navAdminBtn.classList.add('hidden');
+                const isAdmin = isProdedok || currentUser.is_admin;
+                displayName.textContent = `${currentUser.username} ${isAdmin ? '👑' : ''}`;
+
+                if (isProdedok) {
+                    navAdminBtn.classList.remove('hidden');
+                } else {
+                    navAdminBtn.classList.add('hidden');
+                }
 
                 if (currentUser.avatar_url && currentUser.avatar_url.trim() !== '') {
                     navAvatar.innerHTML = `<img src="${currentUser.avatar_url}" class="w-full h-full object-cover">`;
-                } else { navAvatar.innerHTML = '👤'; }
+                } else {
+                    navAvatar.innerHTML = '👤';
+                }
             } else {
                 navAuth.classList.remove('hidden');
                 navUser.classList.add('hidden');
@@ -372,7 +358,6 @@
 
         function logout() {
             localStorage.removeItem('jp_user');
-            db.auth.signOut();
             currentUser = null;
             updateAuthUI();
             showSection('home');
@@ -382,68 +367,109 @@
             event.preventDefault();
             const username = document.getElementById('register-username').value.trim();
             const password = document.getElementById('register-password').value.trim();
-            const isAdmin = username.toLowerCase() === 'prodedok';
+            const isAdmin = username.toLowerCase() === 'prodedok' || username.toLowerCase() === 'dedokxxreal';
 
             try {
-                const { error } = await db.from('users').insert([{ username, password, is_admin: isAdmin, avatar_url: '' }]);
+                const { error } = await db
+                    .from('users')
+                    .insert([{ username, password, is_admin: isAdmin, avatar_url: '' }]);
+
                 if (error) throw error;
+
                 alert('Kayıt başarılı yeğen! Şimdi giriş yapabilirsin.');
                 showSection('login');
-            } catch (err) { alert('Kayıt olurken hata: ' + err.message); }
+            } catch (err) {
+                alert('Kayıt olurken hata oluştu: ' + (err.message || 'Bilinmeyen hata'));
+            }
         }
 
         async function handleLogin(event) {
             event.preventDefault();
-            const identifier = document.getElementById('login-username').value.trim();
+            const username = document.getElementById('login-username').value.trim();
             const password = document.getElementById('login-password').value.trim();
 
             try {
-                const { data, error } = await db.from('users').select('*').eq('username', identifier).eq('password', password).single();
+                const { data, error } = await db
+                    .from('users')
+                    .select('*')
+                    .eq('username', username)
+                    .eq('password', password)
+                    .single();
+
                 if (error || !data) {
                     alert('Geçersiz kullanıcı adı veya şifre!');
                     return;
                 }
+
                 currentUser = data;
                 localStorage.setItem('jp_user', JSON.stringify(currentUser));
                 updateAuthUI();
                 showSection('home');
-            } catch (err) { alert('Giriş yapılırken hata oluştu.'); }
+            } catch (err) {
+                alert('Giriş yapılırken hata oluştu.');
+            }
         }
 
         async function handleUpdateAvatar(event) {
             event.preventDefault();
             if (!currentUser || !currentUser.username) return;
-            const fileInput = document.getElementById('profile-image-file');
-            if (fileInput.files.length === 0) return;
 
+            const fileInput = document.getElementById('profile-image-file');
+            if (fileInput.files.length === 0) {
+                alert('Lütfen bir fotoğraf seç yeğen!');
+                return;
+            }
+
+            const file = fileInput.files[0];
             const reader = new FileReader();
+
             reader.onload = async function(e) {
                 const base64Image = e.target.result;
-                await db.from('users').update({ avatar_url: base64Image }).eq('username', currentUser.username);
-                currentUser.avatar_url = base64Image;
-                localStorage.setItem('jp_user', JSON.stringify(currentUser));
-                updateAuthUI();
-                loadProfileStats();
-                alert('Profil fotoğrafın güncellendi!');
+                try {
+                    const { error } = await db.from('users').update({ avatar_url: base64Image }).eq('username', currentUser.username);
+                    if (error) throw error;
+                    currentUser.avatar_url = base64Image;
+                    localStorage.setItem('jp_user', JSON.stringify(currentUser));
+                    updateAuthUI();
+                    loadProfileStats();
+                    alert('Profil fotoğrafın başarıyla güncellendi!');
+                } catch (err) {
+                    alert('Güncellenirken hata oluştu: ' + err.message);
+                }
             };
-            reader.readAsDataURL(fileInput.files[0]);
+            reader.readAsDataURL(file);
         }
 
         async function loadProfileStats() {
             if (!currentUser || !currentUser.username) return;
-            document.getElementById('profile-username').innerHTML = `${escapeHTML(currentUser.username)} ${currentUser.username.toLowerCase() === 'prodedok' ? '👑' : ''}`;
-            const avatarBox = document.getElementById('profile-avatar-box');
-            if (currentUser.avatar_url) avatarBox.innerHTML = `<img src="${currentUser.avatar_url}" class="w-full h-full object-cover">`;
+            const isProdedok = currentUser.username.toLowerCase() === 'prodedok';
+            document.getElementById('profile-username').innerHTML = `${escapeHTML(currentUser.username)} ${isProdedok ? '👑' : ''}`;
             
-            const { data: jokes } = await db.from('jokes').select('*').eq('username', currentUser.username);
-            if (jokes) {
-                document.getElementById('stat-joke-count').textContent = jokes.length;
-                document.getElementById('stat-total-likes').textContent = jokes.reduce((acc, j) => acc + (j.likes || 0), 0);
+            const avatarBox = document.getElementById('profile-avatar-box');
+            if (currentUser.avatar_url && currentUser.avatar_url.trim() !== '') {
+                avatarBox.innerHTML = `<img src="${currentUser.avatar_url}" class="w-full h-full object-cover">`;
+            } else {
+                avatarBox.innerHTML = '👤';
+            }
+
+            try {
+                const { data: jokes } = await db.from('jokes').select('*').eq('username', currentUser.username);
+                if (jokes) {
+                    document.getElementById('stat-joke-count').textContent = jokes.length;
+                    const totalLikes = jokes.reduce((acc, j) => acc + (j.likes || 0), 0);
+                    document.getElementById('stat-total-likes').textContent = totalLikes;
+                }
+            } catch (err) {
+                console.error(err);
             }
         }
 
         function checkAuthAndOpenPost() {
-            if (!currentUser) { alert('Giriş yapmalısın yeğen!'); showSection('login'); return; }
+            if (!currentUser) {
+                alert('Espri paylaşmak için önce giriş yapmalısın yeğen!');
+                showSection('login');
+                return;
+            }
             showSection('post');
         }
 
@@ -451,113 +477,228 @@
             event.preventDefault();
             if (!currentUser) return;
             const content = document.getElementById('joke-content').value.trim();
-            await db.from('jokes').insert([{ content, username: currentUser.username, likes: 0, dislikes: 0, liked_by: [], disliked_by: [] }]);
-            document.getElementById('joke-content').value = '';
-            showSection('home');
+
+            try {
+                const { error } = await db.from('jokes').insert([{ 
+                    content, 
+                    user_id: currentUser.id || null, 
+                    username: currentUser.username, 
+                    likes: 0, 
+                    dislikes: 0,
+                    liked_by: [],
+                    disliked_by: []
+                }]);
+                if (error) throw error;
+                document.getElementById('joke-content').value = '';
+                showSection('home');
+            } catch (err) {
+                alert('Espri paylaşılamadı: ' + (err.message || 'Bilinmeyen hata'));
+            }
         }
 
         async function voteJoke(jokeId, type) {
-            if (!currentUser) { showSection('login'); return; }
-            const { data: joke } = await db.from('jokes').select('*').eq('id', jokeId).single();
-            if (!joke) return;
-
-            let likedBy = joke.liked_by || [];
-            let dislikedBy = joke.disliked_by || [];
-            let likes = joke.likes || 0;
-            let dislikes = joke.dislikes || 0;
-            const uname = currentUser.username;
-
-            if (type === 'like') {
-                if (likedBy.includes(uname)) return;
-                if (dislikedBy.includes(uname)) { dislikedBy = dislikedBy.filter(u => u !== uname); dislikes--; }
-                likedBy.push(uname); likes++;
-            } else {
-                if (dislikedBy.includes(uname)) return;
-                if (likedBy.includes(uname)) { likedBy = likedBy.filter(u => u !== uname); likes--; }
-                dislikedBy.push(uname); dislikes++;
+            if (!currentUser) {
+                alert('Oy vermek için giriş yapmalısın yeğen!');
+                showSection('login');
+                return;
             }
-            await db.from('jokes').update({ likes, dislikes, liked_by: likedBy, disliked_by: dislikedBy }).eq('id', jokeId);
-            fetchJokes();
+
+            try {
+                const { data: joke, error: fetchErr } = await db.from('jokes').select('*').eq('id', jokeId).single();
+                if (fetchErr || !joke) throw fetchErr;
+
+                let likedBy = joke.liked_by || [];
+                let dislikedBy = joke.disliked_by || [];
+                let likes = joke.likes || 0;
+                let dislikes = joke.dislikes || 0;
+                const username = currentUser.username;
+
+                if (type === 'like') {
+                    if (likedBy.includes(username)) { alert('Bu espriyi zaten beğendin!'); return; }
+                    if (dislikedBy.includes(username)) { dislikedBy = dislikedBy.filter(u => u !== username); dislikes = Math.max(0, dislikes - 1); }
+                    likedBy.push(username); likes += 1;
+                } else {
+                    if (dislikedBy.includes(username)) { alert('Bu espriye zaten dislike attın!'); return; }
+                    if (likedBy.includes(username)) { likedBy = likedBy.filter(u => u !== username); likes = Math.max(0, likes - 1); }
+                    dislikedBy.push(username); dislikes += 1;
+                }
+
+                const { error: updateErr } = await db.from('jokes').update({ likes, dislikes, liked_by: likedBy, disliked_by: dislikedBy }).eq('id', jokeId);
+                if (updateErr) throw updateErr;
+                fetchJokes();
+            } catch (err) {
+                alert('İşlem başarısız oldu: ' + (err.message || 'Bilinmeyen hata'));
+            }
         }
 
         async function deleteJoke(jokeId) {
-            if (!currentUser || currentUser.username.toLowerCase() !== 'prodedok') return;
-            if (!confirm('Silmek istediğine emin misin?')) return;
-            await db.from('jokes').delete().eq('id', jokeId);
-            fetchJokes();
+            if (!currentUser) return;
+            const isProdedok = currentUser.username.toLowerCase() === 'prodedok';
+            if (!isProdedok) {
+                alert('Bu işlem için yetkin yok yeğen!');
+                return;
+            }
+            if (!confirm('Bu espriyi silmek istediğine emin misin?')) return;
+
+            try {
+                const { error } = await db.from('jokes').delete().eq('id', jokeId);
+                if (error) throw error;
+                fetchJokes();
+            } catch (err) {
+                alert('Silinirken hata oluştu: ' + err.message);
+            }
+        }
+
+        async function banUser(targetUsername) {
+            if (!currentUser || currentUser.username.toLowerCase() !== 'prodedok') {
+                alert('Yetkin yok yeğen!');
+                return;
+            }
+            if (targetUsername.toLowerCase() === 'prodedok') {
+                alert('Kendini sistemden silemezsin!');
+                return;
+            }
+            if (!confirm(`@${targetUsername} kullanıcısını sistemden silmek ve yasaklamak istediğine emin misin?`)) return;
+
+            try {
+                await db.from('users').delete().eq('username', targetUsername);
+                await db.from('jokes').delete().eq('username', targetUsername);
+                alert(`@${targetUsername} sistemden silindi.`);
+                fetchJokes();
+            } catch (err) {
+                alert('İşlem başarısız: ' + err.message);
+            }
         }
 
         async function fetchJokes() {
             const container = document.getElementById('jokes-container');
-            const { data: usersData } = await db.from('users').select('username, avatar_url');
-            const avatarMap = {};
-            if (usersData) usersData.forEach(u => avatarMap[u.username] = u.avatar_url);
+            container.innerHTML = `
+                <div class="flex justify-center items-center py-12">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
+                </div>
+            `;
 
-            const { data } = await db.from('jokes').select('*').order('created_at', { ascending: false });
-            if (!data || data.length === 0) {
-                container.innerHTML = '<div class="text-center text-slate-500 py-12">Henüz espri yok yeğen. İlk sen ol! ✨</div>';
-                return;
+            try {
+                const { data: usersData } = await db.from('users').select('username, avatar_url');
+                const avatarMap = {};
+                if (usersData) {
+                    usersData.forEach(u => { avatarMap[u.username] = u.avatar_url; });
+                }
+
+                const { data, error } = await db.from('jokes').select('*').order('created_at', { ascending: false });
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<div class="text-center text-slate-500 py-12 bg-slate-800/30 rounded-2xl border border-slate-800">Henüz hiç espri paylaşılmamış yeğen. İlk sen ol! ✨</div>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                data.forEach(joke => {
+                    const card = document.createElement('div');
+                    card.className = 'bg-slate-800/70 hover:bg-slate-800 transition p-5 rounded-2xl border border-slate-700/60 shadow-lg space-y-3';
+                    
+                    const username = joke.username || 'Anonim';
+                    const isProdedokAdmin = username.toLowerCase() === 'prodedok';
+                    const likes = joke.likes || 0;
+                    const dislikes = joke.dislikes || 0;
+                    const likedByList = joke.liked_by || [];
+                    const userAvatar = avatarMap[username];
+
+                    let avatarHtml = `<div class="w-7 h-7 rounded-lg bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-xs overflow-hidden">👤</div>`;
+                    if (userAvatar && userAvatar.trim() !== '') {
+                        avatarHtml = `<div class="w-7 h-7 rounded-lg overflow-hidden border border-amber-500/30"><img src="${userAvatar}" class="w-full h-full object-cover"></div>`;
+                    }
+
+                    let likedByText = '';
+                    if (likedByList.length > 0) {
+                        likedByText = `<div class="text-[11px] text-slate-400 pt-1">👍 Beğenenler: <span class="text-slate-300 font-medium">${escapeHTML(likedByList.join(', '))}</span></div>`;
+                    }
+
+                    const isCurrentProdedok = currentUser && currentUser.username.toLowerCase() === 'prodedok';
+                    let adminButtonsHtml = '';
+                    if (isCurrentProdedok) {
+                        adminButtonsHtml = `
+                            <button onclick="deleteJoke('${joke.id}')" class="text-rose-400 hover:text-rose-300 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-lg text-xs transition ml-2">🗑️ Sil</button>
+                            <button onclick="banUser('${escapeHTML(username)}')" class="text-rose-400 hover:text-rose-300 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-lg text-xs transition ml-1">🚫 Yasakla</button>
+                        `;
+                    }
+
+                    card.innerHTML = `
+                        <p class="text-slate-100 text-base whitespace-pre-wrap leading-relaxed">${escapeHTML(joke.content)}</p>
+                        ${likedByText}
+                        <div class="flex justify-between items-center text-xs text-slate-400 pt-3 border-t border-slate-700/40">
+                            <div class="flex items-center gap-2">
+                                ${avatarHtml}
+                                <span class="font-semibold text-amber-400 flex items-center gap-1">@${escapeHTML(username)} ${isProdedokAdmin ? '👑' : ''}</span>
+                                ${adminButtonsHtml}
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <button onclick="voteJoke('${joke.id}', 'like')" class="flex items-center gap-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-lg transition active:scale-95 font-medium">
+                                    👍 <span>${likes}</span>
+                                </button>
+                                <button onclick="voteJoke('${joke.id}', 'dislike')" class="flex items-center gap-1 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 px-2.5 py-1 rounded-lg transition active:scale-95 font-medium">
+                                    👎 <span>${dislikes}</span>
+                                </button>
+                                <span class="text-slate-500 hidden sm:inline">${new Date(joke.created_at).toLocaleDateString('tr-TR')} ${new Date(joke.created_at).toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'})}</span>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (err) {
+                container.innerHTML = '<div class="text-center text-rose-400 py-12 bg-slate-800/30 rounded-2xl border border-rose-500/10">Espriler yüklenirken bir hata oluştu yeğen.</div>';
             }
-
-            container.innerHTML = '';
-            data.forEach(joke => {
-                const card = document.createElement('div');
-                card.className = 'bg-slate-800/70 p-5 rounded-2xl border border-slate-700 shadow-lg space-y-3';
-                const uname = joke.username || 'Anonim';
-                const isProdedok = uname.toLowerCase() === 'prodedok';
-                let avatarHtml = avatarMap[uname] ? `<img src="${avatarMap[uname]}" class="w-full h-full object-cover">` : '👤';
-
-                card.innerHTML = `
-                    <p class="text-slate-100 text-base">${escapeHTML(joke.content)}</p>
-                    <div class="flex justify-between items-center text-xs text-slate-400 pt-3 border-t border-slate-700/40">
-                        <div class="flex items-center gap-2">
-                            <div class="w-7 h-7 rounded-lg overflow-hidden border border-amber-500/30 flex items-center justify-center">${avatarHtml}</div>
-                            <span class="font-semibold text-amber-400">@${escapeHTML(uname)} ${isProdedok ? '👑' : ''}</span>
-                            ${currentUser && currentUser.username.toLowerCase() === 'prodedok' ? `<button onclick="deleteJoke('${joke.id}')" class="text-rose-400 ml-2">🗑️</button>` : ''}
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <button onclick="voteJoke('${joke.id}', 'like')" class="bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-lg">👍 ${joke.likes || 0}</button>
-                            <button onclick="voteJoke('${joke.id}', 'dislike')" class="bg-rose-500/10 text-rose-400 px-2 py-1 rounded-lg">👎 ${joke.dislikes || 0}</button>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
         }
 
-        // --- FLAPPY BIRD OYUN MANTIĞI & HAFTALIK LİDERLİK ---
+        // --- KOLAYLAŞTIRILMIŞ FLAPPY BIRD OYUN MANTIĞI ---
         const canvas = document.getElementById('flappyCanvas');
         const ctx = canvas.getContext('2d');
         let gameInterval = null;
-        let bird = { x: 50, y: 150, radius: 12, gravity: 0.38, lift: -7.5, velocity: 0 };
+        let bird = { x: 50, y: 150, radius: 12, gravity: 0.38, lift: -7.5, velocity: 0 }; // Daha yavaş düşüş
         let pipes = [];
         let score = 0;
         let isGameRunning = false;
 
-        function getCurrentWeekID() {
-            const now = new Date();
-            const oneJan = new Date(now.getFullYear(), 0, 1);
-            const week = Math.ceil((((now - oneJan) / 86400000) + oneJan.getDay() + 1) / 7);
-            return `${now.getFullYear()}-W${week}`;
-        }
-
         function startFlappyGame() {
             document.getElementById('game-overlay').classList.add('hidden');
-            bird.y = 150; bird.velocity = 0; pipes = []; score = 0; isGameRunning = true;
+            bird.y = 150;
+            bird.velocity = 0;
+            pipes = [];
+            score = 0;
+            isGameRunning = true;
+            
             if (gameInterval) clearInterval(gameInterval);
             gameInterval = setInterval(updateGame, 1000 / 60);
         }
 
-        canvas.addEventListener('click', () => { if (isGameRunning) bird.velocity = bird.lift; });
-        window.addEventListener('keydown', (e) => { if (e.code === 'Space' && isGameRunning) { e.preventDefault(); bird.velocity = bird.lift; } });
+        canvas.addEventListener('click', () => {
+            if (isGameRunning) bird.velocity = bird.lift;
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && isGameRunning) {
+                e.preventDefault();
+                bird.velocity = bird.lift;
+            }
+        });
 
         function updateGame() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            bird.velocity += bird.gravity; bird.y += bird.velocity;
 
+            bird.velocity += bird.gravity;
+            bird.y += bird.velocity;
+
+            // Kuş Çizimi
             ctx.fillStyle = '#f59e0b';
-            ctx.beginPath(); ctx.arc(bird.x, bird.y, bird.radius, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath();
+            ctx.arc(bird.x, bird.y, bird.radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#78350f';
+            ctx.lineWidth = 2;
+            ctx.stroke();
 
+            // Borular (Daha geniş boşluk: 130 piksel)
             if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - 180) {
                 let gapHeight = 130;
                 let topHeight = Math.floor(Math.random() * (canvas.height - gapHeight - 80)) + 40;
@@ -566,64 +707,131 @@
 
             ctx.fillStyle = '#10b981';
             pipes.forEach(pipe => {
-                pipe.x -= 2.0;
+                pipe.x -= 2.0; // Daha yavaş ilerleme hızı
                 ctx.fillRect(pipe.x, 0, 50, pipe.top);
                 ctx.fillRect(pipe.x, canvas.height - pipe.bottom, 50, pipe.bottom);
-                if (!pipe.passed && pipe.x + 50 < bird.x) { score++; pipe.passed = true; }
-                if (bird.x + bird.radius > pipe.x && bird.x - bird.radius < pipe.x + 50 && (bird.y - bird.radius < pipe.top || bird.y + bird.radius > canvas.height - pipe.bottom)) gameOver();
+
+                if (!pipe.passed && pipe.x + 50 < bird.x) {
+                    score++;
+                    pipe.passed = true;
+                }
+
+                if (
+                    bird.x + bird.radius > pipe.x && bird.x - bird.radius < pipe.x + 50 &&
+                    (bird.y - bird.radius < pipe.top || bird.y + bird.radius > canvas.height - pipe.bottom)
+                ) {
+                    gameOver();
+                }
             });
 
-            if (bird.y + bird.radius > canvas.height || bird.y - bird.radius < 0) gameOver();
+            if (bird.y + bird.radius > canvas.height || bird.y - bird.radius < 0) {
+                gameOver();
+            }
+
             pipes = pipes.filter(pipe => pipe.x > -50);
 
-            ctx.fillStyle = '#ffffff'; ctx.font = 'bold 20px sans-serif'; ctx.fillText(`Skor: ${score}`, 15, 30);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 20px sans-serif';
+            ctx.fillText(`Skor: ${score}`, 15, 30);
         }
 
         async function gameOver() {
             isGameRunning = false;
             clearInterval(gameInterval);
-            document.getElementById('game-overlay').classList.remove('hidden');
-            document.getElementById('game-overlay').innerHTML = `
+
+            const overlay = document.getElementById('game-overlay');
+            overlay.classList.remove('hidden');
+            overlay.innerHTML = `
                 <h3 class="text-2xl font-black text-rose-500">Oyun Bitti!</h3>
                 <p class="text-sm text-slate-200">Skorun: <strong class="text-amber-400">${score}</strong></p>
-                <button onclick="startFlappyGame()" class="px-6 py-2.5 bg-amber-500 text-slate-950 font-bold rounded-xl">Tekrar Oyna</button>
+                <button onclick="startFlappyGame()" class="px-6 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl shadow-lg transition active:scale-95 text-sm">Tekrar Oyna</button>
             `;
 
             if (currentUser && currentUser.username) {
                 try {
-                    const weekId = getCurrentWeekID();
-                    await db.from('flappy_scores').insert([{ username: currentUser.username, score: score, week_id: weekId }]);
+                    await db.from('flappy_scores').insert([{ username: currentUser.username, score: score }]);
                     fetchLeaderboard();
-                } catch (err) { console.error('Skor kaydedilemedi:', err); }
+                } catch (err) {
+                    console.error('Skor kaydedilemedi:', err);
+                }
             }
         }
 
         async function fetchLeaderboard() {
             const container = document.getElementById('leaderboard-container');
-            const weekId = getCurrentWeekID();
-            const { data } = await db.from('flappy_scores').select('*').eq('week_id', weekId).order('score', { ascending: false });
+            container.innerHTML = '<div class="text-center text-xs text-slate-500 py-3">Skorlar yükleniyor...</div>';
 
-            if (!data || data.length === 0) {
-                container.innerHTML = '<div class="text-center text-xs text-slate-500 py-3">Bu hafta henüz skor yok yeğen. İlk sen ol!</div>';
-                return;
+            try {
+                const { data, error } = await db.from('flappy_scores').select('*').order('score', { ascending: false });
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<div class="text-center text-xs text-slate-500 py-3">Henüz skor kaydedilmemiş yeğen. İlk sen ol!</div>';
+                    return;
+                }
+
+                const { data: usersData } = await db.from('users').select('username, avatar_url');
+                const avatarMap = {};
+                if (usersData) {
+                    usersData.forEach(u => { avatarMap[u.username] = u.avatar_url; });
+                }
+
+                const bestScores = {};
+                data.forEach(item => {
+                    if (!bestScores[item.username] || item.score > bestScores[item.username]) {
+                        bestScores[item.username] = item.score;
+                    }
+                });
+
+                const sortedScores = Object.entries(bestScores).sort((a, b) => b[1] - a[1]);
+
+                container.innerHTML = '';
+                sortedScores.forEach(([uname, scr], index) => {
+                    let rankTag = `<span class="text-xs text-slate-400 font-mono w-6 text-center">#${index + 1}</span>`;
+                    let bgStyle = "bg-slate-900/40 border-slate-800";
+                    let userAvatar = avatarMap[uname];
+
+                    // 1. Kişinin profil fotoğrafı kuş olsun
+                    if (index === 0) {
+                        userAvatar = null; // Kuş emojisi gösterilmesi için
+                        rankTag = `<span class="bg-amber-500/20 text-amber-400 border border-amber-500/40 px-2 py-0.5 rounded-lg text-xs font-bold flex items-center gap-1">🥇 1. Altın</span>`;
+                        bgStyle = "bg-amber-500/10 border-amber-500/30";
+                    } else if (index === 1) {
+                        rankTag = `<span class="bg-slate-300/20 text-slate-200 border border-slate-300/40 px-2 py-0.5 rounded-lg text-xs font-bold flex items-center gap-1">🥈 2. Gümüş</span>`;
+                        bgStyle = "bg-slate-300/10 border-slate-300/30";
+                    } else if (index === 2) {
+                        rankTag = `<span class="bg-amber-700/20 text-amber-600 border border-amber-700/40 px-2 py-0.5 rounded-lg text-xs font-bold flex items-center gap-1">🥉 3. Bronz</span>`;
+                        bgStyle = "bg-amber-700/10 border-amber-700/30";
+                    }
+
+                    let avatarHtml = `<div class="w-7 h-7 rounded-lg bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-xs">👤</div>`;
+                    if (index === 0) {
+                        avatarHtml = `<div class="w-7 h-7 rounded-lg bg-sky-500/20 border border-sky-500/40 flex items-center justify-center text-base shadow-sm">🐦</div>`;
+                    } else if (userAvatar && userAvatar.trim() !== '') {
+                        avatarHtml = `<div class="w-7 h-7 rounded-lg overflow-hidden border border-slate-700"><img src="${userAvatar}" class="w-full h-full object-cover"></div>`;
+                    }
+
+                    const row = document.createElement('div');
+                    row.className = `flex justify-between items-center p-2.5 rounded-xl border ${bgStyle} text-xs`;
+                    row.innerHTML = `
+                        <div class="flex items-center gap-2.5">
+                            ${rankTag}
+                            ${avatarHtml}
+                            <span class="font-semibold text-slate-200">@${escapeHTML(uname)}</span>
+                        </div>
+                        <span class="font-bold text-amber-400">${scr} Puan</span>
+                    `;
+                    container.appendChild(row);
+                });
+            } catch (err) {
+                container.innerHTML = '<div class="text-center text-xs text-rose-400 py-3">Liderlik tablosu yüklenemedi yeğen.</div>';
             }
-
-            const bestScores = {};
-            data.forEach(item => { if (!bestScores[item.username] || item.score > bestScores[item.username]) bestScores[item.username] = item.score; });
-            const sorted = Object.entries(bestScores).sort((a, b) => b[1] - a[1]);
-
-            container.innerHTML = '';
-            sorted.forEach(([uname, scr], index) => {
-                let rankTag = index === 0 ? '🥇 1. Altın' : index === 1 ? '🥈 2. Gümüş' : index === 2 ? '🥉 3. Bronz' : `#${index + 1}`;
-                const row = document.createElement('div');
-                row.className = 'flex justify-between items-center p-2.5 rounded-xl border bg-slate-900/40 border-slate-800 text-xs';
-                row.innerHTML = `<span class="font-semibold text-slate-200">${rankTag} @${escapeHTML(uname)}</span><span class="font-bold text-amber-400">${scr} Puan</span>`;
-                container.appendChild(row);
-            });
         }
 
         function escapeHTML(str) {
-            return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
         }
     </script>
 </body>
