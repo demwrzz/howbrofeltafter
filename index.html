@@ -1,1 +1,338 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ali Özdem - Espri Sarayı</title>
+    <!-- Tailwind CSS ve Google Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .smooth-transition { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-purple-500 selection:text-white">
+
+    <!-- Navbar -->
+    <header class="sticky top-0 z-50 backdrop-blur-md bg-slate-900/80 border-b border-slate-800">
+        <div class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-2 cursor-pointer" onclick="showPage('home')">
+                <span class="text-2xl">😂</span>
+                <h1 class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500 text-xl">Ali Özdem Espri Sitesi</h1>
+            </div>
+            <div id="nav-auth" class="flex items-center space-x-3">
+                <!-- Dinamik Navigasyon -->
+            </div>
+        </div>
+    </header>
+
+    <!-- Ana İçerik Alanı -->
+    <main class="flex-grow max-w-4xl w-full mx-auto px-4 py-8">
+
+        <!-- HATA / BİLGİ MESAJI -->
+        <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 smooth-transition bg-slate-800 border border-slate-700 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-2">
+            <span id="toast-icon">ℹ️</span>
+            <span id="toast-msg">İşlem başarılı!</span>
+        </div>
+
+        <!-- ANA SAYFA: ESPRİLER -->
+        <section id="page-home" class="space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-purple-900/30 to-pink-900/30 p-6 rounded-3xl border border-purple-500/20 backdrop-blur-sm">
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-white">Gülmeye Hazır Mısın?</h2>
+                    <p class="text-slate-400 text-sm mt-1">Ali Özdem'in efsanevi evrenindeki en iyi espriler burada akıyor.</p>
+                </div>
+                <div id="hero-action">
+                    <!-- Giriş durumuna göre buton değişecek -->
+                </div>
+            </div>
+
+            <!-- Espri Listesi Başlığı -->
+            <div class="flex items-center justify-between pt-4">
+                <h3 class="text-lg font-bold text-slate-200 flex items-center gap-2">
+                    <span>🔥</span> Güncel Espriler
+                </h3>
+                <span id="joke-count" class="text-xs bg-slate-800 text-slate-400 px-3 py-1 rounded-full font-medium">0 Espri</span>
+            </div>
+
+            <!-- Esprilerin Listelendiği Alan -->
+            <div id="jokes-container" class="space-y-4">
+                <!-- Espriler JavaScript ile buraya gelecek -->
+            </div>
+        </section>
+
+        <!-- GİRİŞ YAP SAYFASI -->
+        <section id="page-login" class="hidden max-w-md mx-auto bg-slate-900/50 border border-slate-800 p-8 rounded-3xl backdrop-blur-md shadow-xl">
+            <h2 class="text-2xl font-bold text-white mb-2">Giriş Yap</h2>
+            <p class="text-slate-400 text-sm mb-6">Hesabına gir, esprilerini patlatmaya başla.</p>
+            <form onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Kullanıcı Adı</label>
+                    <input type="text" id="login-username" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 smooth-transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Şifre</label>
+                    <input type="password" id="login-password" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 smooth-transition">
+                </div>
+                <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 rounded-xl hover:opacity-95 smooth-transition shadow-lg shadow-purple-600/20">Giriş Yap</button>
+            </form>
+            <p class="text-center text-sm text-slate-400 mt-6">
+                Hesabın yok mu? <a href="#" onclick="showPage('register')" class="text-purple-400 font-semibold hover:underline">Kayıt Ol</a>
+            </p>
+        </section>
+
+        <!-- KAYIT OL SAYFASI -->
+        <section id="page-register" class="hidden max-w-md mx-auto bg-slate-900/50 border border-slate-800 p-8 rounded-3xl backdrop-blur-md shadow-xl">
+            <h2 class="text-2xl font-bold text-white mb-2">Kayıt Ol</h2>
+            <p class="text-slate-400 text-sm mb-6">Aramıza katılarak kendi esprilerini ekle.</p>
+            <form onsubmit="handleRegister(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Kullanıcı Adı</label>
+                    <input type="text" id="reg-username" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 smooth-transition">
+                    <p class="text-[11px] text-slate-500 mt-1">İpucu: "Ali Özdem" yazarsan otomatik olarak Admin olursun!</p>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Şifre</label>
+                    <input type="password" id="reg-password" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 smooth-transition">
+                </div>
+                <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 rounded-xl hover:opacity-95 smooth-transition shadow-lg shadow-purple-600/20">Kayıt Ol</button>
+            </form>
+            <p class="text-center text-sm text-slate-400 mt-6">
+                Zaten hesabın var mı? <a href="#" onclick="showPage('login')" class="text-purple-400 font-semibold hover:underline">Giriş Yap</a>
+            </p>
+        </section>
+
+        <!-- ESPRİ EKLEME SAYFASI -->
+        <section id="page-add-joke" class="hidden max-w-lg mx-auto bg-slate-900/50 border border-slate-800 p-8 rounded-3xl backdrop-blur-md shadow-xl">
+            <h2 class="text-2xl font-bold text-white mb-2">Yeni Espri Patlat 🚀</h2>
+            <p class="text-slate-400 text-sm mb-6">Herkesin gülmesi için harika bir fırsat.</p>
+            <form onsubmit="handleAddJoke(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Espri Metni</label>
+                    <textarea id="joke-text" rows="4" required placeholder="Adamın biri demiş ki..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 smooth-transition resize-none"></textarea>
+                </div>
+                <div class="flex gap-3">
+                    <button type="submit" class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 rounded-xl hover:opacity-95 smooth-transition shadow-lg shadow-purple-600/20">Espriyi Paylaş</button>
+                    <button type="button" onclick="showPage('home')" class="px-5 bg-slate-800 text-slate-300 font-semibold rounded-xl hover:bg-slate-700 smooth-transition">İptal</button>
+                </div>
+            </form>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-900 py-6 text-center text-xs text-slate-500">
+        <p>&copy; 2026 Ali Özdem Espri Sitesi. Tüm hakları saklıdır ve espriler tescillidir.</p>
+    </footer>
+
+    <!-- JavaScript Uygulama Mantığı -->
+    <script>
+        // Veri Yönetimi (LocalStorage)
+        function getData(key, defaultValue) {
+            const val = localStorage.getItem(key);
+            return val ? JSON.parse(val) : defaultValue;
+        }
+
+        function saveData(key, value) {
+            localStorage.setItem(key, JSON.stringify(value));
+        }
+
+        // Başlangıç Verileri
+        let users = getData('ali_users', [
+            { username: 'Ali Özdem', password: '123', isAdmin: true }
+        ]);
+        let currentUser = getData('ali_current_user', null);
+        let jokes = getData('ali_jokes', [
+            { id: 1, text: "Temel bilgisayarı çöpe atmış, çünkü pencerelerden soğuk giriyormuş.", author: "Ali Özdem", date: "05.08.2026" }
+        ]);
+
+        // Bildirim Gösterme Fonksiyonu (Smooth Toast)
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const msg = document.getElementById('toast-msg');
+            const icon = document.getElementById('toast-icon');
+            
+            msg.innerText = message;
+            icon.innerText = type === 'success' ? '✅' : '⚠️';
+            
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Sayfa Geçişleri (Smooth)
+        function showPage(pageId) {
+            document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
+            document.getElementById(`page-${pageId}`).classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if(pageId === 'home') renderJokes();
+        }
+
+        // Navbar ve UI Güncelleme
+        function updateUI() {
+            const navAuth = document.getElementById('nav-auth');
+            const heroAction = document.getElementById('hero-action');
+
+            if (currentUser) {
+                navAuth.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="text-xs font-semibold bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-full text-slate-300 flex items-center gap-1.5">
+                            👤 ${currentUser.username} ${currentUser.isAdmin ? '<span class="text-purple-400 font-bold">(Admin)</span>' : ''}
+                        </span>
+                        <button onclick="logout()" class="text-xs bg-red-500/10 text-red-400 border border-red-500/20 px-3 py-1.5 rounded-full font-semibold hover:bg-red-500/20 smooth-transition">Çıkış</button>
+                    </div>
+                `;
+                heroAction.innerHTML = `
+                    <button onclick="showPage('add-joke')" class="bg-white text-slate-950 font-bold px-6 py-3 rounded-2xl shadow-lg hover:bg-slate-200 smooth-transition flex items-center gap-2">
+                        <span>✨</span> Espri Ekle
+                    </button>
+                `;
+            } else {
+                navAuth.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <button onclick="showPage('login')" class="text-sm font-semibold text-slate-300 px-4 py-2 hover:text-white smooth-transition">Giriş Yap</button>
+                        <button onclick="showPage('register')" class="text-sm font-bold bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-2 rounded-xl text-white shadow-md hover:opacity-90 smooth-transition">Kayıt Ol</button>
+                    </div>
+                `;
+                heroAction.innerHTML = `
+                    <button onclick="showPage('register')" class="bg-white text-slate-950 font-bold px-6 py-3 rounded-2xl shadow-lg hover:bg-slate-200 smooth-transition flex items-center gap-2">
+                        <span>🚀</span> Hemen Katıl & Espri Ekle
+                    </button>
+                `;
+            }
+            renderJokes();
+        }
+
+        // Kayıt Olma İşlemi
+        function handleRegister(e) {
+            e.preventDefault();
+            const username = document.getElementById('reg-username').value.trim();
+            const password = document.getElementById('reg-password').value;
+
+            if (users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
+                showToast("Bu kullanıcı adı zaten alınmış!", "error");
+                return;
+            }
+
+            // Ali Özdem kontrolü (Otomatik Admin)
+            const isAdmin = username.toLowerCase() === "ali özdem";
+
+            const newUser = { username, password, isAdmin };
+            users.push(newUser);
+            saveData('ali_users', users);
+
+            currentUser = newUser;
+            saveData('ali_current_user', currentUser);
+
+            showToast(isAdmin ? "Hoş geldin patron! Otomatik Admin olarak giriş yapıldı." : "Kayıt başarılı! Hoş geldin.");
+            showPage('home');
+            updateUI();
+        }
+
+        // Giriş Yapma İşlemi
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
+
+            if (!user) {
+                showToast("Kullanıcı adı veya şifre hatalı!", "error");
+                return;
+            }
+
+            currentUser = user;
+            saveData('ali_current_user', currentUser);
+
+            showToast("Başarıyla giriş yapıldı!");
+            showPage('home');
+            updateUI();
+        }
+
+        // Çıkış Yapma
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('ali_current_user');
+            showToast("Çıkış yapıldı.");
+            updateUI();
+        }
+
+        // Espri Ekleme
+        function handleAddJoke(e) {
+            e.preventDefault();
+            if (!currentUser) {
+                showPage('login');
+                return;
+            }
+
+            const text = document.getElementById('joke-text').value.trim();
+            if (!text) return;
+
+            const newJoke = {
+                id: Date.now(),
+                text: text,
+                author: currentUser.username,
+                date: new Date().toLocaleDateString('tr-TR')
+            };
+
+            jokes.unshift(newJoke); // En başa ekle
+            saveData('ali_jokes', jokes);
+
+            document.getElementById('joke-text').value = '';
+            showToast("Esprin başarıyla yayınlandı!");
+            showPage('home');
+        }
+
+        // Espri Silme (Sadece Admin veya Sahibi silebilir)
+        function deleteJoke(id) {
+            jokes = jokes.filter(j => j.id !== id);
+            saveData('ali_jokes', jokes);
+            renderJokes();
+            showToast("Espri silindi.");
+        }
+
+        // Esprileri Ekrana Basma
+        function renderJokes() {
+            const container = document.getElementById('jokes-container');
+            const countBadge = document.getElementById('joke-count');
+            countBadge.innerText = `${jokes.length} Espri`;
+
+            if (jokes.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 bg-slate-900/30 border border-slate-800 rounded-3xl">
+                        <p class="text-4xl mb-2">🏜️</p>
+                        <p class="text-slate-400 font-medium">Henüz hiç espri eklenmemiş. İlk espriyi sen patlat!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = jokes.map(joke => `
+                <div class="bg-slate-900/40 border border-slate-800/80 hover:border-purple-500/30 p-6 rounded-3xl backdrop-blur-sm smooth-transition shadow-lg flex flex-col justify-between gap-4">
+                    <p class="text-slate-100 text-lg md:text-xl font-medium leading-relaxed">"${joke.text}"</p>
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-800/60">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center text-xs font-bold text-white">
+                                ${joke.author.charAt(0).toUpperCase()}
+                            </div>
+                            <span class="text-xs font-semibold text-slate-300">Ekleyen: <span class="text-purple-400">${joke.author}</span></span>
+                            <span class="text-slate-600">•</span>
+                            <span class="text-[11px] text-slate-500">${joke.date}</span>
+                        </div>
+                        ${(currentUser && (currentUser.isAdmin || currentUser.username === joke.author)) ? `
+                            <button onclick="deleteJoke(${joke.id})" class="text-xs text-red-400 bg-red-500/10 hover:bg-red-500/20 px-3 py-1 rounded-xl smooth-transition">Sil</button>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Sayfa Yüklendiğinde Başlat
+        updateUI();
+    </script>
+</body>
+</html>
 
