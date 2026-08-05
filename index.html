@@ -16,6 +16,13 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between font-sans selection:bg-amber-500 selection:text-slate-950">
 
+    <!-- Bakım Modu Ekranı (Sadece prodedok haricindekilere görünür) -->
+    <div id="maintenance-screen" class="hidden fixed inset-0 z-[9999] bg-slate-950 flex flex-col items-center justify-center p-6 text-center space-y-4">
+        <div class="text-6xl animate-bounce">🛠️</div>
+        <h1 class="text-2xl sm:text-3xl font-black text-amber-400">Şuan Dedok Siteyle İlgili Bazı Şeyleri Güncelliyor Lütfen Bekleyin</h1>
+        <p class="text-sm text-slate-400 max-w-md">Yeğenler platformu çok daha iyi bir deneyim için güncelleniyor. Kısa süre sonra buradayız!</p>
+    </div>
+
     <!-- Header / Navbar -->
     <header class="bg-slate-800/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-700/60 p-4 shadow-lg">
         <div class="max-w-4xl mx-auto flex justify-between items-center">
@@ -31,6 +38,7 @@
                     <div id="nav-user-avatar" class="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 font-bold text-xs overflow-hidden">👤</div>
                     <span id="user-display-name" class="text-xs font-semibold text-amber-400"></span>
                 </button>
+                <button id="nav-admin-btn" onclick="showSection('admin')" class="hidden px-3 py-1.5 text-xs bg-amber-500/20 text-amber-400 border border-amber-500/30 hover:bg-amber-500/30 active:scale-95 rounded-xl transition font-bold">Admin Panel</button>
                 <button onclick="logout()" class="px-3 py-1.5 text-xs bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 active:scale-95 rounded-xl transition font-medium">Çıkış</button>
             </div>
         </div>
@@ -56,7 +64,7 @@
                 <div class="space-y-1">
                     <span class="bg-amber-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">Yeni Çıktı!</span>
                     <h3 class="text-base font-bold text-slate-100 group-hover:text-amber-400 transition">Yeni çıkan oyunumuzu denemek ister misiniz yeğen? 🎮</h3>
-                    <p class="text-xs text-slate-400">Flappy Yeğen oyna, skorunu yap ve haftalık ligde zirveye yerleş!</p>
+                    <p class="text-xs text-slate-400">Flappy Yeğen oyna, skorunu yap ve liderlik tablosunda zirveye yerleş!</p>
                 </div>
                 <span class="text-2xl group-hover:translate-x-1 transition">🕹️</span>
             </div>
@@ -64,6 +72,31 @@
             <div id="jokes-container" class="space-y-4">
                 <div class="flex justify-center items-center py-12">
                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Admin Panel Section (Sadece prodedok için) -->
+        <section id="section-admin" class="page-transition hidden max-w-2xl mx-auto bg-slate-800/90 backdrop-blur-md p-8 rounded-3xl border border-slate-700/60 shadow-2xl mt-6 space-y-6">
+            <div class="flex justify-between items-center border-b border-slate-700/60 pb-4">
+                <h2 class="text-xl font-bold text-amber-400 flex items-center gap-2">👑 Prodedok Admin Paneli</h2>
+                <button onclick="showSection('home')" class="px-3 py-1.5 text-xs bg-slate-700 hover:bg-slate-600 rounded-xl transition text-slate-300">Geri Dön</button>
+            </div>
+
+            <div class="space-y-4">
+                <div class="bg-slate-900/60 p-5 rounded-2xl border border-slate-700/50 space-y-3">
+                    <h3 class="text-sm font-bold text-slate-200">Bakım Modu Kontrolü</h3>
+                    <p class="text-xs text-slate-400">Aşağıdaki butona basarak veya komut girerek bakım modunu açıp kapatabilirsin.</p>
+                    <div class="flex gap-3">
+                        <button onclick="toggleMaintenance(true)" class="px-4 py-2.5 bg-rose-500/20 text-rose-400 border border-rose-500/30 hover:bg-rose-500/30 font-bold text-xs rounded-xl transition">🛠️ Bakımı Aç (.bakım)</button>
+                        <button onclick="toggleMaintenance(false)" class="px-4 py-2.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 font-bold text-xs rounded-xl transition">✅ Bakımı Kapat (.unbakım)</button>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/60 p-5 rounded-2xl border border-slate-700/50 space-y-3">
+                    <h3 class="text-sm font-bold text-slate-200">Hızlı Komut Satırı</h3>
+                    <input type="text" id="admin-command-input" placeholder=".bakım veya .unbakım yaz..." class="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-amber-500">
+                    <button onclick="handleAdminCommand()" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl transition">Komutu Uygula</button>
                 </div>
             </div>
         </section>
@@ -84,11 +117,11 @@
                 </div>
             </div>
 
-            <!-- Leaderboard (Haftalık Sıralama) -->
+            <!-- Leaderboard (Tüm Zamanların Sıralaması) -->
             <div class="space-y-3 text-left bg-slate-900/60 p-4 rounded-2xl border border-slate-700/50">
                 <div class="flex justify-between items-center">
-                    <h3 class="text-sm font-bold text-amber-400 flex items-center gap-1.5">🏆 Haftalık Liderlik Tablosu</h3>
-                    <span class="text-[10px] text-slate-400 bg-slate-800 px-2 py-1 rounded-lg">Her Pazartesi Sıfırlanır</span>
+                    <h3 class="text-sm font-bold text-amber-400 flex items-center gap-1.5">🏆 Tüm Zamanların Liderlik Tablosu</h3>
+                    <span class="text-[10px] text-slate-400 bg-slate-800 px-2 py-1 rounded-lg">Hiç Sıfırlanmaz</span>
                 </div>
                 <div id="leaderboard-container" class="space-y-2 max-h-48 overflow-y-auto pr-1">
                     <div class="text-center text-xs text-slate-500 py-4">Skorlar yükleniyor...</div>
@@ -185,9 +218,9 @@
                 🛠️ Update Log (Güncelleme Notları)
             </h3>
             <ul class="list-disc list-inside space-y-1 text-slate-400">
-                <li><strong class="text-slate-300">v1.5.0:</strong> "Flappy Yeğen" oyunu ve her hafta otomatik yenilenen Altın/Gümüş/Bronz tagli liderlik tablosu eklendi.</li>
-                <li><strong class="text-slate-300">v1.4.0:</strong> Site tamamen "Yeğenler" konseptine ve adına uyarlandı.</li>
-                <li><strong class="text-slate-300">v1.3.1:</strong> Doğrudan cihazdan profil fotoğrafı seçme (dosya yükleme) özelliği eklendi.</li>
+                <li><strong class="text-slate-300">v1.6.0:</strong> `prodedok` admin paneli, `.bakım` / `.unbakım` modu, kullanıcı silme/yasaklama ve kalıcı liderlik tablosu eklendi.</li>
+                <li><strong class="text-slate-300">v1.5.1:</strong> Flappy Yeğen oyunu daha kolay oynanabilir hale getirildi ve liderlik tablosundaki 1. kişinin avatarı kuş yapıldı.</li>
+                <li><strong class="text-slate-300">v1.4.0:</strong> Site tamamen "Yeğenler" konseptine uyarlandı.</li>
             </ul>
         </section>
 
@@ -209,19 +242,69 @@
         let currentUser = JSON.parse(localStorage.getItem('jp_user')) || null;
 
         window.addEventListener('DOMContentLoaded', () => {
+            checkMaintenanceMode();
             updateAuthUI();
             fetchJokes();
         });
 
-        function showSection(sectionId) {
-            ['home', 'login', 'register', 'post', 'profile', 'flappy'].forEach(id => {
-                const el = document.getElementById(`section-${id}`);
-                if (id === sectionId) {
-                    el.classList.remove('hidden');
-                    el.style.opacity = '0';
-                    setTimeout(() => el.style.opacity = '1', 10);
+        // Bakım modu kontrolü (prodedok hariç herkesi kilitler)
+        async function checkMaintenanceMode() {
+            try {
+                const { data } = await db.from('site_settings').select('*').eq('key', 'maintenance_mode').single();
+                if (data && data.value === 'true') {
+                    const isProdedok = currentUser && currentUser.username && currentUser.username.toLowerCase() === 'prodedok';
+                    if (!isProdedok) {
+                        document.getElementById('maintenance-screen').classList.remove('hidden');
+                    } else {
+                        document.getElementById('maintenance-screen').classList.add('hidden');
+                    }
                 } else {
-                    el.classList.add('hidden');
+                    document.getElementById('maintenance-screen').classList.add('hidden');
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function toggleMaintenance(status) {
+            if (!currentUser || currentUser.username.toLowerCase() !== 'prodedok') {
+                alert('Bu işlem için yetkin yok yeğen!');
+                return;
+            }
+
+            try {
+                const { error } = await db.from('site_settings').update({ value: status ? 'true' : 'false' }).eq('key', 'maintenance_mode');
+                if (error) throw error;
+                alert(status ? 'Bakım modu açıldı! (.bakım)' : 'Bakım modu kapatıldı! (.unbakım)');
+                checkMaintenanceMode();
+            } catch (err) {
+                alert('Hata oluştu: ' + err.message);
+            }
+        }
+
+        function handleAdminCommand() {
+            const val = document.getElementById('admin-command-input').value.trim().toLowerCase();
+            if (val === '.bakım') {
+                toggleMaintenance(true);
+            } else if (val === '.unbakım') {
+                toggleMaintenance(false);
+            } else {
+                alert('Geçersiz komut yeğen! .bakım veya .unbakım yaz.');
+            }
+            document.getElementById('admin-command-input').value = '';
+        }
+
+        function showSection(sectionId) {
+            ['home', 'login', 'register', 'post', 'profile', 'flappy', 'admin'].forEach(id => {
+                const el = document.getElementById(`section-${id}`);
+                if (el) {
+                    if (id === sectionId) {
+                        el.classList.remove('hidden');
+                        el.style.opacity = '0';
+                        setTimeout(() => el.style.opacity = '1', 10);
+                    } else {
+                        el.classList.add('hidden');
+                    }
                 }
             });
             if (sectionId === 'home') {
@@ -239,6 +322,7 @@
             const navUser = document.getElementById('nav-user');
             const displayName = document.getElementById('user-display-name');
             const navAvatar = document.getElementById('nav-user-avatar');
+            const navAdminBtn = document.getElementById('nav-admin-btn');
 
             if (currentUser && currentUser.username) {
                 const { data } = await db.from('users').select('*').eq('username', currentUser.username).single();
@@ -250,8 +334,15 @@
                 navAuth.classList.add('hidden');
                 navUser.classList.remove('hidden');
                 
-                const isAdmin = currentUser.username.toLowerCase() === 'dedokxxreal' || currentUser.is_admin;
+                const isProdedok = currentUser.username.toLowerCase() === 'prodedok';
+                const isAdmin = isProdedok || currentUser.is_admin;
                 displayName.textContent = `${currentUser.username} ${isAdmin ? '👑' : ''}`;
+
+                if (isProdedok) {
+                    navAdminBtn.classList.remove('hidden');
+                } else {
+                    navAdminBtn.classList.add('hidden');
+                }
 
                 if (currentUser.avatar_url && currentUser.avatar_url.trim() !== '') {
                     navAvatar.innerHTML = `<img src="${currentUser.avatar_url}" class="w-full h-full object-cover">`;
@@ -262,6 +353,7 @@
                 navAuth.classList.remove('hidden');
                 navUser.classList.add('hidden');
             }
+            checkMaintenanceMode();
         }
 
         function logout() {
@@ -275,7 +367,7 @@
             event.preventDefault();
             const username = document.getElementById('register-username').value.trim();
             const password = document.getElementById('register-password').value.trim();
-            const isAdmin = username.toLowerCase() === 'dedokxxreal' || username.toLowerCase() === 'ali özdem';
+            const isAdmin = username.toLowerCase() === 'prodedok' || username.toLowerCase() === 'dedokxxreal';
 
             try {
                 const { error } = await db
@@ -320,10 +412,7 @@
 
         async function handleUpdateAvatar(event) {
             event.preventDefault();
-            if (!currentUser || !currentUser.username) {
-                alert('Lütfen önce çıkış yapıp tekrar giriş yap yeğen!');
-                return;
-            }
+            if (!currentUser || !currentUser.username) return;
 
             const fileInput = document.getElementById('profile-image-file');
             if (fileInput.files.length === 0) {
@@ -336,15 +425,9 @@
 
             reader.onload = async function(e) {
                 const base64Image = e.target.result;
-
                 try {
-                    const { error } = await db
-                        .from('users')
-                        .update({ avatar_url: base64Image })
-                        .eq('username', currentUser.username);
-
+                    const { error } = await db.from('users').update({ avatar_url: base64Image }).eq('username', currentUser.username);
                     if (error) throw error;
-
                     currentUser.avatar_url = base64Image;
                     localStorage.setItem('jp_user', JSON.stringify(currentUser));
                     updateAuthUI();
@@ -354,13 +437,13 @@
                     alert('Güncellenirken hata oluştu: ' + err.message);
                 }
             };
-
             reader.readAsDataURL(file);
         }
 
         async function loadProfileStats() {
             if (!currentUser || !currentUser.username) return;
-            document.getElementById('profile-username').innerHTML = `${escapeHTML(currentUser.username)} ${(currentUser.username.toLowerCase() === 'dedokxxreal' || currentUser.is_admin) ? '👑' : ''}`;
+            const isProdedok = currentUser.username.toLowerCase() === 'prodedok';
+            document.getElementById('profile-username').innerHTML = `${escapeHTML(currentUser.username)} ${isProdedok ? '👑' : ''}`;
             
             const avatarBox = document.getElementById('profile-avatar-box');
             if (currentUser.avatar_url && currentUser.avatar_url.trim() !== '') {
@@ -393,24 +476,19 @@
         async function handlePostJoke(event) {
             event.preventDefault();
             if (!currentUser) return;
-
             const content = document.getElementById('joke-content').value.trim();
 
             try {
-                const { error } = await db
-                    .from('jokes')
-                    .insert([{ 
-                        content, 
-                        user_id: currentUser.id || null, 
-                        username: currentUser.username, 
-                        likes: 0, 
-                        dislikes: 0,
-                        liked_by: [],
-                        disliked_by: []
-                    }]);
-
+                const { error } = await db.from('jokes').insert([{ 
+                    content, 
+                    user_id: currentUser.id || null, 
+                    username: currentUser.username, 
+                    likes: 0, 
+                    dislikes: 0,
+                    liked_by: [],
+                    disliked_by: []
+                }]);
                 if (error) throw error;
-
                 document.getElementById('joke-content').value = '';
                 showSection('home');
             } catch (err) {
@@ -433,38 +511,19 @@
                 let dislikedBy = joke.disliked_by || [];
                 let likes = joke.likes || 0;
                 let dislikes = joke.dislikes || 0;
-
                 const username = currentUser.username;
 
                 if (type === 'like') {
-                    if (likedBy.includes(username)) {
-                        alert('Bu espriyi zaten beğendin!');
-                        return;
-                    }
-                    if (dislikedBy.includes(username)) {
-                        dislikedBy = dislikedBy.filter(u => u !== username);
-                        dislikes = Math.max(0, dislikes - 1);
-                    }
-                    likedBy.push(username);
-                    likes += 1;
+                    if (likedBy.includes(username)) { alert('Bu espriyi zaten beğendin!'); return; }
+                    if (dislikedBy.includes(username)) { dislikedBy = dislikedBy.filter(u => u !== username); dislikes = Math.max(0, dislikes - 1); }
+                    likedBy.push(username); likes += 1;
                 } else {
-                    if (dislikedBy.includes(username)) {
-                        alert('Bu espriye zaten dislike attın!');
-                        return;
-                    }
-                    if (likedBy.includes(username)) {
-                        likedBy = likedBy.filter(u => u !== username);
-                        likes = Math.max(0, likes - 1);
-                    }
-                    dislikedBy.push(username);
-                    dislikes += 1;
+                    if (dislikedBy.includes(username)) { alert('Bu espriye zaten dislike attın!'); return; }
+                    if (likedBy.includes(username)) { likedBy = likedBy.filter(u => u !== username); likes = Math.max(0, likes - 1); }
+                    dislikedBy.push(username); dislikes += 1;
                 }
 
-                const { error: updateErr } = await db
-                    .from('jokes')
-                    .update({ likes, dislikes, liked_by: likedBy, disliked_by: dislikedBy })
-                    .eq('id', jokeId);
-
+                const { error: updateErr } = await db.from('jokes').update({ likes, dislikes, liked_by: likedBy, disliked_by: dislikedBy }).eq('id', jokeId);
                 if (updateErr) throw updateErr;
                 fetchJokes();
             } catch (err) {
@@ -474,12 +533,11 @@
 
         async function deleteJoke(jokeId) {
             if (!currentUser) return;
-            const isAdmin = currentUser.username.toLowerCase() === 'dedokxxreal' || currentUser.is_admin;
-            if (!isAdmin) {
+            const isProdedok = currentUser.username.toLowerCase() === 'prodedok';
+            if (!isProdedok) {
                 alert('Bu işlem için yetkin yok yeğen!');
                 return;
             }
-
             if (!confirm('Bu espriyi silmek istediğine emin misin?')) return;
 
             try {
@@ -488,6 +546,27 @@
                 fetchJokes();
             } catch (err) {
                 alert('Silinirken hata oluştu: ' + err.message);
+            }
+        }
+
+        async function banUser(targetUsername) {
+            if (!currentUser || currentUser.username.toLowerCase() !== 'prodedok') {
+                alert('Yetkin yok yeğen!');
+                return;
+            }
+            if (targetUsername.toLowerCase() === 'prodedok') {
+                alert('Kendini sistemden silemezsin!');
+                return;
+            }
+            if (!confirm(`@${targetUsername} kullanıcısını sistemden silmek ve yasaklamak istediğine emin misin?`)) return;
+
+            try {
+                await db.from('users').delete().eq('username', targetUsername);
+                await db.from('jokes').delete().eq('username', targetUsername);
+                alert(`@${targetUsername} sistemden silindi.`);
+                fetchJokes();
+            } catch (err) {
+                alert('İşlem başarısız: ' + err.message);
             }
         }
 
@@ -506,11 +585,7 @@
                     usersData.forEach(u => { avatarMap[u.username] = u.avatar_url; });
                 }
 
-                const { data, error } = await db
-                    .from('jokes')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-
+                const { data, error } = await db.from('jokes').select('*').order('created_at', { ascending: false });
                 if (error) throw error;
 
                 if (!data || data.length === 0) {
@@ -524,7 +599,7 @@
                     card.className = 'bg-slate-800/70 hover:bg-slate-800 transition p-5 rounded-2xl border border-slate-700/60 shadow-lg space-y-3';
                     
                     const username = joke.username || 'Anonim';
-                    const isDedokOrAdmin = username.toLowerCase() === 'dedokxxreal' || username.toLowerCase() === 'ali özdem';
+                    const isProdedokAdmin = username.toLowerCase() === 'prodedok';
                     const likes = joke.likes || 0;
                     const dislikes = joke.dislikes || 0;
                     const likedByList = joke.liked_by || [];
@@ -540,8 +615,14 @@
                         likedByText = `<div class="text-[11px] text-slate-400 pt-1">👍 Beğenenler: <span class="text-slate-300 font-medium">${escapeHTML(likedByList.join(', '))}</span></div>`;
                     }
 
-                    const isCurrentAdmin = currentUser && (currentUser.username.toLowerCase() === 'dedokxxreal' || currentUser.is_admin);
-                    const deleteBtnHtml = isCurrentAdmin ? `<button onclick="deleteJoke('${joke.id}')" class="text-rose-400 hover:text-rose-300 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-lg text-xs transition ml-2">🗑️ Sil</button>` : '';
+                    const isCurrentProdedok = currentUser && currentUser.username.toLowerCase() === 'prodedok';
+                    let adminButtonsHtml = '';
+                    if (isCurrentProdedok) {
+                        adminButtonsHtml = `
+                            <button onclick="deleteJoke('${joke.id}')" class="text-rose-400 hover:text-rose-300 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-lg text-xs transition ml-2">🗑️ Sil</button>
+                            <button onclick="banUser('${escapeHTML(username)}')" class="text-rose-400 hover:text-rose-300 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-lg text-xs transition ml-1">🚫 Yasakla</button>
+                        `;
+                    }
 
                     card.innerHTML = `
                         <p class="text-slate-100 text-base whitespace-pre-wrap leading-relaxed">${escapeHTML(joke.content)}</p>
@@ -549,8 +630,8 @@
                         <div class="flex justify-between items-center text-xs text-slate-400 pt-3 border-t border-slate-700/40">
                             <div class="flex items-center gap-2">
                                 ${avatarHtml}
-                                <span class="font-semibold text-amber-400 flex items-center gap-1">@${escapeHTML(username)} ${isDedokOrAdmin ? '👑' : ''}</span>
-                                ${deleteBtnHtml}
+                                <span class="font-semibold text-amber-400 flex items-center gap-1">@${escapeHTML(username)} ${isProdedokAdmin ? '👑' : ''}</span>
+                                ${adminButtonsHtml}
                             </div>
                             <div class="flex items-center gap-3">
                                 <button onclick="voteJoke('${joke.id}', 'like')" class="flex items-center gap-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-lg transition active:scale-95 font-medium">
@@ -570,22 +651,14 @@
             }
         }
 
-        // --- FLAPPY BIRD OYUN MANTIĞI ---
+        // --- KOLAYLAŞTIRILMIŞ FLAPPY BIRD OYUN MANTIĞI ---
         const canvas = document.getElementById('flappyCanvas');
         const ctx = canvas.getContext('2d');
         let gameInterval = null;
-        let bird = { x: 50, y: 150, radius: 12, gravity: 0.6, lift: -9, velocity: 0 };
+        let bird = { x: 50, y: 150, radius: 12, gravity: 0.38, lift: -7.5, velocity: 0 }; // Daha yavaş düşüş
         let pipes = [];
         let score = 0;
         let isGameRunning = false;
-
-        function getCurrentWeekID() {
-            const now = new Date();
-            const year = now.getFullYear();
-            const oneJan = new Date(year, 0, 1);
-            const week = Math.ceil((((now - oneJan) / 86400000) + oneJan.getDay() + 1) / 7);
-            return `${year}-W${week}`;
-        }
 
         function startFlappyGame() {
             document.getElementById('game-overlay').classList.add('hidden');
@@ -600,9 +673,7 @@
         }
 
         canvas.addEventListener('click', () => {
-            if (isGameRunning) {
-                bird.velocity = bird.lift;
-            }
+            if (isGameRunning) bird.velocity = bird.lift;
         });
 
         window.addEventListener('keydown', (e) => {
@@ -615,11 +686,10 @@
         function updateGame() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Kuş hareketi
             bird.velocity += bird.gravity;
             bird.y += bird.velocity;
 
-            // Kuş çizimi
+            // Kuş Çizimi
             ctx.fillStyle = '#f59e0b';
             ctx.beginPath();
             ctx.arc(bird.x, bird.y, bird.radius, 0, Math.PI * 2);
@@ -628,26 +698,24 @@
             ctx.lineWidth = 2;
             ctx.stroke();
 
-            // Borular
-            if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - 160) {
-                let gapHeight = 100;
+            // Borular (Daha geniş boşluk: 130 piksel)
+            if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - 180) {
+                let gapHeight = 130;
                 let topHeight = Math.floor(Math.random() * (canvas.height - gapHeight - 80)) + 40;
                 pipes.push({ x: canvas.width, top: topHeight, bottom: canvas.height - topHeight - gapHeight, passed: false });
             }
 
             ctx.fillStyle = '#10b981';
             pipes.forEach(pipe => {
-                pipe.x -= 2.5;
+                pipe.x -= 2.0; // Daha yavaş ilerleme hızı
                 ctx.fillRect(pipe.x, 0, 50, pipe.top);
                 ctx.fillRect(pipe.x, canvas.height - pipe.bottom, 50, pipe.bottom);
 
-                // Skor artırma
                 if (!pipe.passed && pipe.x + 50 < bird.x) {
                     score++;
                     pipe.passed = true;
                 }
 
-                // Çarpışma kontrolü
                 if (
                     bird.x + bird.radius > pipe.x && bird.x - bird.radius < pipe.x + 50 &&
                     (bird.y - bird.radius < pipe.top || bird.y + bird.radius > canvas.height - pipe.bottom)
@@ -656,14 +724,12 @@
                 }
             });
 
-            // Yer ve tavan kontrolü
             if (bird.y + bird.radius > canvas.height || bird.y - bird.radius < 0) {
                 gameOver();
             }
 
             pipes = pipes.filter(pipe => pipe.x > -50);
 
-            // Skor yazısı
             ctx.fillStyle = '#ffffff';
             ctx.font = 'bold 20px sans-serif';
             ctx.fillText(`Skor: ${score}`, 15, 30);
@@ -683,12 +749,7 @@
 
             if (currentUser && currentUser.username) {
                 try {
-                    const weekId = getCurrentWeekID();
-                    await db.from('flappy_scores').insert([{
-                        username: currentUser.username,
-                        score: score,
-                        week_id: weekId
-                    }]);
+                    await db.from('flappy_scores').insert([{ username: currentUser.username, score: score }]);
                     fetchLeaderboard();
                 } catch (err) {
                     console.error('Skor kaydedilemedi:', err);
@@ -701,21 +762,20 @@
             container.innerHTML = '<div class="text-center text-xs text-slate-500 py-3">Skorlar yükleniyor...</div>';
 
             try {
-                const weekId = getCurrentWeekID();
-                const { data, error } = await db
-                    .from('flappy_scores')
-                    .select('*')
-                    .eq('week_id', weekId)
-                    .order('score', { ascending: false });
-
+                const { data, error } = await db.from('flappy_scores').select('*').order('score', { ascending: false });
                 if (error) throw error;
 
                 if (!data || data.length === 0) {
-                    container.innerHTML = '<div class="text-center text-xs text-slate-500 py-3">Bu hafta henüz skor kaydedilmemiş yeğen. İlk sen ol!</div>';
+                    container.innerHTML = '<div class="text-center text-xs text-slate-500 py-3">Henüz skor kaydedilmemiş yeğen. İlk sen ol!</div>';
                     return;
                 }
 
-                // Aynı kullanıcının en yüksek skorunu almak için filtreleme
+                const { data: usersData } = await db.from('users').select('username, avatar_url');
+                const avatarMap = {};
+                if (usersData) {
+                    usersData.forEach(u => { avatarMap[u.username] = u.avatar_url; });
+                }
+
                 const bestScores = {};
                 data.forEach(item => {
                     if (!bestScores[item.username] || item.score > bestScores[item.username]) {
@@ -729,8 +789,11 @@
                 sortedScores.forEach(([uname, scr], index) => {
                     let rankTag = `<span class="text-xs text-slate-400 font-mono w-6 text-center">#${index + 1}</span>`;
                     let bgStyle = "bg-slate-900/40 border-slate-800";
+                    let userAvatar = avatarMap[uname];
 
+                    // 1. Kişinin profil fotoğrafı kuş olsun
                     if (index === 0) {
+                        userAvatar = null; // Kuş emojisi gösterilmesi için
                         rankTag = `<span class="bg-amber-500/20 text-amber-400 border border-amber-500/40 px-2 py-0.5 rounded-lg text-xs font-bold flex items-center gap-1">🥇 1. Altın</span>`;
                         bgStyle = "bg-amber-500/10 border-amber-500/30";
                     } else if (index === 1) {
@@ -741,11 +804,19 @@
                         bgStyle = "bg-amber-700/10 border-amber-700/30";
                     }
 
+                    let avatarHtml = `<div class="w-7 h-7 rounded-lg bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-xs">👤</div>`;
+                    if (index === 0) {
+                        avatarHtml = `<div class="w-7 h-7 rounded-lg bg-sky-500/20 border border-sky-500/40 flex items-center justify-center text-base shadow-sm">🐦</div>`;
+                    } else if (userAvatar && userAvatar.trim() !== '') {
+                        avatarHtml = `<div class="w-7 h-7 rounded-lg overflow-hidden border border-slate-700"><img src="${userAvatar}" class="w-full h-full object-cover"></div>`;
+                    }
+
                     const row = document.createElement('div');
                     row.className = `flex justify-between items-center p-2.5 rounded-xl border ${bgStyle} text-xs`;
                     row.innerHTML = `
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2.5">
                             ${rankTag}
+                            ${avatarHtml}
                             <span class="font-semibold text-slate-200">@${escapeHTML(uname)}</span>
                         </div>
                         <span class="font-bold text-amber-400">${scr} Puan</span>
