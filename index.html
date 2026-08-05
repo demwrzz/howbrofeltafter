@@ -3,113 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ali Özdem - Espri Sarayı</title>
-    <!-- Tailwind CSS ve Google Fonts -->
+    <title>Joke Palace - Ali Özdem</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Supabase JS Kütüphanesi -->
+    <!-- Supabase JS Client CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .smooth-transition { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-    </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-purple-500 selection:text-white">
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between font-sans">
 
-    <!-- Navbar -->
-    <header class="sticky top-0 z-50 backdrop-blur-md bg-slate-900/80 border-b border-slate-800">
-        <div class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-2 cursor-pointer" onclick="showPage('home')">
-                <span class="text-2xl">🫠</span>
-                <h1 class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500 text-xl">Ali Özdem Espri Sitesi</h1>
+    <!-- Header / Navbar -->
+    <header class="bg-slate-800 border-b border-slate-700 p-4 shadow-md">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent cursor-pointer" onclick="showSection('home')">
+                👑 Joke Palace (Ali Özdem)
+            </h1>
+            <nav id="nav-auth" class="flex gap-3">
+                <button onclick="showSection('login')" class="px-4 py-2 text-sm bg-slate-700 hover:bg-slate-600 rounded-lg transition">Giriş Yap</button>
+                <button onclick="showSection('register')" class="px-4 py-2 text-sm bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold rounded-lg transition">Kayıt Ol</button>
+            </nav>
+            <div id="nav-user" class="hidden flex items-center gap-4">
+                <span id="user-display-name" class="text-sm font-medium text-amber-400"></span>
+                <button onclick="logout()" class="px-3 py-1.5 text-xs bg-rose-500/20 text-rose-400 border border-rose-500/30 hover:bg-rose-500/30 rounded-lg transition">Çıkış Yap</button>
             </div>
-            <div id="nav-auth" class="flex items-center space-x-3"></div>
         </div>
     </header>
 
-    <!-- Ana İçerik Alanı -->
-    <main class="flex-grow max-w-4xl w-full mx-auto px-4 py-8">
+    <!-- Main Content Area -->
+    <main class="max-w-4xl mx-auto p-4 w-full flex-grow">
 
-        <!-- BİLDİRİM TOAST -->
-        <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 smooth-transition bg-slate-800 border border-slate-700 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-2">
-            <span id="toast-icon">ℹ️</span>
-            <span id="toast-msg">İşlem başarılı!</span>
-        </div>
-
-        <!-- ANA SAYFA -->
-        <section id="page-home" class="space-y-6">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-purple-900/30 to-pink-900/30 p-6 rounded-3xl border border-purple-500/20 backdrop-blur-sm">
-                <div>
-                    <h2 class="text-2xl md:text-3xl font-extrabold text-white">Gülmeye Hazır Mısın?</h2>
-                    <p class="text-slate-400 text-sm mt-1">Ali Özdem'in efsanevi evrenindeki en iyi espriler burada akıyor.</p>
-                </div>
-                <div id="hero-action"></div>
+        <!-- Home Section (Jokes Feed) -->
+        <section id="section-home" class="space-y-6">
+            <div class="flex justify-between items-center bg-slate-800/50 p-4 rounded-xl border border-slate-700/50">
+                <h2 class="text-lg font-semibold text-slate-200">En Komik Espriler</h2>
+                <button onclick="checkAuthAndOpenPost()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold text-sm rounded-lg shadow-lg transition flex items-center gap-2">
+                    ✨ Espri Paylaş
+                </button>
             </div>
-
-            <div class="flex items-center justify-between pt-4">
-                <h3 class="text-lg font-bold text-slate-200 flex items-center gap-2">
-                    <span>🔥</span> Güncel Espriler
-                </h3>
-                <span id="joke-count" class="text-xs bg-slate-800 text-slate-400 px-3 py-1 rounded-full font-medium">0 Espri</span>
-            </div>
-
             <div id="jokes-container" class="space-y-4">
-                <!-- Espriler Supabase'den yüklenecek -->
+                <!-- Espriler buraya dinamik olarak gelecek -->
+                <p class="text-center text-slate-500 py-8">Espriler yükleniyor...</p>
             </div>
         </section>
 
-        <!-- GİRİŞ YAP -->
-        <section id="page-login" class="hidden max-w-md mx-auto bg-slate-900/50 border border-slate-800 p-8 rounded-3xl backdrop-blur-md shadow-xl">
-            <h2 class="text-2xl font-bold text-white mb-2">Giriş Yap</h2>
-            <form onsubmit="handleLogin(event)" class="space-y-4 mt-4">
+        <!-- Login Section -->
+        <section id="section-login" class="hidden max-w-md mx-auto bg-slate-800 p-8 rounded-2xl border border-slate-700 shadow-xl mt-10">
+            <h2 class="text-2xl font-bold mb-6 text-center text-amber-400">Giriş Yap</h2>
+            <form onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Kullanıcı Adı</label>
-                    <input type="text" id="login-username" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 smooth-transition">
+                    <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Kullanıcı Adı</label>
+                    <input type="text" id="login-username" required class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:outline-none focus:border-amber-500 text-slate-100 text-sm">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Şifre</label>
-                    <input type="password" id="login-password" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 smooth-transition">
+                    <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Şifre</label>
+                    <input type="password" id="login-password" required class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:outline-none focus:border-amber-500 text-slate-100 text-sm">
                 </div>
-                <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 rounded-xl hover:opacity-95 smooth-transition shadow-lg">Giriş Yap</button>
+                <button type="submit" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl transition shadow-lg mt-2">Giriş Yap</button>
             </form>
-            <p class="text-center text-sm text-slate-400 mt-6">
-                Hesabın yok mu? <a href="#" onclick="showPage('register')" class="text-purple-400 font-semibold hover:underline">Kayıt Ol</a>
-            </p>
+            <p class="text-center text-sm text-slate-400 mt-4">Hesabın yok mu? <a href="#" onclick="showSection('register')" class="text-amber-400 hover:underline">Kayıt Ol</a></p>
         </section>
 
-        <!-- KAYIT OL -->
-        <section id="page-register" class="hidden max-w-md mx-auto bg-slate-900/50 border border-slate-800 p-8 rounded-3xl backdrop-blur-md shadow-xl">
-            <h2 class="text-2xl font-bold text-white mb-2">Kayıt Ol</h2>
-            <form onsubmit="handleRegister(event)" class="space-y-4 mt-4">
+        <!-- Register Section -->
+        <section id="section-register" class="hidden max-w-md mx-auto bg-slate-800 p-8 rounded-2xl border border-slate-700 shadow-xl mt-10">
+            <h2 class="text-2xl font-bold mb-6 text-center text-amber-400">Kayıt Ol</h2>
+            <form onsubmit="handleRegister(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Kullanıcı Adı</label>
-                    <input type="text" id="reg-username" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 smooth-transition">
-                    <p class="text-[11px] text-slate-500 mt-1">"Ali Özdem" yazarsan otomatik Admin olursun!</p>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Kullanıcı Adı</label>
+                    <input type="text" id="register-username" required class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:outline-none focus:border-amber-500 text-slate-100 text-sm">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Şifre</label>
-                    <input type="password" id="reg-password" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 smooth-transition">
+                    <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Şifre</label>
+                    <input type="password" id="register-password" required class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:outline-none focus:border-amber-500 text-slate-100 text-sm">
                 </div>
-                <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 rounded-xl hover:opacity-95 smooth-transition shadow-lg">Kayıt Ol</button>
+                <button type="submit" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl transition shadow-lg mt-2">Kayıt Ol</button>
             </form>
-            <p class="text-center text-sm text-slate-400 mt-6">
-                Zaten hesabın var mı? <a href="#" onclick="showPage('login')" class="text-purple-400 font-semibold hover:underline">Giriş Yap</a>
-            </p>
+            <p class="text-center text-sm text-slate-400 mt-4">Zaten hesabın var mı? <a href="#" onclick="showSection('login')" class="text-amber-400 hover:underline">Giriş Yap</a></p>
         </section>
 
-        <!-- ESPRİ EKLE -->
-        <section id="page-add-joke" class="hidden max-w-lg mx-auto bg-slate-900/50 border border-slate-800 p-8 rounded-3xl backdrop-blur-md shadow-xl">
-            <h2 class="text-2xl font-bold text-white mb-2">Yeni Espri Patlat 🚀</h2>
-            <form onsubmit="handleAddJoke(event)" class="space-y-4 mt-4">
+        <!-- Post Joke Section -->
+        <section id="section-post" class="hidden max-w-lg mx-auto bg-slate-800 p-8 rounded-2xl border border-slate-700 shadow-xl mt-10">
+            <h2 class="text-2xl font-bold mb-6 text-center text-amber-400">Yeni Espri Paylaş</h2>
+            <form onsubmit="handlePostJoke(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Espri Metni</label>
-                    <textarea id="joke-text" rows="4" required placeholder="Adamın biri demiş ki..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 smooth-transition resize-none"></textarea>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Espri İçeriği</label>
+                    <textarea id="joke-content" rows="4" required placeholder="Esprini buraya yaz..." class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:outline-none focus:border-amber-500 text-slate-100 text-sm"></textarea>
                 </div>
                 <div class="flex gap-3">
-                    <button type="submit" class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 rounded-xl hover:opacity-95 smooth-transition shadow-lg">Espriyi Paylaş</button>
-                    <button type="button" onclick="showPage('home')" class="px-5 bg-slate-800 text-slate-300 font-semibold rounded-xl hover:bg-slate-700 smooth-transition">İptal</button>
+                    <button type="button" onclick="showSection('home')" class="w-1/2 py-3 bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold rounded-xl transition">İptal</button>
+                    <button type="submit" class="w-1/2 py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl transition shadow-lg">Paylaş</button>
                 </div>
             </form>
         </section>
@@ -117,213 +97,191 @@
     </main>
 
     <!-- Footer -->
-    <footer class="border-t border-slate-900 py-6 text-center text-xs text-slate-500">
-        <p>&copy; 2026 Ali Özdem Espri Sitesi. Tüm hakları saklıdır.</p>
+    <footer class="bg-slate-800/50 border-t border-slate-800 py-4 text-center text-xs text-slate-500">
+        &copy; 2026 Joke Palace - Tüm Hakları Saklıdır. (Ali Özdem Alanı)
     </footer>
 
-    <!-- Supabase Entegrasyon Kodları -->
+    <!-- Supabase Logic & App Script -->
     <script>
-        // Supabase Bağlantı Bilgilerin
-        const SUPABASE_URL = 'https://xavwlojgvxgeyhsqljyn.supabase.co';
+        // Supabase Bağlantı Bilgileri (Doğrulandı)
+        const SUPABASE_URL = 'https://xavwlojjgvxgeybqljyn.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_sHrgA7j7ZokBJDrkmAendw_EiTUH40b';
 
         const { createClient } = supabase;
         const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        let currentUser = JSON.parse(localStorage.getItem('ali_current_user')) || null;
-        let jokes = [];
+        // Uygulama Durumu
+        let currentUser = JSON.parse(localStorage.getItem('jp_user')) || null;
 
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            const msg = document.getElementById('toast-msg');
-            const icon = document.getElementById('toast-icon');
-            msg.innerText = message;
-            icon.innerText = type === 'success' ? '✅' : '⚠️';
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => { toast.classList.add('translate-y-20', 'opacity-0'); }, 3000);
+        // Sayfa Yüklendiğinde Çalışacaklar
+        window.addEventListener('DOMContentLoaded', () => {
+            updateAuthUI();
+            fetchJokes();
+        });
+
+        // Sayfa / Sekme Değiştirme Fonksiyonu
+        function showSection(sectionId) {
+            ['home', 'login', 'register', 'post'].forEach(id => {
+                document.getElementById(`section-${id}`).classList.add('hidden');
+            });
+            document.getElementById(`section-${sectionId}`).classList.remove('hidden');
+            if (sectionId === 'home') {
+                fetchJokes();
+            }
         }
 
-        function showPage(pageId) {
-            document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
-            document.getElementById(`page-${pageId}`).classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            if(pageId === 'home') fetchJokes();
-        }
-
-        function updateUI() {
+        // Arayüzü Kullanıcı Durumuna Göre Güncelleme
+        function updateAuthUI() {
             const navAuth = document.getElementById('nav-auth');
-            const heroAction = document.getElementById('hero-action');
+            const navUser = document.getElementById('nav-user');
+            const displayName = document.getElementById('user-display-name');
 
             if (currentUser) {
-                navAuth.innerHTML = `
-                    <div class="flex items-center space-x-3">
-                        <span class="text-xs font-semibold bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-full text-slate-300 flex items-center gap-1.5">
-                            👤 ${currentUser.username} ${currentUser.is_admin ? '<span class="text-purple-400 font-bold">(Admin)</span>' : ''}
-                        </span>
-                        <button onclick="logout()" class="text-xs bg-red-500/10 text-red-400 border border-red-500/20 px-3 py-1.5 rounded-full font-semibold hover:bg-red-500/20 smooth-transition">Çıkış</button>
-                    </div>
-                `;
-                heroAction.innerHTML = `
-                    <button onclick="showPage('add-joke')" class="bg-white text-slate-950 font-bold px-6 py-3 rounded-2xl shadow-lg hover:bg-slate-200 smooth-transition flex items-center gap-2">
-                        <span>✨</span> Espri Ekle
-                    </button>
-                `;
+                navAuth.classList.add('hidden');
+                navUser.classList.remove('hidden');
+                displayName.textContent = `${currentUser.username} ${currentUser.is_admin ? '👑' : ''}`;
             } else {
-                navAuth.innerHTML = `
-                    <div class="flex items-center space-x-2">
-                        <button onclick="showPage('login')" class="text-sm font-semibold text-slate-300 px-4 py-2 hover:text-white smooth-transition">Giriş Yap</button>
-                        <button onclick="showPage('register')" class="text-sm font-bold bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-2 rounded-xl text-white shadow-md hover:opacity-90 smooth-transition">Kayıt Ol</button>
-                    </div>
-                `;
-                heroAction.innerHTML = `
-                    <button onclick="showPage('register')" class="bg-white text-slate-950 font-bold px-6 py-3 rounded-2xl shadow-lg hover:bg-slate-200 smooth-transition flex items-center gap-2">
-                        <span>🚀</span> Hemen Katıl & Espri Ekle
-                    </button>
-                `;
+                navAuth.classList.remove('hidden');
+                navUser.classList.add('hidden');
             }
         }
 
+        // Çıkış Yap
         function logout() {
+            localStorage.removeItem('jp_user');
             currentUser = null;
-            localStorage.removeItem('ali_current_user');
-            showToast("Çıkış yapıldı.");
-            updateUI();
-            fetchJokes();
+            updateAuthUI();
+            showSection('home');
         }
 
-        // Kayıt Ol
-        async function handleRegister(e) {
-            e.preventDefault();
-            const username = document.getElementById('reg-username').value.trim();
-            const password = document.getElementById('reg-password').value;
+        // Kayıt Ol Fonksiyonu
+        async function handleRegister(event) {
+            event.preventDefault();
+            const username = document.getElementById('register-username').value.trim();
+            const password = document.getElementById('register-password').value.trim();
 
-            const { data: existing } = await db.from('users').select('*').ilike('username', username);
-            if (existing && existing.length > 0) {
-                showToast("Bu kullanıcı adı zaten alınmış!", "error");
-                return;
+            // Ali Özdem hesaplarına otomatik admin yetkisi verme kontrolü
+            const isAdmin = username.toLowerCase() === 'ali özdem' || username.toLowerCase() === 'aliozdem';
+
+            try {
+                const { data, error } = await db
+                    .from('users')
+                    .insert([{ username, password, is_admin: isAdmin }])
+                    .select();
+
+                if (error) throw error;
+
+                alert('Kayıt başarılı! Şimdi giriş yapabilirsiniz.');
+                showSection('login');
+            } catch (err) {
+                alert('Kayıt olurken hata oluştu: ' + (err.message || 'Bilinmeyen hata'));
             }
-
-            const is_admin = username.toLowerCase() === "ali özdem";
-            const newUser = { username, password, is_admin };
-
-            const { error } = await db.from('users').insert([newUser]);
-            if (error) {
-                showToast("Kayıt olurken hata oluştu!", "error");
-                return;
-            }
-
-            currentUser = newUser;
-            localStorage.setItem('ali_current_user', JSON.stringify(currentUser));
-            showToast(is_admin ? "Hoş geldin patron! Admin yetkisi verildi." : "Kayıt başarılı!");
-            showPage('home');
-            updateUI();
         }
 
-        // Giriş Yap
-        async function handleLogin(e) {
-            e.preventDefault();
+        // Giriş Yap Fonksiyonu
+        async function handleLogin(event) {
+            event.preventDefault();
             const username = document.getElementById('login-username').value.trim();
-            const password = document.getElementById('login-password').value;
+            const password = document.getElementById('login-password').value.trim();
 
-            const { data, error } = await db.from('users').select('*').ilike('username', username).single();
-            if (error || !data || data.password !== password) {
-                showToast("Kullanıcı adı veya şifre hatalı!", "error");
-                return;
+            try {
+                const { data, error } = await db
+                    .from('users')
+                    .select('*')
+                    .eq('username', username)
+                    .eq('password', password)
+                    .single();
+
+                if (error || !data) {
+                    alert('Geçersiz kullanıcı adı veya şifre!');
+                    return;
+                }
+
+                currentUser = data;
+                localStorage.setItem('jp_user', JSON.stringify(currentUser));
+                updateAuthUI();
+                showSection('home');
+            } catch (err) {
+                alert('Giriş yapılırken hata oluştu. Lütfen tekrar deneyin.');
             }
-
-            currentUser = data;
-            localStorage.setItem('ali_current_user', JSON.stringify(currentUser));
-            showToast("Giriş yapıldı!");
-            showPage('home');
-            updateUI();
         }
 
-        // Espri Ekle
-        async function handleAddJoke(e) {
-            e.preventDefault();
+        // Espri Paylaşma Sayfasına Geçiş Kontrolü
+        function checkAuthAndOpenPost() {
             if (!currentUser) {
-                showPage('login');
+                alert('Espri paylaşmak için önce giriş yapmalısınız!');
+                showSection('login');
                 return;
             }
-
-            const text = document.getElementById('joke-text').value.trim();
-            if (!text) return;
-
-            const newJoke = {
-                text: text,
-                author: currentUser.username,
-                date: new Date().toLocaleDateString('tr-TR'),
-                created_at: Date.now()
-            };
-
-            const { error } = await db.from('jokes').insert([newJoke]);
-            if (error) {
-                showToast("Espri eklenemedi!", "error");
-                return;
-            }
-
-            document.getElementById('joke-text').value = '';
-            showToast("Esprin tüm dünyaya yayıldı!");
-            showPage('home');
+            showSection('post');
         }
 
-        // Espri Sil
-        async function deleteJoke(id) {
-            const { error } = await db.from('jokes').delete().eq('id', id);
-            if (error) {
-                showToast("Silme yetkiniz yok veya hata oluştu.", "error");
-                return;
+        // Espri Gönder
+        async function handlePostJoke(event) {
+            event.preventDefault();
+            if (!currentUser) return;
+
+            const content = document.getElementById('joke-content').value.trim();
+
+            try {
+                const { error } = await db
+                    .from('jokes')
+                    .insert([{ content, user_id: currentUser.id, username: currentUser.username }]);
+
+                if (error) throw error;
+
+                document.getElementById('joke-content').value = '';
+                showSection('home');
+            } catch (err) {
+                alert('Espri paylaşılamadı: ' + (err.message || 'Bilinmeyen hata'));
             }
-            showToast("Espri silindi.");
-            fetchJokes();
         }
 
-        // Esprileri Getir
+        // Esprileri Listele
         async function fetchJokes() {
-            const { data, error } = await db.from('jokes').select('*').order('created_at', { ascending: false });
-            if (error) return;
-            
-            jokes = data || [];
-            renderJokes();
-        }
-
-        function renderJokes() {
             const container = document.getElementById('jokes-container');
-            const countBadge = document.getElementById('joke-count');
-            countBadge.innerText = `${jokes.length} Espri`;
+            container.innerHTML = '<p class="text-center text-slate-500 py-8">Espriler yükleniyor...</p>';
 
-            if (jokes.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-12 bg-slate-900/30 border border-slate-800 rounded-3xl">
-                        <p class="text-4xl mb-2">🏜️</p>
-                        <p class="text-slate-400 font-medium">Henüz hiç espri eklenmemiş. İlk espriyi sen patlat!</p>
-                    </div>
-                `;
-                return;
-            }
+            try {
+                const { data, error } = await db
+                    .from('jokes')
+                    .select('*')
+                    .order('created_at', { ascending: false });
 
-            container.innerHTML = jokes.map(joke => `
-                <div class="bg-slate-900/40 border border-slate-800/80 hover:border-purple-500/30 p-6 rounded-3xl backdrop-blur-sm smooth-transition shadow-lg flex flex-col justify-between gap-4">
-                    <p class="text-slate-100 text-lg md:text-xl font-medium leading-relaxed">"${joke.text}"</p>
-                    <div class="flex items-center justify-between pt-2 border-t border-slate-800/60">
-                        <div class="flex items-center space-x-2">
-                            <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center text-xs font-bold text-white">
-                                ${joke.author.charAt(0).toUpperCase()}
-                            </div>
-                            <span class="text-xs font-semibold text-slate-300">Ekleyen: <span class="text-purple-400">${joke.author}</span></span>
-                            <span class="text-slate-600">•</span>
-                            <span class="text-[11px] text-slate-500">${joke.date}</span>
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<p class="text-center text-slate-500 py-8">Henüz hiç espri paylaşılmamış. İlk sen ol!</p>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                data.forEach(joke => {
+                    const card = document.createElement('div');
+                    card.className = 'bg-slate-800 p-5 rounded-xl border border-slate-700 shadow-md space-y-3';
+                    
+                    const isAliAdmin = joke.username && (joke.username.toLowerCase() === 'ali özdem' || joke.username.toLowerCase() === 'aliozdem');
+
+                    card.innerHTML = `
+                        <p class="text-slate-100 text-base whitespace-pre-wrap">${escapeHTML(joke.content)}</p>
+                        <div class="flex justify-between items-center text-xs text-slate-400 pt-2 border-t border-slate-700/50">
+                            <span class="font-medium text-amber-400">@${escapeHTML(joke.username || 'Anonim')} ${isAliAdmin ? '👑' : ''}</span>
+                            <span>${new Date(joke.created_at).toLocaleString('tr-TR')}</span>
                         </div>
-                        ${(currentUser && (currentUser.is_admin || currentUser.username === joke.author)) ? `
-                            <button onclick="deleteJoke(${joke.id})" class="text-xs text-red-400 bg-red-500/10 hover:bg-red-500/20 px-3 py-1 rounded-xl smooth-transition">Sil</button>
-                        ` : ''}
-                    </div>
-                </div>
-            `).join('');
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (err) {
+                container.innerHTML = '<p class="text-center text-rose-400 py-8">Espriler yüklenirken bir hata oluştu.</p>';
+            }
         }
 
-        updateUI();
-        fetchJokes();
+        // Basit Güvenlik (XSS koruması)
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
     </script>
 </body>
 </html>
