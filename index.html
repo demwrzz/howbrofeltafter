@@ -20,14 +20,17 @@
     <header class="bg-slate-800/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-700/60 p-4 shadow-lg">
         <div class="max-w-4xl mx-auto flex justify-between items-center">
             <h1 class="text-xl font-bold bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent cursor-pointer active:scale-95 transition" onclick="showSection('home')">
-                👑 Yeğenler Espri Sitesi <span class="text-xs text-slate-400 font-normal hidden sm:inline">(Ali Özdem)</span>
+                👑 Joke Palace <span class="text-xs text-slate-400 font-normal hidden sm:inline">(Ali Özdem)</span>
             </h1>
             <nav id="nav-auth" class="flex gap-3">
                 <button onclick="showSection('login')" class="px-4 py-2 text-sm bg-slate-700/80 hover:bg-slate-600 active:scale-95 rounded-xl transition font-medium">Giriş Yap</button>
                 <button onclick="showSection('register')" class="px-4 py-2 text-sm bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-semibold rounded-xl transition shadow-md shadow-amber-500/10">Kayıt Ol</button>
             </nav>
             <div id="nav-user" class="hidden flex items-center gap-3">
-                <span id="user-display-name" class="text-sm font-semibold text-amber-400 bg-amber-500/10 px-3 py-1.5 rounded-xl border border-amber-500/20"></span>
+                <button onclick="showSection('profile')" class="flex items-center gap-2 bg-slate-700/60 hover:bg-slate-700 p-1.5 pr-3 rounded-xl border border-slate-600/50 transition active:scale-95">
+                    <div id="nav-user-avatar" class="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 font-bold text-xs overflow-hidden">👤</div>
+                    <span id="user-display-name" class="text-xs font-semibold text-amber-400"></span>
+                </button>
                 <button onclick="logout()" class="px-3 py-1.5 text-xs bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 active:scale-95 rounded-xl transition font-medium">Çıkış</button>
             </div>
         </div>
@@ -88,6 +91,40 @@
             <p class="text-center text-sm text-slate-400 mt-6">Zaten hesabın var mı? <a href="#" onclick="showSection('login')" class="text-amber-400 hover:underline font-semibold">Giriş Yap</a></p>
         </section>
 
+        <!-- Profile Section -->
+        <section id="section-profile" class="page-transition hidden max-w-lg mx-auto bg-slate-800/80 backdrop-blur-md p-8 rounded-3xl border border-slate-700/60 shadow-2xl mt-6 space-y-6">
+            <div class="flex items-center gap-4 border-b border-slate-700/60 pb-6">
+                <div id="profile-avatar-box" class="w-16 h-16 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 font-bold text-2xl overflow-hidden shadow-inner">👤</div>
+                <div>
+                    <h2 id="profile-username" class="text-xl font-bold text-amber-400 flex items-center gap-1.5"></h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Joke Palace Üyesi</p>
+                </div>
+            </div>
+
+            <!-- Avatar Güncelleme Formu -->
+            <form onsubmit="handleUpdateAvatar(event)" class="space-y-3">
+                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Profil Fotoğrafı URL (Resim Linki)</label>
+                <div class="flex gap-2">
+                    <input type="url" id="profile-avatar-url" placeholder="https://ornek.com/resim.jpg" class="w-full px-4 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl focus:outline-none focus:border-amber-500 text-slate-100 text-sm transition">
+                    <button type="submit" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-bold text-sm rounded-xl transition shadow-md">Kaydet</button>
+                </div>
+            </form>
+
+            <!-- İstatistikler -->
+            <div class="grid grid-cols-2 gap-4 pt-2">
+                <div class="bg-slate-900/60 border border-slate-700/50 p-4 rounded-2xl text-center">
+                    <span class="block text-xs text-slate-400 uppercase tracking-wider font-semibold">Paylaştığın Espriler</span>
+                    <span id="stat-joke-count" class="text-2xl font-black text-amber-400 mt-1 block">0</span>
+                </div>
+                <div class="bg-slate-900/60 border border-slate-700/50 p-4 rounded-2xl text-center">
+                    <span class="block text-xs text-slate-400 uppercase tracking-wider font-semibold">Toplam Beğeni</span>
+                    <span id="stat-total-likes" class="text-2xl font-black text-emerald-400 mt-1 block">0</span>
+                </div>
+            </div>
+
+            <button onclick="showSection('home')" class="w-full py-3 bg-slate-700 hover:bg-slate-600 active:scale-[0.98] text-slate-200 font-bold rounded-xl transition text-sm">Geri Dön</button>
+        </section>
+
         <!-- Post Joke Section -->
         <section id="section-post" class="page-transition hidden max-w-lg mx-auto bg-slate-800/80 backdrop-blur-md p-8 rounded-3xl border border-slate-700/60 shadow-2xl mt-6">
             <h2 class="text-2xl font-bold mb-6 text-center text-amber-400">Yeni Espri Paylaş</h2>
@@ -103,15 +140,15 @@
             </form>
         </section>
 
-        <!-- Update Log Section (Altta) -->
+        <!-- Update Log Section -->
         <section class="mt-12 bg-slate-800/40 border border-slate-700/40 rounded-2xl p-5 text-xs text-slate-400 space-y-2">
             <h3 class="font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
                 🛠️ Update Log (Güncelleme Notları)
             </h3>
             <ul class="list-disc list-inside space-y-1 text-slate-400">
-                <li><strong class="text-slate-300">v1.2.0:</strong> Beğen (Like) ve Beğenmeme (Dislike) etkileşim özellikleri eklendi.</li>
-                <li><strong class="text-slate-300">v1.1.0:</strong> Tailwind CSS ile tamamen yenilenmiş modern arayüz ve yumuşak sayfa geçişleri entegre edildi.</li>
-                <li><strong class="text-slate-300">v1.0.0:</strong> Supabase veritabanı desteğiyle kullanıcı kayıt, giriş ve espri paylaşım sistemi kuruldu.</li>
+                <li><strong class="text-slate-300">v1.3.0:</strong> Kullanıcı profilleri, profil fotoğrafları, beğenenlerin isim listesi ve tekli oy sınırı (1 Like/Dislike) eklendi.</li>
+                <li><strong class="text-slate-300">v1.2.5:</strong> `dedokxxreal` kullanıcısı için özel Admin yetkisi ve espri silme butonu entegre edildi.</li>
+                <li><strong class="text-slate-300">v1.1.0:</strong> Tailwind CSS ile modern arayüz ve yumuşak geçişler kuruldu.</li>
             </ul>
         </section>
 
@@ -138,7 +175,7 @@
         });
 
         function showSection(sectionId) {
-            ['home', 'login', 'register', 'post'].forEach(id => {
+            ['home', 'login', 'register', 'post', 'profile'].forEach(id => {
                 const el = document.getElementById(`section-${id}`);
                 if (id === sectionId) {
                     el.classList.remove('hidden');
@@ -150,19 +187,37 @@
             });
             if (sectionId === 'home') {
                 fetchJokes();
+            } else if (sectionId === 'profile') {
+                loadProfileStats();
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function updateAuthUI() {
+        async function updateAuthUI() {
             const navAuth = document.getElementById('nav-auth');
             const navUser = document.getElementById('nav-user');
             const displayName = document.getElementById('user-display-name');
+            const navAvatar = document.getElementById('nav-user-avatar');
 
             if (currentUser) {
+                // Güncel bilgileri veritabanından tazele
+                const { data } = await db.from('users').select('*').eq('id', currentUser.id).single();
+                if (data) {
+                    currentUser = data;
+                    localStorage.setItem('jp_user', JSON.stringify(currentUser));
+                }
+
                 navAuth.classList.add('hidden');
                 navUser.classList.remove('hidden');
-                displayName.textContent = `${currentUser.username} ${currentUser.is_admin ? '👑' : ''}`;
+                
+                const isAdmin = currentUser.username.toLowerCase() === 'dedokxxreal' || currentUser.is_admin;
+                displayName.textContent = `${currentUser.username} ${isAdmin ? '👑' : ''}`;
+
+                if (currentUser.avatar_url && currentUser.avatar_url.trim() !== '') {
+                    navAvatar.innerHTML = `<img src="${escapeHTML(currentUser.avatar_url)}" class="w-full h-full object-cover">`;
+                } else {
+                    navAvatar.innerHTML = '👤';
+                }
             } else {
                 navAuth.classList.remove('hidden');
                 navUser.classList.add('hidden');
@@ -180,12 +235,12 @@
             event.preventDefault();
             const username = document.getElementById('register-username').value.trim();
             const password = document.getElementById('register-password').value.trim();
-            const isAdmin = username.toLowerCase() === 'ali özdem' || username.toLowerCase() === 'aliozdem';
+            const isAdmin = username.toLowerCase() === 'dedokxxreal' || username.toLowerCase() === 'ali özdem';
 
             try {
                 const { error } = await db
                     .from('users')
-                    .insert([{ username, password, is_admin: isAdmin }]);
+                    .insert([{ username, password, is_admin: isAdmin, avatar_url: '' }]);
 
                 if (error) throw error;
 
@@ -223,6 +278,54 @@
             }
         }
 
+        async function handleUpdateAvatar(event) {
+            event.preventDefault();
+            if (!currentUser) return;
+
+            const avatarUrl = document.getElementById('profile-avatar-url').value.trim();
+
+            try {
+                const { error } = await db
+                    .from('users')
+                    .update({ avatar_url: avatarUrl })
+                    .eq('id', currentUser.id);
+
+                if (error) throw error;
+
+                currentUser.avatar_url = avatarUrl;
+                localStorage.setItem('jp_user', JSON.stringify(currentUser));
+                updateAuthUI();
+                loadProfileStats();
+                alert('Profil fotoğrafı güncellendi!');
+            } catch (err) {
+                alert('Güncellenirken hata oluştu: ' + err.message);
+            }
+        }
+
+        async function loadProfileStats() {
+            if (!currentUser) return;
+            document.getElementById('profile-username').innerHTML = `${escapeHTML(currentUser.username)} ${(currentUser.username.toLowerCase() === 'dedokxxreal' || currentUser.is_admin) ? '👑' : ''}`;
+            document.getElementById('profile-avatar-url').value = currentUser.avatar_url || '';
+
+            const avatarBox = document.getElementById('profile-avatar-box');
+            if (currentUser.avatar_url && currentUser.avatar_url.trim() !== '') {
+                avatarBox.innerHTML = `<img src="${escapeHTML(currentUser.avatar_url)}" class="w-full h-full object-cover">`;
+            } else {
+                avatarBox.innerHTML = '👤';
+            }
+
+            try {
+                const { data: jokes } = await db.from('jokes').select('*').eq('user_id', currentUser.id);
+                if (jokes) {
+                    document.getElementById('stat-joke-count').textContent = jokes.length;
+                    const totalLikes = jokes.reduce((acc, j) => acc + (j.likes || 0), 0);
+                    document.getElementById('stat-total-likes').textContent = totalLikes;
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
         function checkAuthAndOpenPost() {
             if (!currentUser) {
                 alert('Espri paylaşmak için önce giriş yapmalısınız!');
@@ -241,7 +344,15 @@
             try {
                 const { error } = await db
                     .from('jokes')
-                    .insert([{ content, user_id: currentUser.id, username: currentUser.username, likes: 0, dislikes: 0 }]);
+                    .insert([{ 
+                        content, 
+                        user_id: currentUser.id, 
+                        username: currentUser.username, 
+                        likes: 0, 
+                        dislikes: 0,
+                        liked_by: [],
+                        disliked_by: []
+                    }]);
 
                 if (error) throw error;
 
@@ -252,24 +363,77 @@
             }
         }
 
-        async function voteJoke(jokeId, type, currentLikes, currentDislikes) {
-            let updateData = {};
-            if (type === 'like') {
-                updateData = { likes: (currentLikes || 0) + 1 };
-            } else {
-                updateData = { dislikes: (currentDislikes || 0) + 1 };
+        async function voteJoke(jokeId, type) {
+            if (!currentUser) {
+                alert('Oy vermek için giriş yapmalısınız!');
+                showSection('login');
+                return;
             }
 
             try {
-                const { error } = await db
+                // Mevcut espri verisini çek
+                const { data: joke, error: fetchErr } = await db.from('jokes').select('*').eq('id', jokeId).single();
+                if (fetchErr || !joke) throw fetchErr;
+
+                let likedBy = joke.liked_by || [];
+                let dislikedBy = joke.disliked_by || [];
+                let likes = joke.likes || 0;
+                let dislikes = joke.dislikes || 0;
+
+                const username = currentUser.username;
+
+                if (type === 'like') {
+                    if (likedBy.includes(username)) {
+                        alert('Bu espriyi zaten beğendin!');
+                        return;
+                    }
+                    if (dislikedBy.includes(username)) {
+                        dislikedBy = dislikedBy.filter(u => u !== username);
+                        dislikes = Math.max(0, dislikes - 1);
+                    }
+                    likedBy.push(username);
+                    likes += 1;
+                } else {
+                    if (dislikedBy.includes(username)) {
+                        alert('Bu espriye zaten dislike attın!');
+                        return;
+                    }
+                    if (likedBy.includes(username)) {
+                        likedBy = likedBy.filter(u => u !== username);
+                        likes = Math.max(0, likes - 1);
+                    }
+                    dislikedBy.push(username);
+                    dislikes += 1;
+                }
+
+                const { error: updateErr } = await db
                     .from('jokes')
-                    .update(updateData)
+                    .update({ likes, dislikes, liked_by: likedBy, disliked_by: dislikedBy })
                     .eq('id', jokeId);
 
-                if (error) throw error;
-                fetchJokes(); // Listeyi güncelle
+                if (updateErr) throw updateErr;
+                fetchJokes();
             } catch (err) {
-                alert('İşlem başarısız oldu.');
+                alert('İşlem başarısız oldu: ' + (err.message || 'Bilinmeyen hata'));
+            }
+        }
+
+        async function deleteJoke(jokeId) {
+            if (!currentUser) return;
+            const isAdmin = currentUser.username.toLowerCase() === 'dedokxxreal' || currentUser.is_admin;
+            if (!isAdmin) {
+                alert('Bu işlem için yetkiniz yok!');
+                return;
+            }
+
+            if (!confirm('Bu espriyi silmek istediğinize emin misiniz?')) return;
+
+            try {
+                const { error } = await db.from('jokes').delete().eq('id', jokeId);
+                if (error) throw error;
+                fetchJokes();
+            } catch (err) {
+                alert('Silinirken hata oluştu: ' + err.message);
             }
         }
 
@@ -282,6 +446,13 @@
             `;
 
             try {
+                // Tüm kullanıcıların avatarlarını eşleştirmek için kullanıcıları çekelim
+                const { data: usersData } = await db.from('users').select('username, avatar_url');
+                const avatarMap = {};
+                if (usersData) {
+                    usersData.forEach(u => { avatarMap[u.username] = u.avatar_url; });
+                }
+
                 const { data, error } = await db
                     .from('jokes')
                     .select('*')
@@ -299,19 +470,43 @@
                     const card = document.createElement('div');
                     card.className = 'bg-slate-800/70 hover:bg-slate-800 transition p-5 rounded-2xl border border-slate-700/60 shadow-lg space-y-3';
                     
-                    const isAliAdmin = joke.username && (joke.username.toLowerCase() === 'ali özdem' || joke.username.toLowerCase() === 'aliozdem');
+                    const username = joke.username || 'Anonim';
+                    const isDedokOrAdmin = username.toLowerCase() === 'dedokxxreal' || username.toLowerCase() === 'ali özdem';
                     const likes = joke.likes || 0;
                     const dislikes = joke.dislikes || 0;
+                    const likedByList = joke.liked_by || [];
+                    const userAvatar = avatarMap[username];
+
+                    // Avatar HTML oluştur
+                    let avatarHtml = `<div class="w-7 h-7 rounded-lg bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-xs overflow-hidden">👤</div>`;
+                    if (userAvatar && userAvatar.trim() !== '') {
+                        avatarHtml = `<div class="w-7 h-7 rounded-lg overflow-hidden border border-amber-500/30"><img src="${escapeHTML(userAvatar)}" class="w-full h-full object-cover"></div>`;
+                    }
+
+                    // Beğenenler yazısı
+                    let likedByText = '';
+                    if (likedByList.length > 0) {
+                        likedByText = `<div class="text-[11px] text-slate-400 pt-1">👍 Beğenenler: <span class="text-slate-300 font-medium">${escapeHTML(likedByList.join(', '))}</span></div>`;
+                    }
+
+                    // Admin silme butonu yetki kontrolü
+                    const isCurrentAdmin = currentUser && (currentUser.username.toLowerCase() === 'dedokxxreal' || currentUser.is_admin);
+                    const deleteBtnHtml = isCurrentAdmin ? `<button onclick="deleteJoke('${joke.id}')" class="text-rose-400 hover:text-rose-300 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-lg text-xs transition ml-2">🗑️ Sil</button>` : '';
 
                     card.innerHTML = `
                         <p class="text-slate-100 text-base whitespace-pre-wrap leading-relaxed">${escapeHTML(joke.content)}</p>
+                        ${likedByText}
                         <div class="flex justify-between items-center text-xs text-slate-400 pt-3 border-t border-slate-700/40">
-                            <span class="font-semibold text-amber-400 flex items-center gap-1">@${escapeHTML(joke.username || 'Anonim')} ${isAliAdmin ? '👑' : ''}</span>
+                            <div class="flex items-center gap-2">
+                                ${avatarHtml}
+                                <span class="font-semibold text-amber-400 flex items-center gap-1">@${escapeHTML(username)} ${isDedokOrAdmin ? '👑' : ''}</span>
+                                ${deleteBtnHtml}
+                            </div>
                             <div class="flex items-center gap-3">
-                                <button onclick="voteJoke('${joke.id}', 'like', ${likes}, ${dislikes})" class="flex items-center gap-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-lg transition active:scale-95 font-medium">
+                                <button onclick="voteJoke('${joke.id}', 'like')" class="flex items-center gap-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-lg transition active:scale-95 font-medium">
                                     👍 <span>${likes}</span>
                                 </button>
-                                <button onclick="voteJoke('${joke.id}', 'dislike', ${likes}, ${dislikes})" class="flex items-center gap-1 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 px-2.5 py-1 rounded-lg transition active:scale-95 font-medium">
+                                <button onclick="voteJoke('${joke.id}', 'dislike')" class="flex items-center gap-1 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 px-2.5 py-1 rounded-lg transition active:scale-95 font-medium">
                                     👎 <span>${dislikes}</span>
                                 </button>
                                 <span class="text-slate-500 hidden sm:inline">${new Date(joke.created_at).toLocaleDateString('tr-TR')} ${new Date(joke.created_at).toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'})}</span>
@@ -333,4 +528,3 @@
     </script>
 </body>
 </html>
-
