@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yeğenler - Espri Sitesi</title>
+    <title>Yeğenler - Espri Sitesi & Oyunlar</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS Client CDN -->
@@ -50,9 +50,48 @@
                     ✨ Espri Paylaş
                 </button>
             </div>
+            
+            <!-- Yeni Oyun Duyuru Kutusu -->
+            <div onclick="showSection('flappy')" class="bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-rose-500/20 border border-amber-500/40 p-5 rounded-2xl cursor-pointer hover:border-amber-500 transition shadow-lg flex items-center justify-between group">
+                <div class="space-y-1">
+                    <span class="bg-amber-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">Yeni Çıktı!</span>
+                    <h3 class="text-base font-bold text-slate-100 group-hover:text-amber-400 transition">Yeni çıkan oyunumuzu denemek ister misiniz yeğen? 🎮</h3>
+                    <p class="text-xs text-slate-400">Flappy Yeğen oyna, skorunu yap ve haftalık ligde zirveye yerleş!</p>
+                </div>
+                <span class="text-2xl group-hover:translate-x-1 transition">🕹️</span>
+            </div>
+
             <div id="jokes-container" class="space-y-4">
                 <div class="flex justify-center items-center py-12">
                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Flappy Bird Game Section -->
+        <section id="section-flappy" class="page-transition hidden max-w-xl mx-auto bg-slate-800/90 backdrop-blur-md p-6 rounded-3xl border border-slate-700/60 shadow-2xl mt-4 space-y-6 text-center">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold text-amber-400 flex items-center gap-2">🐦 Flappy Yeğen</h2>
+                <button onclick="showSection('home')" class="px-3 py-1.5 text-xs bg-slate-700 hover:bg-slate-600 rounded-xl transition text-slate-300">Geri Dön</button>
+            </div>
+
+            <div class="relative w-full aspect-[4/3] bg-slate-950 rounded-2xl overflow-hidden border border-slate-700 shadow-inner flex flex-col items-center justify-center">
+                <canvas id="flappyCanvas" width="400" height="300" class="w-full h-full cursor-pointer bg-sky-950"></canvas>
+                <div id="game-overlay" class="absolute inset-0 bg-slate-950/80 flex flex-col items-center justify-center p-4 space-y-3">
+                    <h3 class="text-2xl font-black text-amber-400">Flappy Yeğen</h3>
+                    <p class="text-xs text-slate-300">Oynamak için ekrana tıkla veya boşluk tuşuna bas!</p>
+                    <button onclick="startFlappyGame()" class="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl shadow-lg transition active:scale-95 text-sm">Oyuna Başla</button>
+                </div>
+            </div>
+
+            <!-- Leaderboard (Haftalık Sıralama) -->
+            <div class="space-y-3 text-left bg-slate-900/60 p-4 rounded-2xl border border-slate-700/50">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-sm font-bold text-amber-400 flex items-center gap-1.5">🏆 Haftalık Liderlik Tablosu</h3>
+                    <span class="text-[10px] text-slate-400 bg-slate-800 px-2 py-1 rounded-lg">Her Pazartesi Sıfırlanır</span>
+                </div>
+                <div id="leaderboard-container" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                    <div class="text-center text-xs text-slate-500 py-4">Skorlar yükleniyor...</div>
                 </div>
             </div>
         </section>
@@ -146,10 +185,9 @@
                 🛠️ Update Log (Güncelleme Notları)
             </h3>
             <ul class="list-disc list-inside space-y-1 text-slate-400">
+                <li><strong class="text-slate-300">v1.5.0:</strong> "Flappy Yeğen" oyunu ve her hafta otomatik yenilenen Altın/Gümüş/Bronz tagli liderlik tablosu eklendi.</li>
                 <li><strong class="text-slate-300">v1.4.0:</strong> Site tamamen "Yeğenler" konseptine ve adına uyarlandı.</li>
                 <li><strong class="text-slate-300">v1.3.1:</strong> Doğrudan cihazdan profil fotoğrafı seçme (dosya yükleme) özelliği eklendi.</li>
-                <li><strong class="text-slate-300">v1.2.5:</strong> `dedokxxreal` kullanıcısı için özel Admin yetkisi ve espri silme butonu entegre edildi.</li>
-                <li><strong class="text-slate-300">v1.1.0:</strong> Tailwind CSS ile modern arayüz ve yumuşak geçişler kuruldu.</li>
             </ul>
         </section>
 
@@ -176,7 +214,7 @@
         });
 
         function showSection(sectionId) {
-            ['home', 'login', 'register', 'post', 'profile'].forEach(id => {
+            ['home', 'login', 'register', 'post', 'profile', 'flappy'].forEach(id => {
                 const el = document.getElementById(`section-${id}`);
                 if (id === sectionId) {
                     el.classList.remove('hidden');
@@ -190,6 +228,8 @@
                 fetchJokes();
             } else if (sectionId === 'profile') {
                 loadProfileStats();
+            } else if (sectionId === 'flappy') {
+                fetchLeaderboard();
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -200,8 +240,8 @@
             const displayName = document.getElementById('user-display-name');
             const navAvatar = document.getElementById('nav-user-avatar');
 
-            if (currentUser) {
-                const { data } = await db.from('users').select('*').eq('id', currentUser.id).single();
+            if (currentUser && currentUser.username) {
+                const { data } = await db.from('users').select('*').eq('username', currentUser.username).single();
                 if (data) {
                     currentUser = data;
                     localStorage.setItem('jp_user', JSON.stringify(currentUser));
@@ -280,7 +320,10 @@
 
         async function handleUpdateAvatar(event) {
             event.preventDefault();
-            if (!currentUser) return;
+            if (!currentUser || !currentUser.username) {
+                alert('Lütfen önce çıkış yapıp tekrar giriş yap yeğen!');
+                return;
+            }
 
             const fileInput = document.getElementById('profile-image-file');
             if (fileInput.files.length === 0) {
@@ -298,7 +341,7 @@
                     const { error } = await db
                         .from('users')
                         .update({ avatar_url: base64Image })
-                        .eq('id', currentUser.id);
+                        .eq('username', currentUser.username);
 
                     if (error) throw error;
 
@@ -316,7 +359,7 @@
         }
 
         async function loadProfileStats() {
-            if (!currentUser) return;
+            if (!currentUser || !currentUser.username) return;
             document.getElementById('profile-username').innerHTML = `${escapeHTML(currentUser.username)} ${(currentUser.username.toLowerCase() === 'dedokxxreal' || currentUser.is_admin) ? '👑' : ''}`;
             
             const avatarBox = document.getElementById('profile-avatar-box');
@@ -327,7 +370,7 @@
             }
 
             try {
-                const { data: jokes } = await db.from('jokes').select('*').eq('user_id', currentUser.id);
+                const { data: jokes } = await db.from('jokes').select('*').eq('username', currentUser.username);
                 if (jokes) {
                     document.getElementById('stat-joke-count').textContent = jokes.length;
                     const totalLikes = jokes.reduce((acc, j) => acc + (j.likes || 0), 0);
@@ -358,7 +401,7 @@
                     .from('jokes')
                     .insert([{ 
                         content, 
-                        user_id: currentUser.id, 
+                        user_id: currentUser.id || null, 
                         username: currentUser.username, 
                         likes: 0, 
                         dislikes: 0,
@@ -527,6 +570,193 @@
             }
         }
 
+        // --- FLAPPY BIRD OYUN MANTIĞI ---
+        const canvas = document.getElementById('flappyCanvas');
+        const ctx = canvas.getContext('2d');
+        let gameInterval = null;
+        let bird = { x: 50, y: 150, radius: 12, gravity: 0.6, lift: -9, velocity: 0 };
+        let pipes = [];
+        let score = 0;
+        let isGameRunning = false;
+
+        function getCurrentWeekID() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const oneJan = new Date(year, 0, 1);
+            const week = Math.ceil((((now - oneJan) / 86400000) + oneJan.getDay() + 1) / 7);
+            return `${year}-W${week}`;
+        }
+
+        function startFlappyGame() {
+            document.getElementById('game-overlay').classList.add('hidden');
+            bird.y = 150;
+            bird.velocity = 0;
+            pipes = [];
+            score = 0;
+            isGameRunning = true;
+            
+            if (gameInterval) clearInterval(gameInterval);
+            gameInterval = setInterval(updateGame, 1000 / 60);
+        }
+
+        canvas.addEventListener('click', () => {
+            if (isGameRunning) {
+                bird.velocity = bird.lift;
+            }
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && isGameRunning) {
+                e.preventDefault();
+                bird.velocity = bird.lift;
+            }
+        });
+
+        function updateGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Kuş hareketi
+            bird.velocity += bird.gravity;
+            bird.y += bird.velocity;
+
+            // Kuş çizimi
+            ctx.fillStyle = '#f59e0b';
+            ctx.beginPath();
+            ctx.arc(bird.x, bird.y, bird.radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#78350f';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Borular
+            if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - 160) {
+                let gapHeight = 100;
+                let topHeight = Math.floor(Math.random() * (canvas.height - gapHeight - 80)) + 40;
+                pipes.push({ x: canvas.width, top: topHeight, bottom: canvas.height - topHeight - gapHeight, passed: false });
+            }
+
+            ctx.fillStyle = '#10b981';
+            pipes.forEach(pipe => {
+                pipe.x -= 2.5;
+                ctx.fillRect(pipe.x, 0, 50, pipe.top);
+                ctx.fillRect(pipe.x, canvas.height - pipe.bottom, 50, pipe.bottom);
+
+                // Skor artırma
+                if (!pipe.passed && pipe.x + 50 < bird.x) {
+                    score++;
+                    pipe.passed = true;
+                }
+
+                // Çarpışma kontrolü
+                if (
+                    bird.x + bird.radius > pipe.x && bird.x - bird.radius < pipe.x + 50 &&
+                    (bird.y - bird.radius < pipe.top || bird.y + bird.radius > canvas.height - pipe.bottom)
+                ) {
+                    gameOver();
+                }
+            });
+
+            // Yer ve tavan kontrolü
+            if (bird.y + bird.radius > canvas.height || bird.y - bird.radius < 0) {
+                gameOver();
+            }
+
+            pipes = pipes.filter(pipe => pipe.x > -50);
+
+            // Skor yazısı
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 20px sans-serif';
+            ctx.fillText(`Skor: ${score}`, 15, 30);
+        }
+
+        async function gameOver() {
+            isGameRunning = false;
+            clearInterval(gameInterval);
+
+            const overlay = document.getElementById('game-overlay');
+            overlay.classList.remove('hidden');
+            overlay.innerHTML = `
+                <h3 class="text-2xl font-black text-rose-500">Oyun Bitti!</h3>
+                <p class="text-sm text-slate-200">Skorun: <strong class="text-amber-400">${score}</strong></p>
+                <button onclick="startFlappyGame()" class="px-6 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl shadow-lg transition active:scale-95 text-sm">Tekrar Oyna</button>
+            `;
+
+            if (currentUser && currentUser.username) {
+                try {
+                    const weekId = getCurrentWeekID();
+                    await db.from('flappy_scores').insert([{
+                        username: currentUser.username,
+                        score: score,
+                        week_id: weekId
+                    }]);
+                    fetchLeaderboard();
+                } catch (err) {
+                    console.error('Skor kaydedilemedi:', err);
+                }
+            }
+        }
+
+        async function fetchLeaderboard() {
+            const container = document.getElementById('leaderboard-container');
+            container.innerHTML = '<div class="text-center text-xs text-slate-500 py-3">Skorlar yükleniyor...</div>';
+
+            try {
+                const weekId = getCurrentWeekID();
+                const { data, error } = await db
+                    .from('flappy_scores')
+                    .select('*')
+                    .eq('week_id', weekId)
+                    .order('score', { ascending: false });
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<div class="text-center text-xs text-slate-500 py-3">Bu hafta henüz skor kaydedilmemiş yeğen. İlk sen ol!</div>';
+                    return;
+                }
+
+                // Aynı kullanıcının en yüksek skorunu almak için filtreleme
+                const bestScores = {};
+                data.forEach(item => {
+                    if (!bestScores[item.username] || item.score > bestScores[item.username]) {
+                        bestScores[item.username] = item.score;
+                    }
+                });
+
+                const sortedScores = Object.entries(bestScores).sort((a, b) => b[1] - a[1]);
+
+                container.innerHTML = '';
+                sortedScores.forEach(([uname, scr], index) => {
+                    let rankTag = `<span class="text-xs text-slate-400 font-mono w-6 text-center">#${index + 1}</span>`;
+                    let bgStyle = "bg-slate-900/40 border-slate-800";
+
+                    if (index === 0) {
+                        rankTag = `<span class="bg-amber-500/20 text-amber-400 border border-amber-500/40 px-2 py-0.5 rounded-lg text-xs font-bold flex items-center gap-1">🥇 1. Altın</span>`;
+                        bgStyle = "bg-amber-500/10 border-amber-500/30";
+                    } else if (index === 1) {
+                        rankTag = `<span class="bg-slate-300/20 text-slate-200 border border-slate-300/40 px-2 py-0.5 rounded-lg text-xs font-bold flex items-center gap-1">🥈 2. Gümüş</span>`;
+                        bgStyle = "bg-slate-300/10 border-slate-300/30";
+                    } else if (index === 2) {
+                        rankTag = `<span class="bg-amber-700/20 text-amber-600 border border-amber-700/40 px-2 py-0.5 rounded-lg text-xs font-bold flex items-center gap-1">🥉 3. Bronz</span>`;
+                        bgStyle = "bg-amber-700/10 border-amber-700/30";
+                    }
+
+                    const row = document.createElement('div');
+                    row.className = `flex justify-between items-center p-2.5 rounded-xl border ${bgStyle} text-xs`;
+                    row.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            ${rankTag}
+                            <span class="font-semibold text-slate-200">@${escapeHTML(uname)}</span>
+                        </div>
+                        <span class="font-bold text-amber-400">${scr} Puan</span>
+                    `;
+                    container.appendChild(row);
+                });
+            } catch (err) {
+                container.innerHTML = '<div class="text-center text-xs text-rose-400 py-3">Liderlik tablosu yüklenemedi yeğen.</div>';
+            }
+        }
+
         function escapeHTML(str) {
             return str.replace(/[&<>'"]/g, 
                 tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
@@ -535,3 +765,4 @@
     </script>
 </body>
 </html>
+
