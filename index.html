@@ -205,7 +205,8 @@
                 🛠️ Update Log (Güncelleme Notları)
             </h3>
             <ul class="list-disc list-inside space-y-1 text-slate-400">
-                <li><strong class="text-slate-300">v1.7.3:</strong> Flappy Yeğen skor kaydetme esnasındaki `week_id` boş kalma hatası (not-null constraint violation) giderildi.</li>
+                <li><strong class="text-slate-300">v1.8.0:</strong> Esprilerin altına yorum yapma (tartışma alanı) özelliği eklendi.</li>
+                <li><strong class="text-slate-300">v1.7.3:</strong> Flappy Yeğen skor kaydetme hatası giderildi.</li>
             </ul>
         </section>
 
@@ -410,7 +411,42 @@
             if (!currentUser || currentUser.username.toLowerCase() !== 'prodedok') return;
             if (!confirm('Silmek istediğine emin misin?')) return;
             await db.from('jokes').delete().eq('id', jokeId);
+            await db.from('joke_comments').delete().eq('joke_id', jokeId);
             fetchJokes();
+        }
+
+        async function addComment(jokeId) {
+            if (!currentUser) {
+                alert('Yorum yapmak için giriş yapmalısın yeğen!');
+                showSection('login');
+                return;
+            }
+            const input = document.getElementById(`comment-input-${jokeId}`);
+            const content = input.value.trim();
+            if (!content) return;
+
+            try {
+                const { error } = await db.from('joke_comments').insert([{
+                    joke_id: jokeId,
+                    username: currentUser.username,
+                    content: content
+                }]);
+                if (error) throw error;
+                input.value = '';
+                fetchJokes();
+            } catch (err) {
+                alert('Yorum eklenemedi: ' + err.message);
+            }
+        }
+
+        async function deleteComment(commentId) {
+            if (!currentUser || currentUser.username.toLowerCase() !== 'prodedok') return;
+            try {
+                await db.from('joke_comments').delete().eq('id', commentId);
+                fetchJokes();
+            } catch (err) {
+                alert('Yorum silinemedi: ' + err.message);
+            }
         }
 
         async function fetchJokes() {
@@ -418,6 +454,15 @@
             const { data: usersData } = await db.from('users').select('username, avatar_url');
             const avatarMap = {};
             if (usersData) usersData.forEach(u => avatarMap[u.username] = u.avatar_url);
+
+            const { data: commentsData } = await db.from('joke_comments').select('*').order('created_at', { ascending: true });
+            const commentsMap = {};
+            if (commentsData) {
+                commentsData.forEach(c => {
+                    if (!commentsMap[c.joke_id]) commentsMap[c.joke_id] = [];
+                    commentsMap[c.joke_id].push(c);
+                });
+            }
 
             const { data } = await db.from('jokes').select('*').order('created_at', { ascending: false });
             if (!data || data.length === 0) {
@@ -433,17 +478,49 @@
                 const isProdedok = uname.toLowerCase() === 'prodedok';
                 let avatarHtml = avatarMap[uname] ? `<img src="${avatarMap[uname]}" class="w-full h-full object-cover">` : '👤';
 
+                // Yorumlar Listesi
+                const jokeComments = commentsMap[joke.id] || [];
+                let commentsHtml = '';
+                jokeComments.forEach(comm => {
+                    const commAuthorAdmin = comm.username.toLowerCase() === 'prodedok';
+                    const deleteCommBtn = (currentUser && currentUser.username.toLowerCase() === 'prodedok') ? `<button onclick="deleteComment('${comm.id}')" class="text-rose-400 hover:text-rose-300 ml-2">🗑️</button>` : '';
+                    commentsHtml += `
+                        <div class="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80 text-xs flex justify-between items-start">
+                            <div>
+                                <span class="font-semibold text-amber-400">@${escapeHTML(comm.username)} ${commAuthorAdmin ? '👑' : ''}:</span>
+                                <span class="text-slate-200 ml-1">${escapeHTML(comm.content)}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] text-slate-500">${new Date(comm.created_at).toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'})}</span>
+                                ${deleteCommBtn}
+                            </div>
+                        </div>
+                    `;
+                });
+
                 card.innerHTML = `
                     <p class="text-slate-100 text-base">${escapeHTML(joke.content)}</p>
                     <div class="flex justify-between items-center text-xs text-slate-400 pt-3 border-t border-slate-700/40">
                         <div class="flex items-center gap-2">
                             <div class="w-7 h-7 rounded-lg overflow-hidden border border-amber-500/30 flex items-center justify-center">${avatarHtml}</div>
                             <span class="font-semibold text-amber-400">@${escapeHTML(uname)} ${isProdedok ? '👑' : ''}</span>
-                            ${currentUser && currentUser.username.toLowerCase() === 'prodedok' ? `<button onclick="deleteJoke('${joke.id}')" class="text-rose-400 ml-2">🗑️</button>` : ''}
+                            ${currentUser && currentUser.username.toLowerCase() === 'prodedok' ? `<button onclick="deleteJoke('${joke.id}')" class="text-rose-400 ml-2">🗑️ Sil</button>` : ''}
                         </div>
                         <div class="flex items-center gap-3">
                             <button onclick="voteJoke('${joke.id}', 'like')" class="bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-lg">👍 ${joke.likes || 0}</button>
                             <button onclick="voteJoke('${joke.id}', 'dislike')" class="bg-rose-500/10 text-rose-400 px-2 py-1 rounded-lg">👎 ${joke.dislikes || 0}</button>
+                        </div>
+                    </div>
+
+                    <!-- Yorumlar Alanı -->
+                    <div class="mt-4 pt-3 border-t border-slate-700/40 space-y-2">
+                        <div class="text-xs font-bold text-slate-300">💬 Yorumlar (${jokeComments.length})</div>
+                        <div class="space-y-2 max-h-40 overflow-y-auto pr-1">
+                            ${commentsHtml || '<div class="text-xs text-slate-500 italic">Henüz yorum yapılmamış. İlk yorumu sen yap!</div>'}
+                        </div>
+                        <div class="flex gap-2 pt-1">
+                            <input type="text" id="comment-input-${joke.id}" placeholder="Yorum yaz yeğen..." class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-amber-500">
+                            <button onclick="addComment('${joke.id}')" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition">Gönder</button>
                         </div>
                     </div>
                 `;
