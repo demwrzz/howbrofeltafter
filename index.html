@@ -1,634 +1,529 @@
-<!DOCTYPE html>
-<html lang="tr" class="scroll-smooth">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yeğenler - Espri Sitesi & Oyunlar</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Supabase JS Client CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        .page-transition {
-            transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
-        }
-    </style>
-</head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between font-sans selection:bg-amber-500 selection:text-slate-950">
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  Coins, 
+  RotateCcw, 
+  Volume2, 
+  VolumeX, 
+  TrendingUp, 
+  Award, 
+  History,
+  DollarSign,
+  Maximize2,
+  Minus,
+  Plus
+} from 'lucide-react';
 
-    <!-- Bakım Modu Ekranı -->
-    <div id="maintenance-screen" class="hidden fixed inset-0 z-[9999] bg-slate-950 flex flex-col items-center justify-center p-6 text-center space-y-4">
-        <div class="text-6xl animate-bounce">🛠️</div>
-        <h1 class="text-2xl sm:text-3xl font-black text-amber-400">Şuan Dedok Siteyle İlgili Bazı Şeyleri Güncelliyor Lütfen Bekleyin</h1>
-        <p class="text-sm text-slate-400 max-w-md">Yeğenler platformu çok daha iyi bir deneyim için güncelleniyor. Kısa süre sonra buradayız!</p>
-    </div>
+// Ana Uygulama
+const CoinFlipApp = () => {
+  // State'ler
+  const [balance, setBalance] = useState(1000);
+  const [betAmount, setBetAmount] = useState(10);
+  const [selectedSide, setSelectedSide] = useState(null); // 'heads' veya 'tails'
+  const [gameState, setGameState] = useState('idle'); // idle, flipping, won, lost
+  const [result, setResult] = useState(null);
+  const [history, setHistory] = useState([]);
+  const [stats, setStats] = useState({ wins: 0, losses: 0, total: 0 });
+  const [isMuted, setIsMuted] = useState(false);
+  const [isFlipping, setIsFlipping] = useState(false);
+  const [rotation, setRotation] = useState(0);
+  
+  // Ses efektleri için ref
+  const flipSoundRef = useRef(null);
+  const winSoundRef = useRef(null);
+  const loseSoundRef = useRef(null);
 
-    <!-- Header / Navbar -->
-    <header class="bg-slate-800/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-700/60 p-4 shadow-lg">
-        <div class="max-w-4xl mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent cursor-pointer active:scale-95 transition" onclick="showSection('home')">
-                🔥 Yeğenler Espri Sitesi
-            </h1>
-            <nav id="nav-auth" class="flex gap-3">
-                <button onclick="showSection('login')" class="px-4 py-2 text-sm bg-slate-700/80 hover:bg-slate-600 active:scale-95 rounded-xl transition font-medium">Giriş Yap</button>
-                <button onclick="showSection('register')" class="px-4 py-2 text-sm bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-semibold rounded-xl transition shadow-md shadow-amber-500/10">Kayıt Ol</button>
-            </nav>
-            <div id="nav-user" class="hidden flex items-center gap-3">
-                <button onclick="showSection('profile')" class="flex items-center gap-2 bg-slate-700/60 hover:bg-slate-700 p-1.5 pr-3 rounded-xl border border-slate-600/50 transition active:scale-95">
-                    <div id="nav-user-avatar" class="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 font-bold text-xs overflow-hidden">👤</div>
-                    <span id="user-display-name" class="text-xs font-semibold text-amber-400"></span>
-                </button>
-                <button id="nav-admin-btn" onclick="showSection('admin')" class="hidden px-3 py-1.5 text-xs bg-amber-500/20 text-amber-400 border border-amber-500/30 hover:bg-amber-500/30 active:scale-95 rounded-xl transition font-bold">Admin Panel</button>
-                <button onclick="logout()" class="px-3 py-1.5 text-xs bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 active:scale-95 rounded-xl transition font-medium">Çıkış</button>
-            </div>
+  // Ses efektlerini yükle
+  useEffect(() => {
+    // Basit ses efektleri (Web Audio API ile)
+    const createFlipSound = () => {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      oscillator.frequency.value = 800;
+      oscillator.type = 'sine';
+      gainNode.gain.value = 0.1;
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + 0.1);
+    };
+
+    const createWinSound = () => {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const notes = [523.25, 659.25, 783.99];
+      notes.forEach((freq, i) => {
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        oscillator.frequency.value = freq;
+        oscillator.type = 'sine';
+        gainNode.gain.value = 0.1;
+        oscillator.start(audioCtx.currentTime + i * 0.1);
+        oscillator.stop(audioCtx.currentTime + i * 0.1 + 0.1);
+      });
+    };
+
+    const createLoseSound = () => {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      oscillator.frequency.value = 300;
+      oscillator.type = 'sawtooth';
+      gainNode.gain.value = 0.05;
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + 0.3);
+    };
+
+    flipSoundRef.current = createFlipSound;
+    winSoundRef.current = createWinSound;
+    loseSoundRef.current = createLoseSound;
+  }, []);
+
+  // Bahis miktarı ayarla
+  const setBetPreset = (amount) => {
+    if (amount === 'MAX') {
+      setBetAmount(balance);
+    } else {
+      setBetAmount(Math.min(amount, balance));
+    }
+  };
+
+  // Para seçimi
+  const selectSide = (side) => {
+    if (gameState === 'flipping') return;
+    setSelectedSide(side);
+  };
+
+  // Para çevir
+  const flipCoin = () => {
+    if (!selectedSide) {
+      alert('Lütfen önce Yazı veya Tura seçin!');
+      return;
+    }
+    
+    if (betAmount > balance) {
+      alert('Yetersiz bakiye!');
+      return;
+    }
+
+    if (betAmount <= 0) {
+      alert('Geçerli bir bahis miktarı girin!');
+      return;
+    }
+
+    // Oyunu başlat
+    setIsFlipping(true);
+    setGameState('flipping');
+    
+    // Ses efekti
+    if (!isMuted && flipSoundRef.current) {
+      flipSoundRef.current();
+    }
+
+    // Rastgele sonuç
+    const flipResult = Math.random() < 0.5 ? 'heads' : 'tails';
+    
+    // Animasyon döngüsü
+    let rotations = 0;
+    const totalRotations = 5 + Math.random() * 3; // 5-8 tam tur
+    const interval = setInterval(() => {
+      rotations += 0.5;
+      setRotation(rotations * 360);
+      if (rotations >= totalRotations) {
+        clearInterval(interval);
+        // Sonucu belirle
+        const finalRotation = flipResult === 'heads' ? 0 : 180;
+        setRotation(totalRotations * 360 + finalRotation);
+        setResult(flipResult);
+        
+        // Kazanç kontrolü
+        const won = flipResult === selectedSide;
+        setTimeout(() => {
+          setIsFlipping(false);
+          setGameState(won ? 'won' : 'lost');
+          
+          // Ses efektleri
+          if (!isMuted) {
+            if (won && winSoundRef.current) {
+              winSoundRef.current();
+            } else if (!won && loseSoundRef.current) {
+              loseSoundRef.current();
+            }
+          }
+          
+          // Bakiye güncelle
+          if (won) {
+            setBalance(prev => prev + betAmount);
+          } else {
+            setBalance(prev => prev - betAmount);
+          }
+          
+          // İstatistik güncelle
+          setStats(prev => ({
+            wins: prev.wins + (won ? 1 : 0),
+            losses: prev.losses + (won ? 0 : 1),
+            total: prev.total + 1
+          }));
+          
+          // Geçmişe ekle
+          setHistory(prev => {
+            const newHistory = [{ 
+              result: flipResult, 
+              won, 
+              amount: betAmount,
+              time: new Date().toLocaleTimeString()
+            }, ...prev].slice(0, 10);
+            return newHistory;
+          });
+          
+          // 2 saniye sonra idle durumuna dön
+          setTimeout(() => {
+            setGameState('idle');
+            setResult(null);
+          }, 3000);
+        }, 500);
+      }
+    }, 50);
+  };
+
+  // Konfeti efekti
+  const ConfettiEffect = () => {
+    if (gameState !== 'won') return null;
+    
+    return (
+      <div className="fixed inset-0 pointer-events-none z-50">
+        {[...Array(50)].map((_, i) => {
+          const colors = ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7'];
+          const randomColor = colors[Math.floor(Math.random() * colors.length)];
+          const left = Math.random() * 100;
+          const delay = Math.random() * 2;
+          const duration = 2 + Math.random() * 2;
+          
+          return (
+            <div
+              key={i}
+              className="absolute"
+              style={{
+                left: `${left}%`,
+                top: '-10%',
+                width: '10px',
+                height: '10px',
+                background: randomColor,
+                borderRadius: Math.random() > 0.5 ? '50%' : '0',
+                animation: `confetti ${duration}s ease-in ${delay}s forwards`,
+                transform: `rotate(${Math.random() * 360}deg)`,
+              }}
+            />
+          );
+        })}
+        <style jsx>{`
+          @keyframes confetti {
+            0% {
+              transform: translateY(0) rotate(0deg) scale(1);
+              opacity: 1;
+            }
+            100% {
+              transform: translateY(100vh) rotate(720deg) scale(0);
+              opacity: 0;
+            }
+          }
+        `}</style>
+      </div>
+    );
+  };
+
+  // Coin bileşeni
+  const Coin = ({ isFlipping, result, rotation }) => {
+    const getCoinStyle = () => {
+      if (isFlipping) {
+        return {
+          transform: `rotateY(${rotation}deg)`,
+          transition: 'transform 0.05s linear',
+        };
+      }
+      if (result === 'heads') {
+        return {
+          transform: 'rotateY(0deg)',
+          transition: 'transform 0.5s ease-out',
+        };
+      }
+      if (result === 'tails') {
+        return {
+          transform: 'rotateY(180deg)',
+          transition: 'transform 0.5s ease-out',
+        };
+      }
+      return {
+        transform: 'rotateY(0deg)',
+        transition: 'transform 0.3s ease',
+      };
+    };
+
+    return (
+      <div className="relative w-48 h-48 mx-auto perspective-1000">
+        <div
+          className="w-full h-full relative preserve-3d"
+          style={getCoinStyle()}
+        >
+          {/* Ön yüz (Yazı) */}
+          <div className="absolute w-full h-full backface-hidden rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center border-4 border-yellow-700 shadow-2xl">
+            <div className="text-6xl font-bold text-white">Y</div>
+            <div className="absolute inset-0 rounded-full border-4 border-yellow-300 opacity-30"></div>
+          </div>
+          
+          {/* Arka yüz (Tura) */}
+          <div className="absolute w-full h-full backface-hidden rounded-full bg-gradient-to-br from-yellow-500 to-yellow-700 flex items-center justify-center border-4 border-yellow-700 shadow-2xl rotate-y-180">
+            <div className="text-6xl font-bold text-white">T</div>
+            <div className="absolute inset-0 rounded-full border-4 border-yellow-300 opacity-30"></div>
+          </div>
         </div>
-    </header>
+      </div>
+    );
+  };
 
-    <!-- Main Content Area -->
-    <main class="max-w-4xl mx-auto p-4 w-full flex-grow my-2">
+  // Sonuç durumu
+  const ResultDisplay = () => {
+    if (gameState === 'idle') return null;
+    
+    const isWin = gameState === 'won';
+    const resultText = result === 'heads' ? 'Yazı' : 'Tura';
+    
+    return (
+      <div className={`mt-4 text-center transition-all duration-500 ${
+        isWin ? 'animate-bounce' : 'animate-shake'
+      }`}>
+        <div className={`text-3xl font-bold ${
+          isWin ? 'text-green-400' : 'text-red-400'
+        }`}>
+          {isWin ? '🎉 KAZANDINIZ!' : '😢 KAYBETTİNİZ'}
+        </div>
+        <div className="text-xl text-gray-300 mt-2">
+          Sonuç: {resultText}
+          {isWin && ` +${betAmount} $COIN`}
+          {!isWin && ` -${betAmount} $COIN`}
+        </div>
+      </div>
+    );
+  };
 
-        <!-- Home Section (Jokes Feed) -->
-        <section id="section-home" class="page-transition space-y-6">
-            <div class="flex justify-between items-center bg-slate-800/60 backdrop-blur-sm p-4 rounded-2xl border border-slate-700/60 shadow-md">
-                <div>
-                    <h2 class="text-lg font-bold text-slate-100">En Komik Yeğen Esprileri</h2>
-                    <p class="text-xs text-slate-400">Yeğenlerin paylaştığı en eğlenceli anlar</p>
-                </div>
-                <button onclick="checkAuthAndOpenPost()" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-bold text-sm rounded-xl shadow-lg shadow-amber-500/20 transition flex items-center gap-2">
-                    ✨ Espri Paylaş
+  // İstatistik Kartı
+  const StatsCard = () => {
+    const winRate = stats.total > 0 ? (stats.wins / stats.total * 100).toFixed(1) : 0;
+    const netProfit = stats.wins * 10 - stats.losses * 10; // Örnek hesaplama
+    
+    return (
+      <div className="bg-gray-800 rounded-xl p-4 border border-gray-700">
+        <div className="grid grid-cols-3 gap-4">
+          <div className="text-center">
+            <div className="text-sm text-gray-400">Kazanma Oranı</div>
+            <div className="text-xl font-bold text-green-400">{winRate}%</div>
+          </div>
+          <div className="text-center">
+            <div className="text-sm text-gray-400">Oynanan Oyun</div>
+            <div className="text-xl font-bold text-blue-400">{stats.total}</div>
+          </div>
+          <div className="text-center">
+            <div className="text-sm text-gray-400">Net Kâr</div>
+            <div className={`text-xl font-bold ${netProfit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              {netProfit >= 0 ? '+' : ''}{netProfit} $COIN
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white">
+      {/* Konfeti */}
+      <ConfettiEffect />
+      
+      {/* Ana Container */}
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-8">
+          <div className="flex items-center gap-2">
+            <Coins className="w-8 h-8 text-yellow-400" />
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-yellow-400 to-green-400 bg-clip-text text-transparent">
+              CoinFlip
+            </h1>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <div className="bg-gray-800 rounded-lg px-4 py-2 flex items-center gap-2 border border-gray-700">
+              <DollarSign className="w-4 h-4 text-yellow-400" />
+              <span className="font-bold">{balance} $COIN</span>
+            </div>
+            
+            <button
+              onClick={() => setIsMuted(!isMuted)}
+              className="p-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors"
+            >
+              {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Oyun Kartı */}
+        <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700 shadow-2xl">
+          {/* Coin Gösterimi */}
+          <Coin isFlipping={isFlipping} result={result} rotation={rotation} />
+          
+          {/* Sonuç */}
+          <ResultDisplay />
+
+          {/* Seçim Butonları */}
+          <div className="flex gap-4 mt-6 justify-center">
+            <button
+              onClick={() => selectSide('heads')}
+              disabled={isFlipping}
+              className={`px-8 py-3 rounded-lg font-bold transition-all ${
+                selectedSide === 'heads'
+                  ? 'bg-yellow-500 text-black scale-105'
+                  : 'bg-gray-700 hover:bg-gray-600'
+              } ${isFlipping ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              YAZI
+            </button>
+            <button
+              onClick={() => selectSide('tails')}
+              disabled={isFlipping}
+              className={`px-8 py-3 rounded-lg font-bold transition-all ${
+                selectedSide === 'tails'
+                  ? 'bg-yellow-500 text-black scale-105'
+                  : 'bg-gray-700 hover:bg-gray-600'
+              } ${isFlipping ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              TURA
+            </button>
+          </div>
+
+          {/* Bahis Bölümü */}
+          <div className="mt-6 space-y-4">
+            <div className="flex flex-wrap gap-2 justify-center">
+              {[10, 50, 100, 500].map((amount) => (
+                <button
+                  key={amount}
+                  onClick={() => setBetPreset(amount)}
+                  className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-sm"
+                >
+                  {amount}
                 </button>
+              ))}
+              <button
+                onClick={() => setBetPreset('MAX')}
+                className="px-4 py-2 bg-yellow-500/20 hover:bg-yellow-500/30 rounded-lg transition-colors text-sm text-yellow-400"
+              >
+                MAX
+              </button>
             </div>
             
-            <!-- Yeni Oyun Duyuru Kutusu -->
-            <div onclick="showSection('flappy')" class="bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-rose-500/20 border border-amber-500/40 p-5 rounded-2xl cursor-pointer hover:border-amber-500 transition shadow-lg flex items-center justify-between group">
-                <div class="space-y-1">
-                    <span class="bg-amber-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">Yeni Çıktı!</span>
-                    <h3 class="text-base font-bold text-slate-100 group-hover:text-amber-400 transition">Yeni çıkan oyunumuzu denemek ister misiniz yeğen? 🎮</h3>
-                    <p class="text-xs text-slate-400">Flappy Yeğen oyna, skorunu yap ve haftalık liderlik tablosunda zirveye yerleş!</p>
-                </div>
-                <span class="text-2xl group-hover:translate-x-1 transition">🕹️</span>
+            <div className="flex gap-2 items-center justify-center">
+              <button
+                onClick={() => setBetAmount(Math.max(1, betAmount - 5))}
+                className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600"
+              >
+                <Minus className="w-4 h-4" />
+              </button>
+              <input
+                type="number"
+                value={betAmount}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value) || 0;
+                  setBetAmount(Math.min(value, balance));
+                }}
+                className="w-32 px-4 py-2 bg-gray-700 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                min="1"
+                max={balance}
+                disabled={isFlipping}
+              />
+              <button
+                onClick={() => setBetAmount(Math.min(balance, betAmount + 5))}
+                className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600"
+              >
+                <Plus className="w-4 h-4" />
+              </button>
             </div>
 
-            <div id="jokes-container" class="space-y-4">
-                <div class="flex justify-center items-center py-12">
-                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
-                </div>
+            <button
+              onClick={flipCoin}
+              disabled={isFlipping || !selectedSide}
+              className={`w-full py-4 rounded-xl font-bold text-lg transition-all ${
+                isFlipping || !selectedSide
+                  ? 'bg-gray-600 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-yellow-400 to-green-400 text-black hover:scale-105 hover:shadow-lg'
+              }`}
+            >
+              {isFlipping ? 'ÇEVİRİLİYOR...' : 'BAHİS YAP & ÇEVİR'}
+            </button>
+          </div>
+        </div>
+
+        {/* İstatistikler & Geçmiş */}
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <StatsCard />
+          
+          <div className="bg-gray-800 rounded-xl p-4 border border-gray-700">
+            <div className="flex items-center gap-2 mb-3">
+              <History className="w-5 h-5 text-yellow-400" />
+              <h3 className="font-bold">Son Oyunlar</h3>
             </div>
-        </section>
-
-        <!-- Admin Panel Section -->
-        <section id="section-admin" class="page-transition hidden max-w-2xl mx-auto bg-slate-800/90 backdrop-blur-md p-8 rounded-3xl border border-slate-700/60 shadow-2xl mt-6 space-y-6">
-            <div class="flex justify-between items-center border-b border-slate-700/60 pb-4">
-                <h2 class="text-xl font-bold text-amber-400 flex items-center gap-2">👑 Prodedok Admin Paneli</h2>
-                <button onclick="showSection('home')" class="px-3 py-1.5 text-xs bg-slate-700 hover:bg-slate-600 rounded-xl transition text-slate-300">Geri Dön</button>
+            <div className="flex flex-wrap gap-2">
+              {history.length === 0 ? (
+                <div className="text-gray-500 text-sm">Henüz oyun yok</div>
+              ) : (
+                history.map((item, index) => (
+                  <div
+                    key={index}
+                    className={`px-3 py-1 rounded-lg text-sm ${
+                      item.won ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+                    }`}
+                  >
+                    {item.result === 'heads' ? 'Y' : 'T'} {item.won ? '✅' : '❌'}
+                  </div>
+                ))
+              )}
             </div>
-            <div class="space-y-4">
-                <div class="bg-slate-900/60 p-5 rounded-2xl border border-slate-700/50 space-y-3">
-                    <h3 class="text-sm font-bold text-slate-200">Bakım Modu Kontrolü</h3>
-                    <div class="flex gap-3">
-                        <button onclick="toggleMaintenance(true)" class="px-4 py-2.5 bg-rose-500/20 text-rose-400 border border-rose-500/30 hover:bg-rose-500/30 font-bold text-xs rounded-xl transition">🛠️ Bakımı Aç (.bakım)</button>
-                        <button onclick="toggleMaintenance(false)" class="px-4 py-2.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 font-bold text-xs rounded-xl transition">✅ Bakımı Kapat (.unbakım)</button>
-                    </div>
-                </div>
-            </div>
-        </section>
+          </div>
+        </div>
+      </div>
 
-        <!-- Flappy Bird Game Section -->
-        <section id="section-flappy" class="page-transition hidden max-w-xl mx-auto bg-slate-800/90 backdrop-blur-md p-6 rounded-3xl border border-slate-700/60 shadow-2xl mt-4 space-y-6 text-center">
-            <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold text-amber-400 flex items-center gap-2">🐦 Flappy Yeğen</h2>
-                <button onclick="showSection('home')" class="px-3 py-1.5 text-xs bg-slate-700 hover:bg-slate-600 rounded-xl transition text-slate-300">Geri Dön</button>
-            </div>
-
-            <div class="relative w-full aspect-[4/3] bg-slate-950 rounded-2xl overflow-hidden border border-slate-700 shadow-inner flex flex-col items-center justify-center">
-                <canvas id="flappyCanvas" width="400" height="300" class="w-full h-full cursor-pointer bg-sky-950"></canvas>
-                <div id="game-overlay" class="absolute inset-0 bg-slate-950/80 flex flex-col items-center justify-center p-4 space-y-3">
-                    <h3 class="text-2xl font-black text-amber-400">Flappy Yeğen</h3>
-                    <p class="text-xs text-slate-300">Oynamak için ekrana tıkla veya boşluk tuşuna bas!</p>
-                    <button onclick="startFlappyGame()" class="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl shadow-lg transition active:scale-95 text-sm">Oyuna Başla</button>
-                </div>
-            </div>
-
-            <!-- Leaderboard (Haftalık Sıralama) -->
-            <div class="space-y-3 text-left bg-slate-900/60 p-4 rounded-2xl border border-slate-700/50">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-sm font-bold text-amber-400 flex items-center gap-1.5">🏆 Haftalık Liderlik Tablosu</h3>
-                    <span class="text-[10px] text-slate-400 bg-slate-800 px-2 py-1 rounded-lg">Her Pazartesi Sıfırlanır</span>
-                </div>
-                <div id="leaderboard-container" class="space-y-2 max-h-48 overflow-y-auto pr-1">
-                    <div class="text-center text-xs text-slate-500 py-4">Skorlar yükleniyor...</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Login Section -->
-        <section id="section-login" class="page-transition hidden max-w-md mx-auto bg-slate-800/80 backdrop-blur-md p-8 rounded-3xl border border-slate-700/60 shadow-2xl mt-6">
-            <h2 class="text-2xl font-bold mb-6 text-center text-amber-400">Tekrar Hoşgeldin Yeğen!</h2>
-            <form onsubmit="handleLogin(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Kullanıcı Adı</label>
-                    <input type="text" id="login-username" required class="w-full px-4 py-3 bg-slate-900/80 border border-slate-700 rounded-xl focus:outline-none focus:border-amber-500 text-slate-100 text-sm transition">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Şifre</label>
-                    <input type="password" id="login-password" required class="w-full px-4 py-3 bg-slate-900/80 border border-slate-700 rounded-xl focus:outline-none focus:border-amber-500 text-slate-100 text-sm transition">
-                </div>
-                <button type="submit" class="w-full py-3.5 bg-amber-500 hover:bg-amber-400 active:scale-[0.98] text-slate-950 font-bold rounded-xl transition shadow-lg shadow-amber-500/20 mt-2">Giriş Yap</button>
-            </form>
-            <p class="text-center text-sm text-slate-400 mt-6">Hesabın yok mu? <a href="#" onclick="showSection('register')" class="text-amber-400 hover:underline font-semibold">Kayıt Ol</a></p>
-        </section>
-
-        <!-- Register Section -->
-        <section id="section-register" class="page-transition hidden max-w-md mx-auto bg-slate-800/80 backdrop-blur-md p-8 rounded-3xl border border-slate-700/60 shadow-2xl mt-6">
-            <h2 class="text-2xl font-bold mb-6 text-center text-amber-400">Aramıza Katıl Yeğen</h2>
-            <form onsubmit="handleRegister(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Kullanıcı Adı</label>
-                    <input type="text" id="register-username" required class="w-full px-4 py-3 bg-slate-900/80 border border-slate-700 rounded-xl focus:outline-none focus:border-amber-500 text-slate-100 text-sm transition">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Şifre</label>
-                    <input type="password" id="register-password" required class="w-full px-4 py-3 bg-slate-900/80 border border-slate-700 rounded-xl focus:outline-none focus:border-amber-500 text-slate-100 text-sm transition">
-                </div>
-                <button type="submit" class="w-full py-3.5 bg-amber-500 hover:bg-amber-400 active:scale-[0.98] text-slate-950 font-bold rounded-xl transition shadow-lg shadow-amber-500/20 mt-2">Kayıt Ol</button>
-            </form>
-            <p class="text-center text-sm text-slate-400 mt-6">Zaten hesabın var mı? <a href="#" onclick="showSection('login')" class="text-amber-400 hover:underline font-semibold">Giriş Yap</a></p>
-        </section>
-
-        <!-- Profile Section -->
-        <section id="section-profile" class="page-transition hidden max-w-lg mx-auto bg-slate-800/80 backdrop-blur-md p-8 rounded-3xl border border-slate-700/60 shadow-2xl mt-6 space-y-6">
-            <div class="flex items-center gap-4 border-b border-slate-700/60 pb-6">
-                <div id="profile-avatar-box" class="w-16 h-16 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 font-bold text-2xl overflow-hidden shadow-inner">👤</div>
-                <div>
-                    <h2 id="profile-username" class="text-xl font-bold text-amber-400 flex items-center gap-1.5"></h2>
-                    <p class="text-xs text-slate-400 mt-0.5">Yeğenler Üyesi</p>
-                </div>
-            </div>
-            <form onsubmit="handleUpdateAvatar(event)" class="space-y-3">
-                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Cihazdan Profil Fotoğrafı Seç</label>
-                <div class="flex flex-col gap-3">
-                    <input type="file" id="profile-image-file" accept="image/*" class="w-full text-xs text-slate-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-amber-500/10 file:text-amber-400 hover:file:bg-amber-500/20 file:cursor-pointer bg-slate-900/80 border border-slate-700 rounded-xl p-2">
-                    <button type="submit" class="w-full py-3 bg-amber-500 hover:bg-amber-400 active:scale-[0.98] text-slate-950 font-bold text-sm rounded-xl transition shadow-md">Fotoğrafı Güncelle</button>
-                </div>
-            </form>
-            <div class="grid grid-cols-2 gap-4 pt-2">
-                <div class="bg-slate-900/60 border border-slate-700/50 p-4 rounded-2xl text-center">
-                    <span class="block text-xs text-slate-400 uppercase tracking-wider font-semibold">Paylaştığın Espriler</span>
-                    <span id="stat-joke-count" class="text-2xl font-black text-amber-400 mt-1 block">0</span>
-                </div>
-                <div class="bg-slate-900/60 border border-slate-700/50 p-4 rounded-2xl text-center">
-                    <span class="block text-xs text-slate-400 uppercase tracking-wider font-semibold">Toplam Beğeni</span>
-                    <span id="stat-total-likes" class="text-2xl font-black text-emerald-400 mt-1 block">0</span>
-                </div>
-            </div>
-            <button onclick="showSection('home')" class="w-full py-3 bg-slate-700 hover:bg-slate-600 active:scale-[0.98] text-slate-200 font-bold rounded-xl transition text-sm">Geri Dön</button>
-        </section>
-
-        <!-- Post Joke Section -->
-        <section id="section-post" class="page-transition hidden max-w-lg mx-auto bg-slate-800/80 backdrop-blur-md p-8 rounded-3xl border border-slate-700/60 shadow-2xl mt-6">
-            <h2 class="text-2xl font-bold mb-6 text-center text-amber-400">Yeni Espri Paylaş</h2>
-            <form onsubmit="handlePostJoke(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Espri İçeriği</label>
-                    <textarea id="joke-content" rows="4" required placeholder="Esprini buraya yaz yeğen..." class="w-full px-4 py-3 bg-slate-900/80 border border-slate-700 rounded-xl focus:outline-none focus:border-amber-500 text-slate-100 text-sm transition resize-none"></textarea>
-                </div>
-                <div class="flex gap-3 pt-2">
-                    <button type="button" onclick="showSection('home')" class="w-1/2 py-3.5 bg-slate-700 hover:bg-slate-600 active:scale-[0.98] text-slate-300 font-bold rounded-xl transition">İptal</button>
-                    <button type="submit" class="w-1/2 py-3.5 bg-amber-500 hover:bg-amber-400 active:scale-[0.98] text-slate-950 font-bold rounded-xl transition shadow-lg shadow-amber-500/20">Paylaş</button>
-                </div>
-            </form>
-        </section>
-
-        <!-- Update Log Section -->
-        <section class="mt-12 bg-slate-800/40 border border-slate-700/40 rounded-2xl p-5 text-xs text-slate-400 space-y-2">
-            <h3 class="font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                🛠️ Update Log (Güncelleme Notları)
-            </h3>
-            <ul class="list-disc list-inside space-y-1 text-slate-400">
-                <li><strong class="text-slate-300">v1.8.0:</strong> Esprilerin altına yorum yapma (tartışma alanı) özelliği eklendi.</li>
-                <li><strong class="text-slate-300">v1.7.3:</strong> Flappy Yeğen skor kaydetme hatası giderildi.</li>
-            </ul>
-        </section>
-
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-slate-800/40 border-t border-slate-800 py-4 text-center text-xs text-slate-500 mt-6">
-        &copy; 2026 Yeğenler - Tüm Hakları Saklıdır.
-    </footer>
-
-    <!-- Supabase Logic & App Script -->
-    <script>
-        const SUPABASE_URL = 'https://xavwlojjgvxgeybqljyn.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_sHrgA7j7ZokBJDrkmAendw_EiTUH40b';
-
-        const { createClient } = supabase;
-        const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        let currentUser = JSON.parse(localStorage.getItem('jp_user')) || null;
-
-        window.addEventListener('DOMContentLoaded', () => {
-            checkMaintenanceMode();
-            updateAuthUI();
-            fetchJokes();
-        });
-
-        async function checkMaintenanceMode() {
-            try {
-                const { data } = await db.from('site_settings').select('*').eq('key', 'maintenance_mode').single();
-                if (data && data.value === 'true') {
-                    const isProdedok = currentUser && currentUser.username && currentUser.username.toLowerCase() === 'prodedok';
-                    if (!isProdedok) {
-                        document.getElementById('maintenance-screen').classList.remove('hidden');
-                    } else {
-                        document.getElementById('maintenance-screen').classList.add('hidden');
-                    }
-                } else {
-                    document.getElementById('maintenance-screen').classList.add('hidden');
-                }
-            } catch (err) { console.error(err); }
+      {/* Özel CSS Animasyonları */}
+      <style jsx global>{`
+        .perspective-1000 {
+          perspective: 1000px;
         }
-
-        async function toggleMaintenance(status) {
-            if (!currentUser || currentUser.username.toLowerCase() !== 'prodedok') return;
-            await db.from('site_settings').update({ value: status ? 'true' : 'false' }).eq('key', 'maintenance_mode');
-            alert(status ? 'Bakım modu açıldı!' : 'Bakım modu kapatıldı!');
-            checkMaintenanceMode();
+        .preserve-3d {
+          transform-style: preserve-3d;
         }
-
-        function showSection(sectionId) {
-            ['home', 'login', 'register', 'post', 'profile', 'flappy', 'admin'].forEach(id => {
-                const el = document.getElementById(`section-${id}`);
-                if (el) {
-                    if (id === sectionId) {
-                        el.classList.remove('hidden');
-                        el.style.opacity = '0';
-                        setTimeout(() => el.style.opacity = '1', 10);
-                    } else { el.classList.add('hidden'); }
-                }
-            });
-            if (sectionId === 'home') fetchJokes();
-            else if (sectionId === 'profile') loadProfileStats();
-            else if (sectionId === 'flappy') fetchLeaderboard();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        .backface-hidden {
+          backface-visibility: hidden;
         }
-
-        async function updateAuthUI() {
-            const navAuth = document.getElementById('nav-auth');
-            const navUser = document.getElementById('nav-user');
-            const displayName = document.getElementById('user-display-name');
-            const navAvatar = document.getElementById('nav-user-avatar');
-            const navAdminBtn = document.getElementById('nav-admin-btn');
-
-            if (currentUser && currentUser.username) {
-                navAuth.classList.add('hidden');
-                navUser.classList.remove('hidden');
-                const isProdedok = currentUser.username.toLowerCase() === 'prodedok';
-                displayName.textContent = `${currentUser.username} ${isProdedok ? '👑' : ''}`;
-                if (isProdedok) navAdminBtn.classList.remove('hidden');
-                else navAdminBtn.classList.add('hidden');
-
-                if (currentUser.avatar_url && currentUser.avatar_url.trim() !== '') {
-                    navAvatar.innerHTML = `<img src="${currentUser.avatar_url}" class="w-full h-full object-cover">`;
-                } else { navAvatar.innerHTML = '👤'; }
-            } else {
-                navAuth.classList.remove('hidden');
-                navUser.classList.add('hidden');
-            }
-            checkMaintenanceMode();
+        .rotate-y-180 {
+          transform: rotateY(180deg);
         }
-
-        function logout() {
-            localStorage.removeItem('jp_user');
-            currentUser = null;
-            updateAuthUI();
-            showSection('home');
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+          20%, 40%, 60%, 80% { transform: translateX(10px); }
         }
-
-        async function handleRegister(event) {
-            event.preventDefault();
-            const username = document.getElementById('register-username').value.trim();
-            const password = document.getElementById('register-password').value.trim();
-            const isAdmin = username.toLowerCase() === 'prodedok';
-
-            try {
-                const { error } = await db.from('users').insert([{ username, password, is_admin: isAdmin, avatar_url: '' }]);
-                if (error) throw error;
-                alert('Kayıt başarılı yeğen! Şimdi giriş yapabilirsin.');
-                showSection('login');
-            } catch (err) { alert('Kayıt olurken hata: ' + err.message); }
+        .animate-shake {
+          animation: shake 0.5s ease-in-out;
         }
-
-        async function handleLogin(event) {
-            event.preventDefault();
-            const username = document.getElementById('login-username').value.trim();
-            const password = document.getElementById('login-password').value.trim();
-
-            try {
-                const { data, error } = await db.from('users').select('*').eq('username', username).eq('password', password).single();
-                if (error || !data) {
-                    alert('Geçersiz kullanıcı adı veya şifre!');
-                    return;
-                }
-                currentUser = data;
-                localStorage.setItem('jp_user', JSON.stringify(currentUser));
-                updateAuthUI();
-                showSection('home');
-            } catch (err) { alert('Giriş yapılırken hata oluştu.'); }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
         }
-
-        async function handleUpdateAvatar(event) {
-            event.preventDefault();
-            if (!currentUser || !currentUser.username) return;
-            const fileInput = document.getElementById('profile-image-file');
-            if (fileInput.files.length === 0) return;
-
-            const reader = new FileReader();
-            reader.onload = async function(e) {
-                const base64Image = e.target.result;
-                await db.from('users').update({ avatar_url: base64Image }).eq('username', currentUser.username);
-                currentUser.avatar_url = base64Image;
-                localStorage.setItem('jp_user', JSON.stringify(currentUser));
-                updateAuthUI();
-                loadProfileStats();
-                alert('Profil fotoğrafın güncellendi!');
-            };
-            reader.readAsDataURL(fileInput.files[0]);
+        input[type="number"] {
+          -moz-appearance: textfield;
         }
+      `}</style>
+    </div>
+  );
+};
 
-        async function loadProfileStats() {
-            if (!currentUser || !currentUser.username) return;
-            document.getElementById('profile-username').innerHTML = `${escapeHTML(currentUser.username)} ${currentUser.username.toLowerCase() === 'prodedok' ? '👑' : ''}`;
-            const avatarBox = document.getElementById('profile-avatar-box');
-            if (currentUser.avatar_url) avatarBox.innerHTML = `<img src="${currentUser.avatar_url}" class="w-full h-full object-cover">`;
-            
-            const { data: jokes } = await db.from('jokes').select('*').eq('username', currentUser.username);
-            if (jokes) {
-                document.getElementById('stat-joke-count').textContent = jokes.length;
-                document.getElementById('stat-total-likes').textContent = jokes.reduce((acc, j) => acc + (j.likes || 0), 0);
-            }
-        }
-
-        function checkAuthAndOpenPost() {
-            if (!currentUser) { alert('Giriş yapmalısın yeğen!'); showSection('login'); return; }
-            showSection('post');
-        }
-
-        async function handlePostJoke(event) {
-            event.preventDefault();
-            if (!currentUser) return;
-            const content = document.getElementById('joke-content').value.trim();
-            await db.from('jokes').insert([{ content, username: currentUser.username, likes: 0, dislikes: 0, liked_by: [], disliked_by: [] }]);
-            document.getElementById('joke-content').value = '';
-            showSection('home');
-        }
-
-        async function voteJoke(jokeId, type) {
-            if (!currentUser) { showSection('login'); return; }
-            const { data: joke } = await db.from('jokes').select('*').eq('id', jokeId).single();
-            if (!joke) return;
-
-            let likedBy = joke.liked_by || [];
-            let dislikedBy = joke.disliked_by || [];
-            let likes = joke.likes || 0;
-            let dislikes = joke.dislikes || 0;
-            const uname = currentUser.username;
-
-            if (type === 'like') {
-                if (likedBy.includes(uname)) return;
-                if (dislikedBy.includes(uname)) { dislikedBy = dislikedBy.filter(u => u !== uname); dislikes--; }
-                likedBy.push(uname); likes++;
-            } else {
-                if (dislikedBy.includes(uname)) return;
-                if (likedBy.includes(uname)) { likedBy = likedBy.filter(u => u !== uname); likes--; }
-                dislikedBy.push(uname); dislikes++;
-            }
-            await db.from('jokes').update({ likes, dislikes, liked_by: likedBy, disliked_by: dislikedBy }).eq('id', jokeId);
-            fetchJokes();
-        }
-
-        async function deleteJoke(jokeId) {
-            if (!currentUser || currentUser.username.toLowerCase() !== 'prodedok') return;
-            if (!confirm('Silmek istediğine emin misin?')) return;
-            await db.from('jokes').delete().eq('id', jokeId);
-            await db.from('joke_comments').delete().eq('joke_id', jokeId);
-            fetchJokes();
-        }
-
-        async function addComment(jokeId) {
-            if (!currentUser) {
-                alert('Yorum yapmak için giriş yapmalısın yeğen!');
-                showSection('login');
-                return;
-            }
-            const input = document.getElementById(`comment-input-${jokeId}`);
-            const content = input.value.trim();
-            if (!content) return;
-
-            try {
-                const { error } = await db.from('joke_comments').insert([{
-                    joke_id: jokeId,
-                    username: currentUser.username,
-                    content: content
-                }]);
-                if (error) throw error;
-                input.value = '';
-                fetchJokes();
-            } catch (err) {
-                alert('Yorum eklenemedi: ' + err.message);
-            }
-        }
-
-        async function deleteComment(commentId) {
-            if (!currentUser || currentUser.username.toLowerCase() !== 'prodedok') return;
-            try {
-                await db.from('joke_comments').delete().eq('id', commentId);
-                fetchJokes();
-            } catch (err) {
-                alert('Yorum silinemedi: ' + err.message);
-            }
-        }
-
-        async function fetchJokes() {
-            const container = document.getElementById('jokes-container');
-            const { data: usersData } = await db.from('users').select('username, avatar_url');
-            const avatarMap = {};
-            if (usersData) usersData.forEach(u => avatarMap[u.username] = u.avatar_url);
-
-            const { data: commentsData } = await db.from('joke_comments').select('*').order('created_at', { ascending: true });
-            const commentsMap = {};
-            if (commentsData) {
-                commentsData.forEach(c => {
-                    if (!commentsMap[c.joke_id]) commentsMap[c.joke_id] = [];
-                    commentsMap[c.joke_id].push(c);
-                });
-            }
-
-            const { data } = await db.from('jokes').select('*').order('created_at', { ascending: false });
-            if (!data || data.length === 0) {
-                container.innerHTML = '<div class="text-center text-slate-500 py-12">Henüz espri yok yeğen. İlk sen ol! ✨</div>';
-                return;
-            }
-
-            container.innerHTML = '';
-            data.forEach(joke => {
-                const card = document.createElement('div');
-                card.className = 'bg-slate-800/70 p-5 rounded-2xl border border-slate-700 shadow-lg space-y-3';
-                const uname = joke.username || 'Anonim';
-                const isProdedok = uname.toLowerCase() === 'prodedok';
-                let avatarHtml = avatarMap[uname] ? `<img src="${avatarMap[uname]}" class="w-full h-full object-cover">` : '👤';
-
-                // Yorumlar Listesi
-                const jokeComments = commentsMap[joke.id] || [];
-                let commentsHtml = '';
-                jokeComments.forEach(comm => {
-                    const commAuthorAdmin = comm.username.toLowerCase() === 'prodedok';
-                    const deleteCommBtn = (currentUser && currentUser.username.toLowerCase() === 'prodedok') ? `<button onclick="deleteComment('${comm.id}')" class="text-rose-400 hover:text-rose-300 ml-2">🗑️</button>` : '';
-                    commentsHtml += `
-                        <div class="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80 text-xs flex justify-between items-start">
-                            <div>
-                                <span class="font-semibold text-amber-400">@${escapeHTML(comm.username)} ${commAuthorAdmin ? '👑' : ''}:</span>
-                                <span class="text-slate-200 ml-1">${escapeHTML(comm.content)}</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span class="text-[10px] text-slate-500">${new Date(comm.created_at).toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'})}</span>
-                                ${deleteCommBtn}
-                            </div>
-                        </div>
-                    `;
-                });
-
-                card.innerHTML = `
-                    <p class="text-slate-100 text-base">${escapeHTML(joke.content)}</p>
-                    <div class="flex justify-between items-center text-xs text-slate-400 pt-3 border-t border-slate-700/40">
-                        <div class="flex items-center gap-2">
-                            <div class="w-7 h-7 rounded-lg overflow-hidden border border-amber-500/30 flex items-center justify-center">${avatarHtml}</div>
-                            <span class="font-semibold text-amber-400">@${escapeHTML(uname)} ${isProdedok ? '👑' : ''}</span>
-                            ${currentUser && currentUser.username.toLowerCase() === 'prodedok' ? `<button onclick="deleteJoke('${joke.id}')" class="text-rose-400 ml-2">🗑️ Sil</button>` : ''}
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <button onclick="voteJoke('${joke.id}', 'like')" class="bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-lg">👍 ${joke.likes || 0}</button>
-                            <button onclick="voteJoke('${joke.id}', 'dislike')" class="bg-rose-500/10 text-rose-400 px-2 py-1 rounded-lg">👎 ${joke.dislikes || 0}</button>
-                        </div>
-                    </div>
-
-                    <!-- Yorumlar Alanı -->
-                    <div class="mt-4 pt-3 border-t border-slate-700/40 space-y-2">
-                        <div class="text-xs font-bold text-slate-300">💬 Yorumlar (${jokeComments.length})</div>
-                        <div class="space-y-2 max-h-40 overflow-y-auto pr-1">
-                            ${commentsHtml || '<div class="text-xs text-slate-500 italic">Henüz yorum yapılmamış. İlk yorumu sen yap!</div>'}
-                        </div>
-                        <div class="flex gap-2 pt-1">
-                            <input type="text" id="comment-input-${joke.id}" placeholder="Yorum yaz yeğen..." class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-amber-500">
-                            <button onclick="addComment('${joke.id}')" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition">Gönder</button>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        // --- FLAPPY BIRD OYUN MANTIĞI & HAFTALIK LİDERLİK ---
-        const canvas = document.getElementById('flappyCanvas');
-        const ctx = canvas.getContext('2d');
-        let gameInterval = null;
-        let bird = { x: 50, y: 150, radius: 12, gravity: 0.38, lift: -7.5, velocity: 0 };
-        let pipes = [];
-        let score = 0;
-        let isGameRunning = false;
-
-        function getCurrentWeekID() {
-            const now = new Date();
-            const oneJan = new Date(now.getFullYear(), 0, 1);
-            const week = Math.ceil((((now - oneJan) / 86400000) + oneJan.getDay() + 1) / 7);
-            return `${now.getFullYear()}-W${week}`;
-        }
-
-        function startFlappyGame() {
-            document.getElementById('game-overlay').classList.add('hidden');
-            bird.y = 150; bird.velocity = 0; pipes = []; score = 0; isGameRunning = true;
-            if (gameInterval) clearInterval(gameInterval);
-            gameInterval = setInterval(updateGame, 1000 / 60);
-        }
-
-        canvas.addEventListener('click', () => { if (isGameRunning) bird.velocity = bird.lift; });
-        window.addEventListener('keydown', (e) => { if (e.code === 'Space' && isGameRunning) { e.preventDefault(); bird.velocity = bird.lift; } });
-
-        function updateGame() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            bird.velocity += bird.gravity; bird.y += bird.velocity;
-
-            ctx.fillStyle = '#f59e0b';
-            ctx.beginPath(); ctx.arc(bird.x, bird.y, bird.radius, 0, Math.PI * 2); ctx.fill();
-
-            if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - 180) {
-                let gapHeight = 130;
-                let topHeight = Math.floor(Math.random() * (canvas.height - gapHeight - 80)) + 40;
-                pipes.push({ x: canvas.width, top: topHeight, bottom: canvas.height - topHeight - gapHeight, passed: false });
-            }
-
-            ctx.fillStyle = '#10b981';
-            pipes.forEach(pipe => {
-                pipe.x -= 2.0;
-                ctx.fillRect(pipe.x, 0, 50, pipe.top);
-                ctx.fillRect(pipe.x, canvas.height - pipe.bottom, 50, pipe.bottom);
-                if (!pipe.passed && pipe.x + 50 < bird.x) { score++; pipe.passed = true; }
-                if (bird.x + bird.radius > pipe.x && bird.x - bird.radius < pipe.x + 50 && (bird.y - bird.radius < pipe.top || bird.y + bird.radius > canvas.height - pipe.bottom)) gameOver();
-            });
-
-            if (bird.y + bird.radius > canvas.height || bird.y - bird.radius < 0) gameOver();
-            pipes = pipes.filter(pipe => pipe.x > -50);
-
-            ctx.fillStyle = '#ffffff'; ctx.font = 'bold 20px sans-serif'; ctx.fillText(`Skor: ${score}`, 15, 30);
-        }
-
-        async function gameOver() {
-            isGameRunning = false;
-            clearInterval(gameInterval);
-            document.getElementById('game-overlay').classList.remove('hidden');
-            document.getElementById('game-overlay').innerHTML = `
-                <h3 class="text-2xl font-black text-rose-500">Oyun Bitti!</h3>
-                <p class="text-sm text-slate-200">Skorun: <strong class="text-amber-400">${score}</strong></p>
-                <button onclick="startFlappyGame()" class="px-6 py-2.5 bg-amber-500 text-slate-950 font-bold rounded-xl">Tekrar Oyna</button>
-            `;
-
-            if (currentUser && currentUser.username) {
-                try {
-                    const weekId = getCurrentWeekID() || 'genel';
-                    await db.from('flappy_scores').insert([{ username: currentUser.username, score: score, week_id: weekId }]);
-                    fetchLeaderboard();
-                } catch (err) { console.error('Skor kaydedilemedi:', err); }
-            }
-        }
-
-        async function fetchLeaderboard() {
-            const container = document.getElementById('leaderboard-container');
-            const weekId = getCurrentWeekID() || 'genel';
-            const { data } = await db.from('flappy_scores').select('*').eq('week_id', weekId).order('score', { ascending: false });
-
-            if (!data || data.length === 0) {
-                container.innerHTML = '<div class="text-center text-xs text-slate-500 py-3">Bu hafta henüz skor yok yeğen. İlk sen ol!</div>';
-                return;
-            }
-
-            const bestScores = {};
-            data.forEach(item => { if (!bestScores[item.username] || item.score > bestScores[item.username]) bestScores[item.username] = item.score; });
-            const sorted = Object.entries(bestScores).sort((a, b) => b[1] - a[1]);
-
-            container.innerHTML = '';
-            sorted.forEach(([uname, scr], index) => {
-                let rankTag = index === 0 ? '🥇 1. Altın' : index === 1 ? '🥈 2. Gümüş' : index === 2 ? '🥉 3. Bronz' : `#${index + 1}`;
-                const row = document.createElement('div');
-                row.className = 'flex justify-between items-center p-2.5 rounded-xl border bg-slate-900/40 border-slate-800 text-xs';
-                row.innerHTML = `<span class="font-semibold text-slate-200">${rankTag} @${escapeHTML(uname)}</span><span class="font-bold text-amber-400">${scr} Puan</span>`;
-                container.appendChild(row);
-            });
-        }
-
-        function escapeHTML(str) {
-            return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
-        }
-    </script>
-</body>
-</html>
-
+export default CoinFlipApp;
