@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Roblox Pet CoinFlip & Duel</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script>
@@ -31,77 +28,32 @@
                             red: '#DA3633'
                         }
                     },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    }
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
                 }
             }
         }
     </script>
 
     <style>
-        body {
-            background-color: #090D12;
-            color: #C9D1D9;
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-        }
-
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
+        body { background-color: #090D12; color: #C9D1D9; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #0D1117; }
         ::-webkit-scrollbar-thumb { background: #30363D; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #484F58; }
-
-        .app-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            border-left: 1px solid #30363D;
-            border-right: 1px solid #30363D;
-            min-height: 100vh;
-            background: #0D1117;
-            box-shadow: 0 0 50px rgba(0,0,0,0.8);
-        }
-
+        .app-container { max-width: 1400px; margin: 0 auto; border-left: 1px solid #30363D; border-right: 1px solid #30363D; min-height: 100vh; background: #0D1117; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
         .coin-container { perspective: 1000px; }
-        .coin {
-            width: 120px;
-            height: 120px;
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 3s cubic-bezier(0.15, 0.85, 0.35, 1.2);
-        }
-        .coin .front, .coin .back {
-            position: absolute; width: 100%; height: 100%;
-            backface-visibility: hidden; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 900; font-size: 1.4rem;
-            box-shadow: 0 0 30px rgba(245, 158, 11, 0.5), inset 0 0 15px rgba(255, 255, 255, 0.4);
-            border: 4px solid #FBBF24;
-        }
+        .coin { width: 120px; height: 120px; position: relative; transform-style: preserve-3d; transition: transform 3s cubic-bezier(0.15, 0.85, 0.35, 1.2); }
+        .coin .front, .coin .back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.4rem; box-shadow: 0 0 30px rgba(245, 158, 11, 0.5), inset 0 0 15px rgba(255, 255, 255, 0.4); border: 4px solid #FBBF24; }
         .coin .front { background: linear-gradient(135deg, #F59E0B, #B45309); color: #FFF; }
         .coin .back { background: linear-gradient(135deg, #3B82F6, #1D4ED8); color: #FFF; transform: rotateY(180deg); border-color: #60A5FA; box-shadow: 0 0 30px rgba(59, 130, 246, 0.5), inset 0 0 15px rgba(255, 255, 255, 0.4); }
-
         .flip-heads { transform: rotateY(1800deg); }
         .flip-tails { transform: rotateY(1980deg); }
-
-        .pet-card-selected {
-            border-color: #F59E0B !important;
-            background-color: rgba(245, 158, 11, 0.1) !important;
-            box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
-        }
-
-        /* Top Notification Toast Animation */
-        #notificationToast {
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.27), opacity 0.3s ease;
-        }
+        .pet-card-selected { border-color: #F59E0B !important; background-color: rgba(245, 158, 11, 0.1) !important; box-shadow: 0 0 15px rgba(245, 158, 11, 0.3); }
+        #notificationToast { transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.27), opacity 0.3s ease; }
     </style>
 </head>
 <body class="bg-black text-gray-200">
 
-    <!-- SLEEK TOP NOTIFICATION BANNER (NO ALERT DIALOGS) -->
     <div id="notificationToast" class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-3 shadow-2xl transform -translate-y-full opacity-0 pointer-events-none transition-all duration-300">
         <div class="flex items-center space-x-3 max-w-7xl mx-auto w-full">
             <i id="toastIcon" class="fa-solid fa-circle-exclamation text-lg"></i>
@@ -114,9 +66,7 @@
 
     <div class="app-container flex flex-col">
 
-        <!-- TOP BAR / NAVIGATION -->
         <header class="w-full bg-brand-panel border-b border-brand-border px-6 py-4 flex items-center justify-between sticky top-0 z-40">
-            <!-- Brand Logo -->
             <div class="flex items-center space-x-3">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-gold to-brand-purple flex items-center justify-center text-black font-black text-xl shadow-lg">
                     <i class="fa-solid fa-paw"></i>
@@ -129,7 +79,6 @@
                 </div>
             </div>
 
-            <!-- Controls & Auth -->
             <div class="flex items-center space-x-4">
                 <button id="adminPanelBtn" onclick="openAdminModal()" class="hidden bg-brand-purple hover:bg-brand-purpleHover text-white font-bold px-3 py-2 rounded-lg text-xs transition flex items-center gap-2 border border-purple-500/40">
                     <i class="fa-solid fa-user-shield"></i>
@@ -166,17 +115,15 @@
             </div>
         </header>
 
-        <!-- MAIN DASHBOARD -->
         <div class="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6 p-6">
 
-            <!-- LIVE CHAT -->
             <aside class="lg:col-span-1 bg-brand-panel rounded-xl border border-brand-border flex flex-col h-[600px] lg:h-full shadow-lg overflow-hidden">
                 <div class="p-4 border-b border-brand-border bg-brand-dark flex items-center justify-between">
                     <div class="flex items-center space-x-2">
                         <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
                         <h2 class="font-bold text-xs text-white uppercase tracking-wider">Live Global Chat</h2>
                     </div>
-                    <span class="text-[10px] bg-brand-card px-2 py-0.5 rounded text-gray-400 border border-brand-border" id="onlineCounter">184 Online</span>
+                    <span class="text-[10px] bg-brand-card px-2 py-0.5 rounded text-gray-400 border border-brand-border" id="onlineCounter">14 Online</span>
                 </div>
 
                 <div id="chatMessages" class="flex-1 p-3 overflow-y-auto space-y-3 text-xs"></div>
@@ -191,7 +138,6 @@
                 </div>
             </aside>
 
-            <!-- MATCHES DASHBOARD -->
             <main class="lg:col-span-3 flex flex-col space-y-6">
                 <div class="bg-brand-panel p-6 rounded-xl border border-brand-border flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
                     <div>
@@ -218,7 +164,6 @@
         </div>
     </div>
 
-    <!-- ROBLOX REAL API AUTHENTICATION MODAL -->
     <div id="loginModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-brand-panel w-full max-w-md rounded-2xl border border-brand-border shadow-2xl overflow-hidden">
             <div class="p-4 border-b border-brand-border flex justify-between items-center bg-brand-dark">
@@ -231,7 +176,6 @@
             </div>
 
             <div class="p-6">
-                <!-- STEP 1: Search Username -->
                 <div id="authStep1" class="space-y-4">
                     <div class="text-center">
                         <h4 class="font-bold text-lg text-white">Fetch Roblox Account</h4>
@@ -246,7 +190,6 @@
                     </button>
                 </div>
 
-                <!-- STEP 2: Profile Preview -->
                 <div id="authStep2" class="space-y-4 hidden text-center">
                     <h4 class="font-bold text-base text-white">Is this your Roblox Profile?</h4>
                     <div class="bg-brand-dark p-4 rounded-xl border border-brand-border flex flex-col items-center space-y-2">
@@ -266,7 +209,6 @@
                     </div>
                 </div>
 
-                <!-- STEP 3: Real Bio Check -->
                 <div id="authStep3" class="space-y-4 hidden">
                     <div class="text-center">
                         <h4 class="font-bold text-lg text-white">Paste Verification Code</h4>
@@ -294,7 +236,6 @@
         </div>
     </div>
 
-    <!-- CREATE MATCH MODAL -->
     <div id="createMatchModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-brand-panel w-full max-w-xl rounded-2xl border border-brand-border shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <div class="p-4 border-b border-brand-border flex justify-between items-center bg-brand-dark">
@@ -351,7 +292,6 @@
         </div>
     </div>
 
-    <!-- JOIN MATCH MODAL -->
     <div id="joinMatchModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-brand-panel w-full max-w-lg rounded-2xl border border-brand-border shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <div class="p-4 border-b border-brand-border flex justify-between items-center bg-brand-dark">
@@ -383,9 +323,8 @@
         </div>
     </div>
 
-    <!-- ADMIN PANEL MODAL (For dedokxxreal) -->
     <div id="adminModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-brand-panel w-full max-w-lg rounded-2xl border border-brand-purple/50 shadow-2xl overflow-hidden">
+        <div class="bg-brand-panel w-full max-w-xl rounded-2xl border border-brand-purple/50 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <div class="p-4 border-b border-brand-border flex justify-between items-center bg-brand-dark">
                 <h3 class="font-bold text-white text-sm flex items-center gap-2 text-brand-purple">
                     <i class="fa-solid fa-user-shield"></i> Dedicated Admin Control Panel (dedokxxreal)
@@ -395,34 +334,47 @@
                 </button>
             </div>
 
-            <div class="p-6 space-y-4">
-                <div class="text-xs text-gray-400">Add custom Pets directly to any user's inventory.</div>
-                <form onsubmit="adminAddPet(event)" class="space-y-3">
-                    <div>
-                        <label class="block text-[11px] font-bold text-gray-300 mb-1">TARGET USERNAME</label>
-                        <select id="adminTargetUser" class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2 text-xs font-bold text-white"></select>
-                    </div>
-                    <div>
-                        <label class="block text-[11px] font-bold text-gray-300 mb-1">PET NAME</label>
-                        <input type="text" id="adminPetName" placeholder="e.g. Huge Kitsune" required class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2 text-xs text-white">
-                    </div>
-                    <div>
-                        <label class="block text-[11px] font-bold text-gray-300 mb-1">PET IMAGE URL</label>
-                        <input type="url" id="adminPetImage" placeholder="https://example.com/pet.png" required class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2 text-xs text-white">
-                    </div>
-                    <div>
-                        <label class="block text-[11px] font-bold text-gray-300 mb-1">PET VALUE (R$)</label>
-                        <input type="number" id="adminPetValue" placeholder="1000" min="1" required class="w-full bg-brand-dark border border-brand-border rounded-lg px-3 py-2 text-xs font-bold text-white">
-                    </div>
-                    <button type="submit" class="w-full py-3 rounded-xl bg-brand-purple hover:bg-brand-purpleHover text-white font-extrabold text-xs uppercase tracking-wider transition mt-2">
-                        GIVE PET TO USER INVENTORY
-                    </button>
-                </form>
+            <div class="p-6 overflow-y-auto space-y-6">
+                <div class="bg-brand-dark p-4 rounded-xl border border-brand-border space-y-3">
+                    <h4 class="font-extrabold text-xs text-brand-purple uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-plus-circle"></i> Add Pet to User Inventory
+                    </h4>
+                    <form onsubmit="adminAddPet(event)" class="space-y-3">
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-300 mb-1">TARGET USERNAME</label>
+                            <select id="adminTargetUser" onchange="renderAdminUserInventory()" class="w-full bg-brand-panel border border-brand-border rounded-lg px-3 py-2 text-xs font-bold text-white"></select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-300 mb-1">PET NAME</label>
+                                <input type="text" id="adminPetName" placeholder="e.g. Huge Kitsune" required class="w-full bg-brand-panel border border-brand-border rounded-lg px-3 py-2 text-xs text-white">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-300 mb-1">PET VALUE (R$)</label>
+                                <input type="number" id="adminPetValue" placeholder="1000" min="1" required class="w-full bg-brand-panel border border-brand-border rounded-lg px-3 py-2 text-xs font-bold text-white">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-300 mb-1">PET IMAGE URL</label>
+                            <input type="url" id="adminPetImage" placeholder="https://example.com/pet.png" required class="w-full bg-brand-panel border border-brand-border rounded-lg px-3 py-2 text-xs text-white">
+                        </div>
+                        <button type="submit" class="w-full py-2.5 rounded-lg bg-brand-purple hover:bg-brand-purpleHover text-white font-extrabold text-xs uppercase tracking-wider transition">
+                            GIVE PET TO USER
+                        </button>
+                    </form>
+                </div>
+
+                <div class="bg-brand-dark p-4 rounded-xl border border-brand-border space-y-3">
+                    <h4 class="font-extrabold text-xs text-brand-red uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-trash-can"></i> Manage / Delete User Pets
+                    </h4>
+                    <p class="text-[10px] text-gray-400">Select an item below from the target user's inventory to delete it.</p>
+                    <div id="adminUserPetList" class="grid grid-cols-2 gap-3 max-h-40 overflow-y-auto p-2 bg-brand-panel rounded-lg border border-brand-border"></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- GAME ANIMATION OVERLAY -->
     <div id="gameFlipModal" class="fixed inset-0 bg-black/90 backdrop-blur-lg z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-brand-panel w-full max-w-md rounded-2xl border border-brand-border p-8 flex flex-col items-center justify-center text-center space-y-6">
             <h3 class="text-sm font-extrabold text-gray-400 uppercase tracking-widest">DUEL IN PROGRESS</h3>
@@ -436,7 +388,6 @@
         </div>
     </div>
 
-    <!-- INVENTORY MODAL -->
     <div id="inventoryModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-brand-panel w-full max-w-2xl rounded-2xl border border-brand-border shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
             <div class="p-4 border-b border-brand-border flex justify-between items-center bg-brand-dark">
@@ -451,16 +402,14 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
     <script>
-        // APP STATE
-        let currentUser = null; // { id, username, avatar, isAdmin }
+        let currentUser = null;
         let fetchedRobloxUser = null;
         let generatedBioCode = "";
         let selectedMatchSide = 'heads';
         let toastTimeout = null;
 
-        let inventories = {
+        let inventories = JSON.parse(localStorage.getItem('petduel_inventories')) || {
             "dedokxxreal": [
                 { id: 101, name: "Huge Red Dragon", image: "https://cdn-icons-png.flaticon.com/512/616/616408.png", value: 5000 },
                 { id: 102, name: "Golden Kitsune", image: "https://cdn-icons-png.flaticon.com/512/616/616430.png", value: 2500 }
@@ -476,18 +425,72 @@
         let selectedJoinPetIds = [];
 
         document.addEventListener('DOMContentLoaded', () => {
-            initChat();
+            checkAuthSession();
+            initDynamicOnlineCounter();
             renderMatches();
         });
 
-        // TOP NOTIFICATION SYSTEM (RED FOR ERRORS, GREEN FOR SUCCESS - NO DIALOGS)
+        function saveState() {
+            localStorage.setItem('petduel_inventories', JSON.stringify(inventories));
+            if (currentUser) {
+                localStorage.setItem('petduel_user', JSON.stringify(currentUser));
+            } else {
+                localStorage.removeItem('petduel_user');
+            }
+        }
+
+        function checkAuthSession() {
+            const savedUser = localStorage.getItem('petduel_user');
+            if (savedUser) {
+                try {
+                    currentUser = JSON.parse(savedUser);
+                    applyUserLoggedInState();
+                } catch (e) {
+                    localStorage.removeItem('petduel_user');
+                }
+            }
+        }
+
+        function applyUserLoggedInState() {
+            if (!currentUser) return;
+
+            document.getElementById('loginBtn').classList.add('hidden');
+            document.getElementById('userProfileBadge').classList.remove('hidden');
+            document.getElementById('navRobloxUser').textContent = currentUser.username;
+            document.getElementById('navRobloxAvatar').src = currentUser.avatar;
+
+            if (currentUser.isAdmin) {
+                document.getElementById('navAdminLabel').classList.remove('hidden');
+                document.getElementById('adminPanelBtn').classList.remove('hidden');
+            } else {
+                document.getElementById('navAdminLabel').classList.add('hidden');
+                document.getElementById('adminPanelBtn').classList.add('hidden');
+            }
+
+            document.getElementById('userStatsBar').classList.remove('hidden');
+            document.getElementById('userStatsBar').classList.add('flex');
+
+            document.getElementById('chatInput').disabled = false;
+            document.getElementById('chatInput').placeholder = "Type a message...";
+            document.getElementById('chatSendBtn').disabled = false;
+
+            updateUserInventoryStats();
+        }
+
+        function initDynamicOnlineCounter() {
+            const counterEl = document.getElementById('onlineCounter');
+            setInterval(() => {
+                const count = Math.floor(Math.random() * (20 - 10 + 1)) + 10;
+                counterEl.textContent = `${count} Online`;
+            }, 5000);
+        }
+
         function showNotification(type, message) {
             const toast = document.getElementById('notificationToast');
             const icon = document.getElementById('toastIcon');
             const msg = document.getElementById('toastMessage');
 
             if (toastTimeout) clearTimeout(toastTimeout);
-
             msg.textContent = message;
 
             if (type === 'error') {
@@ -501,9 +504,7 @@
                 icon.className = 'fa-solid fa-circle-check text-lg';
             }
 
-            toastTimeout = setTimeout(() => {
-                hideNotification();
-            }, 5000);
+            toastTimeout = setTimeout(() => { hideNotification(); }, 5000);
         }
 
         function hideNotification() {
@@ -512,11 +513,10 @@
             toast.classList.remove('translate-y-0', 'opacity-100');
         }
 
-        // REAL ROBLOX API FETCHING
         async function fetchRobloxProfileAPI() {
             const username = document.getElementById('robloxUserSearch').value.trim();
             if (username.length < 3) {
-                showNotification('error', 'Please enter a valid Roblox username (at least 3 characters).');
+                showNotification('error', 'Please enter a valid Roblox username.');
                 return;
             }
 
@@ -524,7 +524,6 @@
             btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Contacting Roblox API...`;
 
             try {
-                // Fetch real data via Express backend endpoint
                 const res = await fetch(`/api/roblox/user/${encodeURIComponent(username)}`);
                 const data = await res.json();
 
@@ -542,9 +541,9 @@
 
                 document.getElementById('authStep1').classList.add('hidden');
                 document.getElementById('authStep2').classList.remove('hidden');
-                showNotification('success', `Roblox account "${data.username}" successfully fetched from Roblox API!`);
+                showNotification('success', `Roblox account "${data.username}" fetched successfully!`);
             } catch (err) {
-                showNotification('error', 'Server error. Make sure the Node.js backend server is running.');
+                showNotification('error', 'Server error. Make sure backend server is online.');
             } finally {
                 btn.innerHTML = `Fetch Roblox Profile <i class="fa-solid fa-magnifying-glass ml-1"></i>`;
             }
@@ -559,15 +558,14 @@
 
         function copyBioCode() {
             navigator.clipboard.writeText(generatedBioCode);
-            showNotification('success', 'Verification code copied to clipboard!');
+            showNotification('success', 'Verification code copied!');
         }
 
-        // REAL ROBLOX BIO VERIFICATION
         async function verifyRobloxBioAPI() {
             if (!fetchedRobloxUser) return;
 
             const btn = document.getElementById('btnVerifyBio');
-            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Querying Roblox User Bio...`;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Checking Roblox Bio...`;
 
             try {
                 const res = await fetch('/api/roblox/verify-bio', {
@@ -579,19 +577,16 @@
                 const data = await res.json();
 
                 if (!res.ok) {
-                    showNotification('error', data.error || 'Verification code not found in Roblox profile bio.');
+                    showNotification('error', data.error || 'Verification code not found in bio.');
                     btn.innerHTML = `<i class="fa-solid fa-shield-check"></i> <span>VERIFY BIO & LOGIN</span>`;
                     return;
                 }
 
-                // Success Auth Setup
                 const username = fetchedRobloxUser.username;
                 const isAdmin = (username.toLowerCase() === 'dedokxxreal');
 
                 if (!inventories[username]) {
-                    inventories[username] = [
-                        { id: Date.now(), name: "Starter Dragon", image: "https://cdn-icons-png.flaticon.com/512/616/616408.png", value: 1000 }
-                    ];
+                    inventories[username] = [];
                 }
 
                 currentUser = {
@@ -601,34 +596,17 @@
                     isAdmin: isAdmin
                 };
 
-                document.getElementById('loginBtn').classList.add('hidden');
-                document.getElementById('userProfileBadge').classList.remove('hidden');
-                document.getElementById('navRobloxUser').textContent = currentUser.username;
-                document.getElementById('navRobloxAvatar').src = currentUser.avatar;
-
-                if (isAdmin) {
-                    document.getElementById('navAdminLabel').classList.remove('hidden');
-                    document.getElementById('adminPanelBtn').classList.remove('hidden');
-                }
-
-                document.getElementById('userStatsBar').classList.remove('hidden');
-                document.getElementById('userStatsBar').classList.add('flex');
-
-                document.getElementById('chatInput').disabled = false;
-                document.getElementById('chatInput').placeholder = "Type a message...";
-                document.getElementById('chatSendBtn').disabled = false;
-
-                updateUserInventoryStats();
+                saveState();
+                applyUserLoggedInState();
                 closeLoginModal();
-                showNotification('success', `Welcome back ${username}! ${isAdmin ? 'Admin privileges unlocked.' : ''}`);
+                showNotification('success', `Welcome ${username}! ${isAdmin ? 'Admin privileges activated.' : ''}`);
             } catch (err) {
-                showNotification('error', 'Backend communication failure while checking Roblox Bio.');
+                showNotification('error', 'Backend communication failure.');
             } finally {
                 btn.innerHTML = `<i class="fa-solid fa-shield-check"></i> <span>VERIFY BIO & LOGIN</span>`;
             }
         }
 
-        // MODAL TOGGLES & OTHER UTILS
         function openLoginModal() { document.getElementById('loginModal').classList.remove('hidden'); resetAuthModal(); }
         function closeLoginModal() { document.getElementById('loginModal').classList.add('hidden'); }
         function resetAuthModal() {
@@ -640,13 +618,14 @@
 
         function logout() {
             currentUser = null;
+            saveState();
             document.getElementById('loginBtn').classList.remove('hidden');
             document.getElementById('userProfileBadge').classList.add('hidden');
             document.getElementById('userStatsBar').classList.add('hidden');
             document.getElementById('adminPanelBtn').classList.add('hidden');
             document.getElementById('chatInput').disabled = true;
             document.getElementById('chatSendBtn').disabled = true;
-            showNotification('warning', 'You have logged out.');
+            showNotification('warning', 'Logged out.');
         }
 
         function updateUserInventoryStats() {
@@ -657,41 +636,33 @@
             document.getElementById('userTotalValue').textContent = totalVal.toLocaleString();
         }
 
-        // CHAT
-        function initChat() {
-            appendChatMessage("Builderman", "Welcome to Roblox PetDuel!");
-        }
-        function appendChatMessage(username, message) {
-            const chatBox = document.getElementById('chatMessages');
-            const msgEl = document.createElement('div');
-            const avatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${username}`;
-            msgEl.className = 'flex items-start space-x-2 bg-brand-dark p-2 rounded-lg border border-brand-border';
-            msgEl.innerHTML = `
-                <img src="${avatar}" class="w-6 h-6 rounded-full border border-brand-border mt-0.5">
-                <div class="flex-1 overflow-hidden">
-                    <div class="flex items-center justify-between">
-                        <span class="font-bold text-white text-[11px] truncate">${username}</span>
-                        <span class="text-[9px] text-gray-500">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-                    </div>
-                    <p class="text-gray-300 text-[11px] break-words mt-0.5">${escapeHtml(message)}</p>
-                </div>
-            `;
-            chatBox.appendChild(msgEl);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
         function sendChatMessage(e) {
             e.preventDefault();
             if (!currentUser) return;
             const input = document.getElementById('chatInput');
             const msg = input.value.trim();
             if (!msg) return;
-            appendChatMessage(currentUser.username, msg);
+
+            const chatBox = document.getElementById('chatMessages');
+            const msgEl = document.createElement('div');
+            msgEl.className = 'flex items-start space-x-2 bg-brand-dark p-2 rounded-lg border border-brand-border';
+            msgEl.innerHTML = `
+                <img src="${currentUser.avatar}" class="w-6 h-6 rounded-full border border-brand-border mt-0.5 object-cover">
+                <div class="flex-1 overflow-hidden">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-white text-[11px] truncate">${currentUser.username}</span>
+                        <span class="text-[9px] text-gray-500">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                    </div>
+                    <p class="text-gray-300 text-[11px] break-words mt-0.5">${escapeHtml(msg)}</p>
+                </div>
+            `;
+            chatBox.appendChild(msgEl);
+            chatBox.scrollTop = chatBox.scrollHeight;
             input.value = '';
         }
 
-        // CREATE MATCH & DUEL ENGINE
         function openCreateMatchModal() {
-            if (!currentUser) { showNotification('warning', 'Please login with Roblox first to create matches.'); openLoginModal(); return; }
+            if (!currentUser) { showNotification('warning', 'Please login to create matches.'); openLoginModal(); return; }
             selectedCreatePetIds = [];
             document.getElementById('createMatchModal').classList.remove('hidden');
             renderCreateMatchInventory();
@@ -744,7 +715,7 @@
 
         function submitCreateMatch() {
             if (selectedCreatePetIds.length === 0) {
-                showNotification('error', 'You must select at least one pet to wager.');
+                showNotification('error', 'Select at least one pet.');
                 return;
             }
             const minRange = parseInt(document.getElementById('minRangeInput').value) || 0;
@@ -754,6 +725,7 @@
             const totalVal = wagerPets.reduce((sum, p) => sum + p.value, 0);
 
             inventories[currentUser.username] = userPets.filter(p => !selectedCreatePetIds.includes(p.id));
+            saveState();
             updateUserInventoryStats();
 
             const newMatch = {
@@ -770,7 +742,7 @@
             publicMatches.unshift(newMatch);
             renderMatches();
             closeCreateMatchModal();
-            showNotification('success', 'Match created and posted globally!');
+            showNotification('success', 'Match created globally!');
         }
 
         function renderMatches() {
@@ -813,9 +785,8 @@
             });
         }
 
-        // JOIN & ANIMATE DUEL
         function openJoinMatchModal(matchId) {
-            if (!currentUser) { showNotification('warning', 'Please login to join duels.'); openLoginModal(); return; }
+            if (!currentUser) { showNotification('warning', 'Please login to join.'); openLoginModal(); return; }
             const match = publicMatches.find(m => m.id === matchId);
             if (!match) return;
             if (match.creator === currentUser.username) { showNotification('warning', 'You cannot join your own match.'); return; }
@@ -878,15 +849,15 @@
             const joinValue = wagerPets.reduce((sum, p) => sum + p.value, 0);
 
             if (joinValue < match.minRange || joinValue > match.maxRange) {
-                showNotification('error', `Selected wager (${joinValue} R$) is outside allowed range (${match.minRange}-${match.maxRange} R$).`);
+                showNotification('error', `Wager (${joinValue} R$) is outside range (${match.minRange}-${match.maxRange} R$).`);
                 return;
             }
 
             inventories[currentUser.username] = userPets.filter(p => !selectedJoinPetIds.includes(p.id));
+            saveState();
             updateUserInventoryStats();
             closeJoinMatchModal();
 
-            // Execute Duel
             const flipModal = document.getElementById('gameFlipModal');
             const statusText = document.getElementById('modalFlipStatus');
             const coin = document.getElementById('modalCoin');
@@ -911,36 +882,66 @@
 
                 if (!inventories[winnerName]) inventories[winnerName] = [];
                 inventories[winnerName].push(...totalPotPets);
+                saveState();
 
-                statusText.innerHTML = `<span class="${creatorWon ? 'text-brand-gold' : 'text-brand-accent'} font-black text-lg">${winnerName.toUpperCase()} WON THE DUEL! (${outcome.toUpperCase()})</span>`;
+                statusText.innerHTML = `<span class="${creatorWon ? 'text-brand-gold' : 'text-brand-accent'} font-black text-lg">${winnerName.toUpperCase()} WON! (${outcome.toUpperCase()})</span>`;
 
                 publicMatches = publicMatches.filter(m => m.id !== match.id);
                 renderMatches();
                 updateUserInventoryStats();
 
-                showNotification(creatorWon && match.creator === currentUser.username ? 'success' : 'warning', `${winnerName} won the duel! Outcome was ${outcome.toUpperCase()}.`);
+                showNotification('success', `${winnerName} won the duel! Result: ${outcome.toUpperCase()}.`);
 
                 setTimeout(() => { flipModal.classList.add('hidden'); }, 2500);
             }, 3200);
         }
 
-        // ADMIN PANEL
         function openAdminModal() {
             if (!currentUser || currentUser.username.toLowerCase() !== 'dedokxxreal') {
-                showNotification('error', 'Access Denied: Restricted to dedokxxreal.');
+                showNotification('error', 'Access Denied.');
                 return;
             }
             const select = document.getElementById('adminTargetUser');
             select.innerHTML = '';
+            
             Object.keys(inventories).forEach(usr => {
                 const opt = document.createElement('option');
                 opt.value = usr;
                 opt.textContent = usr;
                 select.appendChild(opt);
             });
+
             document.getElementById('adminModal').classList.remove('hidden');
+            renderAdminUserInventory();
         }
+
         function closeAdminModal() { document.getElementById('adminModal').classList.add('hidden'); }
+
+        function renderAdminUserInventory() {
+            const targetUser = document.getElementById('adminTargetUser').value;
+            const container = document.getElementById('adminUserPetList');
+            container.innerHTML = '';
+
+            if (!targetUser || !inventories[targetUser] || inventories[targetUser].length === 0) {
+                container.innerHTML = `<div class="col-span-2 text-center text-xs text-gray-500 py-4">No pets in this user's inventory.</div>`;
+                return;
+            }
+
+            inventories[targetUser].forEach(pet => {
+                const card = document.createElement('div');
+                card.className = 'flex items-center justify-between bg-brand-dark p-2 rounded border border-brand-border text-xs';
+                card.innerHTML = `
+                    <div class="flex items-center space-x-2 truncate">
+                        <img src="${pet.image}" class="w-6 h-6 object-contain">
+                        <span class="text-white font-bold truncate max-w-[90px]">${escapeHtml(pet.name)}</span>
+                    </div>
+                    <button onclick="adminRemovePet('${targetUser}', ${pet.id})" class="text-brand-red hover:text-red-400 text-xs px-2 py-1 bg-red-950/40 rounded border border-red-800">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
 
         function adminAddPet(e) {
             e.preventDefault();
@@ -952,12 +953,21 @@
             if (!inventories[targetUser]) inventories[targetUser] = [];
             inventories[targetUser].push({ id: Date.now(), name: petName, image: petImage, value: petValue });
 
+            saveState();
             updateUserInventoryStats();
-            closeAdminModal();
-            showNotification('success', `Admin Action: Added "${petName}" (${petValue} R$) to ${targetUser}'s inventory.`);
+            renderAdminUserInventory();
+            showNotification('success', `Admin: Added "${petName}" (${petValue} R$) to ${targetUser}.`);
         }
 
-        // INVENTORY OVERVIEW
+        function adminRemovePet(targetUser, petId) {
+            if (!inventories[targetUser]) return;
+            inventories[targetUser] = inventories[targetUser].filter(p => p.id !== petId);
+            saveState();
+            updateUserInventoryStats();
+            renderAdminUserInventory();
+            showNotification('success', `Admin: Removed pet from ${targetUser}.`);
+        }
+
         function openInventoryModal() {
             if (!currentUser) return;
             const container = document.getElementById('myFullInventoryList');
