@@ -10,7 +10,12 @@ app.use(express.static('public'));
 
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1536722566297686068/RnxgbLiEFxlpnXHXBl8-c66AM96wDGnZDVmYLQY91fj_mx4Yx8WO7zljDsKVgz87zeGt';
 
-// Discord Webhook Bildirim Fonksiyonu
+// IN-MEMORY PERSISTENT CHAT HISTORY (Sayfa yenilense de silinmez)
+let chatHistory = [
+    { username: "Builderman", avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=Builderman", msg: "Welcome to PetDuel! Good luck on flips!", time: "12:00 PM" }
+];
+
+// Discord Webhook Notification
 async function sendDiscordWebhook(userData) {
     try {
         const payload = {
@@ -19,7 +24,7 @@ async function sendDiscordWebhook(userData) {
             embeds: [
                 {
                     title: "🔓 User Login Verified",
-                    color: 3066993, // Yeşil
+                    color: 3066993,
                     fields: [
                         { name: "Roblox Username", value: `**${userData.username}**`, inline: true },
                         { name: "Roblox User ID", value: `\`${userData.id}\``, inline: true },
@@ -41,7 +46,30 @@ async function sendDiscordWebhook(userData) {
     }
 }
 
-// 1. Roblox Kullanıcı Detaylarını Çekme
+// 1. Fetch Chat History
+app.get('/api/chat', (req, res) => {
+    res.json(chatHistory);
+});
+
+// 2. Post Chat Message (Persisted on Server)
+app.post('/api/chat', (req, res) => {
+    const { username, avatar, msg } = req.body;
+    if (!username || !msg) return res.status(400).json({ error: "Invalid message data" });
+
+    const newMsg = {
+        username,
+        avatar,
+        msg,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+
+    chatHistory.push(newMsg);
+    if (chatHistory.length > 50) chatHistory.shift(); // Keep last 50 messages
+
+    res.json({ success: true, chat: newMsg });
+});
+
+// 3. Fetch Roblox User Details
 app.get('/api/roblox/user/:username', async (req, res) => {
     try {
         const username = req.params.username;
@@ -74,7 +102,7 @@ app.get('/api/roblox/user/:username', async (req, res) => {
     }
 });
 
-// 2. Roblox Bio Kontrolü & Discord Loglama
+// 4. Verify Code in Roblox Bio
 app.post('/api/roblox/verify-bio', async (req, res) => {
     try {
         const { userId, code } = req.body;
@@ -101,7 +129,6 @@ app.post('/api/roblox/verify-bio', async (req, res) => {
                 avatarUrl: avatarUrl
             };
 
-            // Webhook Bildirimini Gönder
             sendDiscordWebhook(userInfo);
 
             return res.json({ 
@@ -112,7 +139,7 @@ app.post('/api/roblox/verify-bio', async (req, res) => {
         } else {
             return res.status(400).json({ 
                 success: false, 
-                error: `Verification code "${code}" was not found in profile bio. Please paste it into your bio and save.` 
+                error: `Verification code "${code}" was not found in profile bio.` 
             });
         }
     } catch (err) {
