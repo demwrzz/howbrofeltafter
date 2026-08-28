@@ -14,17 +14,37 @@
         * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
         body { background-color: #0d1117; color: #e6edf3; font-family: 'Rajdhani', sans-serif; font-size: 18px; overflow-x: hidden; }
         
-        /* Loader Screen Fix */
+        /* Smooth Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #090d12; }
+        ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #ff4655; }
+
+        /* Top Notification Toast */
+        #toastContainer {
+            position: fixed; top: 90px; right: 20px; z-index: 99999;
+            display: flex; flex-direction: column; gap: 10px; pointer-events: none;
+        }
+        .toast {
+            background: #161b22; border-left: 4px solid #ff4655; color: #fff;
+            padding: 14px 20px; border-radius: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            font-family: 'Orbitron', sans-serif; font-size: 0.85rem; display: flex; align-items: center; gap: 12px;
+            transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: auto; min-width: 280px; max-width: 380px; border-top: 1px solid #30363d; border-right: 1px solid #30363d; border-bottom: 1px solid #30363d;
+        }
+        .toast.toast-show { transform: translateX(0); }
+        .toast.toast-success { border-left-color: #2ea043; }
+        .toast.toast-success i { color: #2ea043; }
+        .toast.toast-error { border-left-color: #ff4655; }
+        .toast.toast-error i { color: #ff4655; }
+
+        /* Loader Screen */
         #loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #090d12;
             display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999;
             opacity: 1; transition: opacity 0.5s ease, visibility 0.5s ease; visibility: visible;
         }
-        #loader.hidden-loader {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
+        #loader.hidden-loader { opacity: 0; visibility: hidden; pointer-events: none; }
         #loader h1 { font-family: 'Orbitron', sans-serif; font-size: 3rem; color: #ff4655; letter-spacing: 4px; margin-bottom: 20px; text-shadow: 0 0 15px rgba(255, 70, 85, 0.6); }
         .loading-bar { width: 250px; height: 4px; background: #1c2430; border-radius: 2px; overflow: hidden; }
         .loading-fill { width: 0%; height: 100%; background: #ff4655; box-shadow: 0 0 10px #ff4655; animation: load 1.2s ease-in-out forwards; }
@@ -33,7 +53,7 @@
         /* Header / Navbar */
         header {
             position: fixed; top: 0; width: 100%; padding: 20px 8%; display: flex; justify-content: space-between; align-items: center;
-            background: rgba(13, 17, 23, 0.9); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255, 70, 85, 0.2); z-index: 1000;
+            background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 70, 85, 0.2); z-index: 1000;
         }
         .logo { font-family: 'Orbitron', sans-serif; font-size: 1.6rem; font-weight: 800; color: #fff; letter-spacing: 2px; }
         .logo span { color: #ff4655; }
@@ -46,22 +66,22 @@
 
         /* Hero */
         .hero { height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; position: relative; background: linear-gradient(135deg, #090d12 0%, #161b22 100%); padding: 0 20px; }
-        .hero-overlay { position: absolute; inset: 0; background: radial-gradient(circle, rgba(255,70,85,0.08) 0%, rgba(0,0,0,0.8) 100%); }
+        .hero-overlay { position: absolute; inset: 0; background: radial-gradient(circle, rgba(255,70,85,0.08) 0%, rgba(0,0,0,0.85) 100%); }
         .hero-content { position: relative; z-index: 1; max-width: 800px; }
         .hero-content h1 { font-family: 'Orbitron', sans-serif; font-size: 4.5rem; color: #fff; letter-spacing: 6px; margin-bottom: 10px; text-shadow: 0 0 20px rgba(255, 255, 255, 0.2); }
         .hero-content h2 { font-size: 2rem; color: #ff4655; margin-bottom: 15px; font-weight: 700; }
         .hero-content p { font-size: 1.2rem; color: #8b949e; margin-bottom: 30px; }
 
-        .hero-content button, #apply button {
+        .hero-content button, #apply button, .chat-btn {
             background: #ff4655; color: #fff; border: none; padding: 14px 40px; font-size: 1.1rem; font-family: 'Orbitron', sans-serif;
-            font-weight: 700; text-transform: uppercase; cursor: pointer; clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px); transition: 0.3s ease; box-shadow: 0 0 15px rgba(255, 70, 85, 0.4);
+            font-weight: 700; text-transform: uppercase; cursor: pointer; clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px); transition: all 0.3s ease; box-shadow: 0 0 15px rgba(255, 70, 85, 0.4);
         }
-        .hero-content button:hover, #apply button:hover { background: #e03e4c; transform: translateY(-3px); box-shadow: 0 0 25px rgba(255, 70, 85, 0.7); }
+        .hero-content button:hover, #apply button:hover, .chat-btn:hover { background: #e03e4c; transform: translateY(-3px); box-shadow: 0 0 25px rgba(255, 70, 85, 0.7); }
 
         section { padding: 100px 8%; }
         .about-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
         .about-card { background: #161b22; border: 1px solid #30363d; padding: 30px; border-radius: 8px; transition: 0.3s; }
-        .about-card:hover { border-color: #ff4655; transform: translateY(-5px); }
+        .about-card:hover { border-color: #ff4655; transform: translateY(-5px); box-shadow: 0 10px 20px rgba(255,70,85,0.1); }
         .about-card h3 { font-family: 'Orbitron', sans-serif; color: #ff4655; margin-bottom: 15px; }
         .about-card p { color: #8b949e; line-height: 1.6; }
 
@@ -69,22 +89,48 @@
         .stat-box h1 { font-family: 'Orbitron', sans-serif; font-size: 3rem; color: #ff4655; }
         .stat-box p { color: #8b949e; text-transform: uppercase; font-weight: 600; }
 
+        /* Kadro */
         .players { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 30px; }
-        .player-card { background: #161b22; border: 1px solid #30363d; padding: 20px; text-align: center; border-radius: 8px; transition: 0.3s; }
-        .player-card:hover { border-color: #ff4655; transform: translateY(-5px); }
-        .player-card img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #ff4655; margin-bottom: 15px; }
-        .player-card h3 { font-family: 'Orbitron', sans-serif; color: #fff; }
-        .player-card p { color: #8b949e; font-weight: 600; }
+        .player-card { background: #161b22; border: 1px solid #30363d; padding: 25px; text-align: center; border-radius: 8px; transition: 0.3s; }
+        .player-card:hover { border-color: #ff4655; transform: translateY(-5px); box-shadow: 0 10px 20px rgba(255,70,85,0.15); }
+        .player-card img { width: 130px; height: 130px; border-radius: 50%; object-fit: cover; border: 3px solid #ff4655; margin-bottom: 15px; box-shadow: 0 0 15px rgba(255,70,85,0.3); }
+        .player-card h3 { font-family: 'Orbitron', sans-serif; color: #fff; font-size: 1.3rem; margin-bottom: 5px; }
+        .player-card p { color: #8b949e; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
 
         .tournament-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 25px; }
-        .tournament-card { background: #161b22; border-left: 4px solid #ff4655; padding: 25px; border-radius: 4px; }
+        .tournament-card { background: #161b22; border-left: 4px solid #ff4655; padding: 25px; border-radius: 4px; border-top: 1px solid #30363d; border-right: 1px solid #30363d; border-bottom: 1px solid #30363d; }
         .tournament-card h3 { color: #fff; margin-bottom: 8px; }
         .tournament-card p { color: #ff4655; font-weight: 700; }
 
         .requirements { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
-        .req-card { background: #161b22; border: 1px solid #30363d; padding: 25px; text-align: center; font-family: 'Orbitron', sans-serif; font-size: 1.1rem; color: #fff; border-radius: 8px; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+        .req-card { background: #161b22; border: 1px solid #30363d; padding: 25px; text-align: center; font-family: 'Orbitron', sans-serif; font-size: 1.1rem; color: #fff; border-radius: 8px; display: flex; flex-direction: column; gap: 10px; align-items: center; transition: 0.3s; }
+        .req-card:hover { border-color: #ff4655; }
         .req-card i { font-size: 2rem; color: #ff4655; }
 
+        /* LIVE CHAT SECTION */
+        .chat-section { max-width: 800px; margin: 0 auto; background: #161b22; border: 1px solid #30363d; border-radius: 12px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
+        .chat-header { background: #090d12; padding: 15px 20px; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; align-items: center; }
+        .chat-header h3 { font-family: 'Orbitron', sans-serif; font-size: 1.1rem; color: #fff; display: flex; align-items: center; gap: 10px; }
+        .chat-header h3 span { width: 10px; height: 10px; background: #2ea043; border-radius: 50%; box-shadow: 0 0 8px #2ea043; }
+        .chat-box { height: 350px; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; background: #0d1117; }
+        .chat-msg { background: #161b22; border: 1px solid #21262d; padding: 10px 15px; border-radius: 8px; max-width: 85%; align-self: flex-start; }
+        .chat-msg .author { font-family: 'Orbitron', sans-serif; font-size: 0.8rem; color: #ff4655; margin-bottom: 4px; display: block; font-weight: 700; }
+        .chat-msg .text { color: #e6edf3; font-size: 0.95rem; word-break: break-word; }
+        .chat-msg .time { font-size: 0.7rem; color: #8b949e; float: right; margin-top: 4px; margin-left: 10px; }
+        .chat-input-area { padding: 15px; background: #090d12; border-top: 1px solid #30363d; display: flex; gap: 10px; }
+        .chat-input-area input { flex: 1; padding: 12px 15px; background: #161b22; border: 1px solid #30363d; color: #fff; font-family: 'Rajdhani', sans-serif; font-size: 1rem; border-radius: 6px; outline: none; }
+        .chat-input-area input:focus { border-color: #ff4655; }
+        .chat-input-area button { padding: 12px 25px; font-size: 0.9rem; }
+
+        /* Nickname Modal Overlay */
+        #nickModal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-50; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .nick-box { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 30px; max-width: 420px; width: 100%; text-align: center; space-y: 20px; }
+        .nick-box h3 { font-family: 'Orbitron', sans-serif; color: #fff; margin-bottom: 10px; font-size: 1.4rem; }
+        .nick-box p { color: #8b949e; font-size: 0.95rem; margin-bottom: 20px; }
+        .nick-box input { width: 100%; padding: 14px; background: #0d1117; border: 1px solid #30363d; color: #fff; font-family: 'Rajdhani', sans-serif; font-size: 1.1rem; border-radius: 6px; outline: none; margin-bottom: 20px; text-align: center; }
+        .nick-box input:focus { border-color: #ff4655; }
+
+        /* Application Form */
         #apply form { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
         #apply input, #apply textarea { width: 100%; padding: 15px; background: #161b22; border: 1px solid #30363d; color: #fff; font-family: 'Rajdhani', sans-serif; font-size: 1rem; border-radius: 6px; outline: none; transition: 0.3s; }
         #apply input:focus, #apply textarea:focus { border-color: #ff4655; box-shadow: 0 0 10px rgba(255, 70, 85, 0.3); }
@@ -97,6 +143,9 @@
     </style>
 </head>
 <body>
+
+    <!-- Notification Toast Container -->
+    <div id="toastContainer"></div>
 
     <!-- Loader -->
     <div id="loader">
@@ -113,7 +162,7 @@
             <a href="#home">Ana Sayfa</a>
             <a href="#about">Hakkımızda</a>
             <a href="#roster">Kadro</a>
-            <a href="#tournaments">Turnuvalar</a>
+            <a href="#chat">Live Chat</a>
             <a href="#recruitment">Alımlar</a>
             <a href="#apply">Başvuru</a>
             <a href="#contact">İletişim</a>
@@ -152,10 +201,10 @@
 
     <!-- İstatistikler -->
     <section class="stats">
-        <div class="stat-box"><h1>1+</h1><p>Aktif Üye</p></div>
+        <div class="stat-box"><h1>3+</h1><p>Aktif Üye</p></div>
         <div class="stat-box"><h1>0</h1><p>Turnuva</p></div>
         <div class="stat-box"><h1>0</h1><p>Galibiyet</p></div>
-        <div class="stat-box"><h1>1</h1><p>Toplam Üye</p></div>
+        <div class="stat-box"><h1>3</h1><p>Toplam Üye</p></div>
     </section>
 
     <!-- Kadro -->
@@ -163,22 +212,48 @@
         <h2 class="section-title">Takım Kadrosu</h2>
         <div class="players">
             <div class="player-card">
-                <img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" alt="Etin1x">
-                <h3>Etin1x</h3>
+                <img src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=400&auto=format&fit=crop&q=80" alt="NBT Etin1x">
+                <h3>NBT Etin1x</h3>
                 <p>Founder</p>
             </div>
             <div class="player-card">
-                <img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" alt="PlayerOne">
-                <h3>PlayerOne</h3>
+                <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&auto=format&fit=crop&q=80" alt="Cryptoled">
+                <h3>Cryptoled</h3>
                 <p>IGL</p>
             </div>
             <div class="player-card">
-                <img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" alt="PlayerTwo">
-                <h3>PlayerTwo</h3>
+                <img src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=400&auto=format&fit=crop&q=80" alt="litecoinspace">
+                <h3>litecoinspace</h3>
                 <p>Duelist</p>
             </div>
         </div>
     </section>
+
+    <!-- Live Chat Section -->
+    <section id="chat">
+        <h2 class="section-title">Live Chat</h2>
+        <div class="chat-section">
+            <div class="chat-header">
+                <h3><span></span> Canlı Sohbet Topluluğu</h3>
+                <span id="userBadge" style="font-size: 0.85rem; color: #8b949e;"></span>
+            </div>
+            <div id="chatBox" class="chat-box"></div>
+            <form id="chatForm" class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="Mesajınızı yazın..." required autocomplete="off">
+                <button type="submit" class="chat-btn">Gönder</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Nickname Selector Modal -->
+    <div id="nickModal" style="display: none;">
+        <div class="nick-box">
+            <h3>NICKNAME SEÇİN</h3>
+            <p>Sohbete katılmak için benzersiz bir kullanıcı adı belirleyin. Her nickname sadece 1 defa alınabilir!</p>
+            <input type="text" id="nickInput" placeholder="Örn: ValorantPro34" maxlength="15" autocomplete="off">
+            <button onclick="claimNickname()" class="chat-btn" style="width: 100%;">Sohbete Katıl</button>
+        </div>
+    </div>
 
     <!-- Turnuvalar -->
     <section id="tournaments">
@@ -208,7 +283,7 @@
             <input type="text" id="playerName" placeholder="Oyuncu Adı (Riot ID #TAG)" required>
             <input type="number" id="playerAge" placeholder="Yaş" min="14" max="40" required>
             <input type="text" id="playerRank" placeholder="Rank (Örn: Diamond 2, Ascendant 1)" required>
-            <textarea id="playerDesc" placeholder="Kendinizi Tanıtın" rows="4" required></textarea>
+            <textarea id="playerDesc" placeholder="Kendinizi Tanıtın (Oynadığınız ajanlar, tecrübeleriniz vb.)" rows="4" required></textarea>
             <button type="submit" id="submitBtn">Başvur</button>
         </form>
     </section>
@@ -223,46 +298,126 @@
     </section>
 
     <footer>
-        <p>© 2026 NBT TEAM</p>
+        <p>© 2026 NBT TEAM | All Rights Reserved</p>
     </footer>
 
     <script>
-        // DISCORD WEBHOOK URL
         const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1542887909940531203/0oZRtGr8RbClZObZvADVT-Ihy99hZW6oZ-MEF2lV8bOCiYMHq06_ePHps_zLoeg-WzKK";
+        
+        // TOAST NOTIFICATION SYSTEM
+        function showToast(message, type = 'error') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-triangle-exclamation'}"></i>
+                <span>${message}</span>
+            `;
+            container.appendChild(toast);
 
-        // GARANTİLİ YÜKLEME EKRANI KALDIRICI (LOADER FIX)
-        function hideLoader() {
-            const loader = document.getElementById('loader');
-            if (loader) {
-                loader.classList.add('hidden-loader');
-            }
+            setTimeout(() => toast.classList.add('toast-show'), 50);
+
+            setTimeout(() => {
+                toast.classList.remove('toast-show');
+                setTimeout(() => toast.remove(), 400);
+            }, 3500);
         }
 
-        // 1.5 saniye sonra kesin olarak kaldır
+        // LOADER FIX
+        function hideLoader() {
+            const loader = document.getElementById('loader');
+            if (loader) loader.classList.add('hidden-loader');
+        }
         setTimeout(hideLoader, 1500);
         window.addEventListener('load', hideLoader);
 
-        // SUPABASE GÜVENLİ BAĞLANTI İNİTİALİZASYONU
-        let supabaseClient = null;
-        try {
-            if (window.supabase && typeof window.supabase.createClient === 'function') {
-                const SUPABASE_URL = "https://zEkznp5QOL1NbqVDgI5zsg.supabase.co";
-                const SUPABASE_KEY = "sb_publishable_ComZOBwVMqtVnzHDgUMVvw_tnK6MuAb";
-                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // LIVE CHAT & UNIQUE NICKNAME SYSTEM
+        let currentNick = localStorage.getItem('nbt_user_nick') || null;
+        let takenNicks = JSON.parse(localStorage.getItem('nbt_taken_nicks')) || ["NBT Etin1x", "Cryptoled", "litecoinspace"];
+        let chatMessages = JSON.parse(localStorage.getItem('nbt_chat_messages')) || [
+            { author: "NBT Etin1x", text: "NBT TEAM canlı sohbet alanına hoş geldiniz!", time: "12:00" },
+            { author: "Cryptoled", text: "Alımlarımız aktif olarak devam etmektedir.", time: "12:05" }
+        ];
+
+        function initChat() {
+            const chatBox = document.getElementById('chatBox');
+            chatBox.innerHTML = '';
+            chatMessages.forEach(msg => {
+                const el = document.createElement('div');
+                el.className = 'chat-msg';
+                el.innerHTML = `
+                    <span class="author">${escapeHtml(msg.author)}</span>
+                    <span class="text">${escapeHtml(msg.text)}</span>
+                    <span class="time">${msg.time}</span>
+                `;
+                chatBox.appendChild(el);
+            });
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            if (currentNick) {
+                document.getElementById('userBadge').textContent = `Giriş Yapıldı: ${currentNick}`;
             }
-        } catch (e) {
-            console.warn("Supabase bağlantısı kurulamadı:", e);
         }
 
-        // DISCORD'A BİLDİRİM GÖNDERME FONKSİYONU
+        function claimNickname() {
+            const input = document.getElementById('nickInput');
+            const nick = input.value.trim();
+
+            if (!nick) {
+                showToast("Lütfen geçerli bir kullanıcı adı girin!");
+                return;
+            }
+
+            const lowerNick = nick.toLowerCase();
+            const isTaken = takenNicks.some(n => n.toLowerCase() === lowerNick);
+
+            if (isTaken) {
+                showToast("Bu nickname zaten alınmış! Başka bir ad deneyin.", "error");
+                return;
+            }
+
+            // Nickname accepted
+            currentNick = nick;
+            takenNicks.push(nick);
+            localStorage.setItem('nbt_user_nick', nick);
+            localStorage.setItem('nbt_taken_nicks', JSON.stringify(takenNicks));
+
+            document.getElementById('nickModal').style.display = 'none';
+            showToast(`Hoş geldin, ${nick}! Sohbete katıldın.`, "success");
+            initChat();
+        }
+
+        document.getElementById('chatForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!currentNick) {
+                document.getElementById('nickModal').style.display = 'flex';
+                return;
+            }
+
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const newMsg = { author: currentNick, text, time: timeStr };
+
+            chatMessages.push(newMsg);
+            if (chatMessages.length > 50) chatMessages.shift();
+
+            localStorage.setItem('nbt_chat_messages', JSON.stringify(chatMessages));
+            input.value = '';
+            initChat();
+        });
+
+        // DISCORD WEBHOOK SENDER
         async function sendDiscordNotification(name, age, rank, desc) {
             try {
                 const payload = {
-                    username: "NBT TEAM Başvuru Botu",
+                    username: "NBT TEAM Recruitment",
                     avatar_url: "https://cdn-icons-png.flaticon.com/512/616/616408.png",
                     embeds: [{
                         title: "🎯 Yeni Valorant Oyuncu Başvurusu!",
-                        color: 16729685, // Valorant Kırmızısı (#ff4655)
+                        color: 16729685,
                         fields: [
                             { name: "👤 Oyuncu Adı / Tag", value: `**${name}**`, inline: true },
                             { name: "🎂 Yaş", value: `\`${age}\``, inline: true },
@@ -280,11 +435,11 @@
                     body: JSON.stringify(payload)
                 });
             } catch (err) {
-                console.error("Discord bildirim hatası:", err);
+                console.error("Discord Notification Error:", err);
             }
         }
 
-        // FORM GÖNDERİM İŞLEYİCİSİ
+        // FORM SUBMIT
         document.getElementById('recruitmentForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -297,28 +452,21 @@
             const rank = document.getElementById('playerRank').value.trim();
             const desc = document.getElementById('playerDesc').value.trim();
 
-            // 1. Supabase'e kaydet (varsa)
-            if (supabaseClient) {
-                try {
-                    await supabaseClient
-                        .from('applications')
-                        .insert([
-                            { player_name: name, player_age: age, player_rank: rank, player_desc: desc }
-                        ]);
-                } catch (err) {
-                    console.warn("Supabase insert uyarısı:", err);
-                }
-            }
-
-            // 2. Discord Webhook'a Bildirim At
             await sendDiscordNotification(name, age, rank, desc);
 
-            alert(`Teşekkürler ${name}! Başvurunuz NBT TEAM ekibine ve Discord kanalımıza başarıyla ulaştırıldı.`);
+            showToast(`Teşekkürler ${name}! Başvurunuz Discord kanalımıza ulaştırıldı.`, "success");
             e.target.reset();
 
             submitBtn.innerText = "Başvur";
             submitBtn.disabled = false;
         });
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        }
+
+        // Initialize Chat on Load
+        initChat();
     </script>
 </body>
 </html>
