@@ -49,7 +49,7 @@
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <!-- TOP NOTIFICATION BANNER (FIXED AUTO-HIDE & CLOSE) -->
+    <!-- TOP NOTIFICATION BANNER -->
     <div id="notificationToast" class="fixed top-4 right-4 z-50 flex items-center justify-between px-5 py-3.5 rounded-xl shadow-2xl bg-cardBg border border-panelBorder text-white transform transition-all duration-300 translate-x-full opacity-0 pointer-events-none">
         <div class="flex items-center space-x-3 mr-4">
             <i id="toastIcon" class="fa-solid fa-circle-info text-pinkAccent text-base"></i>
@@ -95,7 +95,7 @@
         </div>
     </header>
 
-    <!-- FULL WIDTH MAIN LAYOUT -->
+    <!-- MAIN LAYOUT -->
     <div class="flex-1 grid grid-cols-1 lg:grid-cols-5 gap-6 p-6 w-full">
 
         <!-- LIVE CHAT -->
@@ -155,11 +155,129 @@
         </main>
     </div>
 
-    <!-- MATCH SPECTATE / VIEW MODAL (EXACT MATCH TO THE USER'S SCREENSHOT) -->
+    <!-- CREATE MATCH MODAL (EXACT MATCH TO THE USER's 1st SCREENSHOT) -->
+    <div id="createMatchModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-[#12141D] w-full max-w-4xl rounded-2xl border border-panelBorder shadow-2xl overflow-hidden flex flex-col p-6 space-y-6">
+            
+            <!-- HEADER -->
+            <div class="flex justify-between items-center">
+                <h3 class="font-black text-xl text-white">Create</h3>
+                <button onclick="closeCreateMatchModal()" class="text-gray-400 hover:text-white bg-cardBg px-2.5 py-1 rounded-lg border border-panelBorder text-xs"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- TOP FILTER BAR -->
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-[#0B0D13] border border-panelBorder rounded-xl px-4 py-2 flex items-center space-x-2 text-xs font-extrabold text-white">
+                        <span>Selected value</span>
+                        <i class="fa-brands fa-roblox text-pinkAccent"></i>
+                        <span id="selectedWagerValue" class="text-pinkAccent">0</span>
+                    </div>
+                    <div class="bg-[#0B0D13] border border-panelBorder rounded-xl px-3 py-2 text-xs font-bold text-gray-400">
+                        <span id="selectedItemCount">0</span>/20 ITEMS
+                    </div>
+                    <div class="flex items-center space-x-1">
+                        <button class="bg-[#0B0D13] border border-panelBorder hover:border-gray-500 text-gray-300 text-xs font-bold px-3 py-2 rounded-lg">1x</button>
+                        <button class="bg-[#0B0D13] border border-panelBorder hover:border-gray-500 text-gray-300 text-xs font-bold px-3 py-2 rounded-lg">5x</button>
+                        <button class="bg-[#0B0D13] border border-panelBorder hover:border-gray-500 text-gray-300 text-xs font-bold px-3 py-2 rounded-lg">10x</button>
+                        <button class="bg-[#0B0D13] border border-panelBorder hover:border-gray-500 text-gray-300 text-xs font-bold px-3 py-2 rounded-lg">15x</button>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-3 flex-1 justify-end">
+                    <div class="relative max-w-xs w-full">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-xs text-gray-500"></i>
+                        <input type="text" placeholder="Search items..." class="w-full bg-[#0B0D13] border border-panelBorder rounded-xl pl-8 pr-3 py-2 text-xs text-white focus:outline-none">
+                    </div>
+                    <select class="bg-[#0B0D13] border border-panelBorder rounded-xl px-3 py-2 text-xs text-gray-300 font-bold">
+                        <option>High to low</option>
+                        <option>Low to high</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- INVENTORY CONTENT AREA -->
+            <div class="bg-[#0B0D13] border border-panelBorder rounded-2xl p-12 min-h-[300px] flex flex-col items-center justify-center">
+                <div id="createMatchInventory" class="w-full grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3 max-h-[280px] overflow-y-auto"></div>
+                <div id="emptyInventoryBox" class="text-center space-y-4 hidden">
+                    <p class="text-sm font-semibold text-gray-400">You do not have any available items.</p>
+                    <button onclick="openDepositModal()" class="bg-pinkAccent hover:bg-pinkHover text-white font-extrabold px-8 py-3 rounded-xl text-xs uppercase tracking-wider transition shadow-lg shadow-pinkAccent/20">
+                        + Deposit
+                    </button>
+                </div>
+            </div>
+
+            <!-- FOOTER SIDE SELECTION & ACTION BUTTON -->
+            <div class="flex items-center justify-end space-x-4 pt-2">
+                <div class="flex items-center space-x-2">
+                    <button type="button" id="matchSidePink" onclick="setMatchSide('pink')" class="w-10 h-10 rounded-full bg-pinkCoin border-2 border-white flex items-center justify-center text-white shadow-lg">
+                        <i class="fa-solid fa-paw text-sm"></i>
+                    </button>
+                    <button type="button" id="matchSideBlue" onclick="setMatchSide('blue')" class="w-10 h-10 rounded-full bg-blueCoin/30 border-2 border-panelBorder flex items-center justify-center text-gray-500">
+                        <i class="fa-solid fa-egg text-sm"></i>
+                    </button>
+                </div>
+                <button onclick="submitCreateMatch()" class="bg-pinkAccent/50 hover:bg-pinkAccent text-white font-extrabold px-12 py-3 rounded-xl text-sm transition shadow-lg">
+                    Create
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DEPOSIT MODAL (EXACT MATCH TO THE USER's 2nd SCREENSHOT) -->
+    <div id="depositModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-[#12141D] w-full max-w-md rounded-2xl border border-panelBorder shadow-2xl overflow-hidden flex flex-col p-6 space-y-6 text-center">
+            
+            <div class="flex justify-between items-center border-b border-panelBorder/50 pb-3">
+                <h3 class="font-black text-lg text-white">Deposit</h3>
+                <button onclick="closeDepositModal()" class="text-gray-400 hover:text-white bg-cardBg px-2.5 py-1 rounded-lg border border-panelBorder text-xs"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="space-y-4">
+                <div class="w-12 h-12 rounded-full border-4 border-pinkAccent border-t-transparent animate-spin mx-auto"></div>
+                <h4 class="font-extrabold text-lg text-white">Join the official bot</h4>
+                <p class="text-xs text-gray-400 px-4 leading-relaxed">
+                    Join Adopt Me and the bot's game. You will enter the deposit queue automatically.
+                </p>
+
+                <!-- BOT WARNING BOX -->
+                <div class="bg-[#1E141A] border border-pinkAccent/30 rounded-2xl p-4 text-left space-y-2">
+                    <div class="flex items-center space-x-2 text-pinkAccent font-extrabold text-[11px] tracking-wider uppercase">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <span>ONLY TRADE WITH THIS OFFICIAL BOT</span>
+                    </div>
+                    <div class="text-white font-extrabold text-lg tracking-wide">
+                        dedokgag2
+                    </div>
+                    <p class="text-[11px] text-gray-400 leading-relaxed">
+                        Ignore every other trade request, even if the username looks similar. We will never ask you to trade with another account.
+                    </p>
+                </div>
+
+                <!-- JOIN PRIVATE SERVER BUTTON -->
+                <a href="https://www.roblox.com/share?code=bcf56020403ba845aa32ccbb336b8cd9&type=Server" target="_blank" class="block w-full py-3.5 rounded-xl bg-pinkAccent hover:bg-pinkHover text-white font-extrabold text-sm transition shadow-lg shadow-pinkAccent/20">
+                    Join Private Server
+                </a>
+
+                <span class="text-xs font-bold text-pinkAccent block">Join within 2:56</span>
+
+                <!-- TRADING GUIDE CARD -->
+                <div class="bg-[#FAF3E0] rounded-2xl p-4 text-black text-left space-y-2 shadow-lg">
+                    <div class="flex justify-between items-center">
+                        <h5 class="font-black text-xl tracking-tight">Trading</h5>
+                        <span class="bg-[#5CB85C] text-white text-xs font-extrabold px-3 py-1 rounded-lg">Everyone</span>
+                    </div>
+                    <p class="text-xs text-gray-700 font-medium">Determine who can send you trading invites.</p>
+                </div>
+
+                <p class="text-xs font-extrabold text-white">Make sure Trading is set to Everyone.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SPECTATE MODAL -->
     <div id="spectateModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-[#12141D] w-full max-w-4xl rounded-2xl border border-panelBorder shadow-2xl overflow-hidden flex flex-col">
-            
-            <!-- MODAL HEADER -->
             <div class="p-4 border-b border-panelBorder/50 flex justify-between items-center bg-[#0B0D13]">
                 <div class="w-full text-center">
                     <h2 class="font-black text-xl text-white tracking-wider flex items-center justify-center gap-1">
@@ -168,11 +286,8 @@
                 </div>
                 <button onclick="closeSpectateModal()" class="text-gray-400 hover:text-white bg-cardBg px-2.5 py-1 rounded-lg border border-panelBorder text-xs"><i class="fa-solid fa-xmark"></i></button>
             </div>
-
             <div class="p-8 space-y-6">
-                <!-- TOP MATCHUP DISPLAY -->
                 <div class="flex items-center justify-around relative py-4">
-                    <!-- CREATOR -->
                     <div class="flex flex-col items-center space-y-2">
                         <div class="relative">
                             <img id="specCreatorAvatar" src="" class="w-16 h-16 rounded-full border-2 border-panelBorder object-cover">
@@ -180,8 +295,6 @@
                         </div>
                         <span id="specCreatorName" class="font-extrabold text-sm text-white"></span>
                     </div>
-
-                    <!-- CENTER SPINNING CHIP / COIN -->
                     <div class="flex flex-col items-center">
                         <div class="w-24 h-24 rounded-full bg-pinkAccent p-2 shadow-2xl shadow-pinkAccent/30 flex items-center justify-center border-4 border-white pulse-spin">
                             <div class="w-full h-full rounded-full border-2 border-dashed border-white/60 flex items-center justify-center">
@@ -189,8 +302,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- JOINER -->
                     <div class="flex flex-col items-center space-y-2">
                         <div class="relative">
                             <img id="specJoinerAvatar" src="" class="w-16 h-16 rounded-full border-2 border-panelBorder object-cover">
@@ -199,15 +310,11 @@
                         <span id="specJoinerName" class="font-extrabold text-sm text-white"></span>
                     </div>
                 </div>
-
-                <!-- PROVABLY FAIR HASHES -->
                 <div class="grid grid-cols-3 gap-3">
                     <div class="bg-cardBg p-2.5 rounded-lg border border-panelBorder text-center font-mono text-[10px] text-gray-400 truncate"><i class="fa-solid fa-shield-halved text-pinkAccent mr-1"></i> <span id="specHash1">46bb6dfc54ce42...</span></div>
                     <div class="bg-cardBg p-2.5 rounded-lg border border-panelBorder text-center font-mono text-[10px] text-gray-400 truncate"><i class="fa-solid fa-key text-pinkAccent mr-1"></i> <span id="specHash2">8c2239c9dab207...</span></div>
                     <div class="bg-cardBg p-2.5 rounded-lg border border-panelBorder text-center font-mono text-[10px] text-gray-400 truncate"><i class="fa-solid fa-circle-question text-pinkAccent mr-1"></i> <span id="specHash3">1ed3c85df666d6...</span></div>
                 </div>
-
-                <!-- STATS BAR -->
                 <div class="grid grid-cols-2 gap-4">
                     <div class="bg-cardBg p-3 rounded-xl border border-panelBorder flex justify-between items-center">
                         <span class="font-extrabold text-xs text-white">50.00%</span>
@@ -218,8 +325,6 @@
                         <span class="font-extrabold text-xs text-white flex items-center gap-1"><i class="fa-brands fa-roblox text-pinkAccent"></i> <span id="specJoinerVal">0</span></span>
                     </div>
                 </div>
-
-                <!-- ITEM LISTS -->
                 <div class="grid grid-cols-2 gap-4 max-h-48 overflow-y-auto">
                     <div id="specCreatorItems" class="space-y-2"></div>
                     <div id="specJoinerItems" class="space-y-2"></div>
@@ -238,59 +343,6 @@
                 <button onclick="closeInventoryModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div id="myFullInventoryList" class="p-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 overflow-y-auto"></div>
-        </div>
-    </div>
-
-    <!-- CREATE MATCH MODAL -->
-    <div id="createMatchModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-cardBg w-full max-w-xl rounded-2xl border border-panelBorder shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div class="p-4 border-b border-panelBorder flex justify-between items-center bg-darkBg">
-                <h3 class="font-bold text-white text-sm">Create New Pet Coin Flip Match</h3>
-                <button onclick="closeCreateMatchModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="p-6 overflow-y-auto space-y-5">
-                <div>
-                    <label class="block text-xs font-bold text-gray-300 uppercase mb-2">1. Select Pet(s) to Wager</label>
-                    <div id="createMatchInventory" class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-48 overflow-y-auto p-2 bg-darkBg rounded-xl border border-panelBorder"></div>
-                    <div class="flex justify-between items-center mt-2 text-xs">
-                        <span class="text-gray-400">Selected Wager Total:</span>
-                        <span id="selectedWagerValue" class="font-extrabold text-amber-400 text-sm">0 R$</span>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-gray-300 uppercase mb-2">2. Pick Your Side</label>
-                    <div class="grid grid-cols-2 gap-3">
-                        <button type="button" id="matchSideBlue" onclick="setMatchSide('blue')" class="py-3 rounded-xl font-bold border-2 border-blueCoin bg-blueCoin/20 text-blue-400 flex items-center justify-center space-x-2">
-                            <i class="fa-solid fa-circle text-blueCoin"></i> <span>BLUE SIDE</span>
-                        </button>
-                        <button type="button" id="matchSidePink" onclick="setMatchSide('pink')" class="py-3 rounded-xl font-bold border-2 border-panelBorder bg-cardBg text-gray-400 flex items-center justify-center space-x-2">
-                            <i class="fa-solid fa-circle text-pinkCoin"></i> <span>PINK SIDE</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-gray-300 uppercase mb-1">3. Custom Value Range (R$)</label>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div><span class="text-[10px] text-gray-400 block mb-1">MIN RANGE</span><input type="number" id="minRangeInput" value="0" class="w-full bg-darkBg border border-panelBorder rounded-lg px-3 py-2 text-xs font-bold text-white"></div>
-                        <div><span class="text-[10px] text-gray-400 block mb-1">MAX RANGE</span><input type="number" id="maxRangeInput" value="0" class="w-full bg-darkBg border border-panelBorder rounded-lg px-3 py-2 text-xs font-bold text-white"></div>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-gray-300 uppercase mb-1">4. Opponent Pet Limit</label>
-                    <select id="petLimitSelect" class="w-full bg-darkBg border border-panelBorder rounded-lg px-3 py-2 text-xs font-bold text-white">
-                        <option value="50">Default (Max 50 Pets)</option>
-                        <option value="1">1 Pet Only</option>
-                        <option value="5">Max 5 Pets</option>
-                        <option value="20">Max 20 Pets</option>
-                    </select>
-                </div>
-            </div>
-            <div class="p-4 border-t border-panelBorder bg-darkBg">
-                <button onclick="submitCreateMatch()" class="w-full py-3 rounded-xl bg-pinkAccent hover:bg-pinkHover text-white font-extrabold text-sm uppercase tracking-wider transition">POST MATCH TO GLOBAL FEED</button>
-            </div>
         </div>
     </div>
 
@@ -401,7 +453,7 @@
         let currentUser = null;
         let fetchedRobloxUser = null;
         let generatedBioCode = "";
-        let selectedMatchSide = 'blue';
+        let selectedMatchSide = 'pink';
         let toastTimeout = null;
 
         let inventories = JSON.parse(localStorage.getItem('petduel_inventories')) || {
@@ -598,6 +650,104 @@
             });
         }
 
+        function openCreateMatchModal() {
+            if (!currentUser) { openLoginModal(); return; }
+            selectedCreatePetIds = [];
+            document.getElementById('createMatchModal').classList.remove('hidden');
+            renderCreateMatchInventory();
+            updateCreateMatchSummary();
+        }
+        function closeCreateMatchModal() { document.getElementById('createMatchModal').classList.add('hidden'); }
+
+        function openDepositModal() {
+            closeCreateMatchModal();
+            document.getElementById('depositModal').classList.remove('hidden');
+        }
+        function closeDepositModal() { document.getElementById('depositModal').classList.add('hidden'); }
+
+        function renderCreateMatchInventory() {
+            const container = document.getElementById('createMatchInventory');
+            const emptyBox = document.getElementById('emptyInventoryBox');
+            container.innerHTML = '';
+            
+            const userPets = inventories[currentUser.username] || [];
+            if (userPets.length === 0) {
+                container.classList.add('hidden');
+                emptyBox.classList.remove('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            emptyBox.classList.add('hidden');
+
+            userPets.forEach(pet => {
+                const card = document.createElement('div');
+                const isSelected = selectedCreatePetIds.includes(pet.id);
+                card.className = `bg-cardBg p-3 rounded-xl border border-panelBorder cursor-pointer transition text-center ${isSelected ? 'pet-card-selected' : ''}`;
+                card.onclick = () => {
+                    const idx = selectedCreatePetIds.indexOf(pet.id);
+                    if (idx > -1) selectedCreatePetIds.splice(idx, 1);
+                    else selectedCreatePetIds.push(pet.id);
+                    renderCreateMatchInventory();
+                    updateCreateMatchSummary();
+                };
+                card.innerHTML = `
+                    <img src="${pet.image}" class="w-12 h-12 mx-auto object-contain mb-2">
+                    <span class="font-extrabold text-xs text-white block truncate">${escapeHtml(pet.name)}</span>
+                    <span class="text-xs text-amber-400 font-black">${pet.value} R$</span>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function setMatchSide(side) {
+            selectedMatchSide = side;
+            document.getElementById('matchSidePink').className = side === 'pink' ? 'w-10 h-10 rounded-full bg-pinkCoin border-2 border-white flex items-center justify-center text-white shadow-lg' : 'w-10 h-10 rounded-full bg-pinkCoin/30 border-2 border-panelBorder flex items-center justify-center text-gray-500';
+            document.getElementById('matchSideBlue').className = side === 'blue' ? 'w-10 h-10 rounded-full bg-blueCoin border-2 border-white flex items-center justify-center text-white shadow-lg' : 'w-10 h-10 rounded-full bg-blueCoin/30 border-2 border-panelBorder flex items-center justify-center text-gray-500';
+        }
+
+        function updateCreateMatchSummary() {
+            const userPets = inventories[currentUser.username] || [];
+            const selectedPets = userPets.filter(p => selectedCreatePetIds.includes(p.id));
+            const totalVal = selectedPets.reduce((sum, p) => sum + p.value, 0);
+            document.getElementById('selectedWagerValue').textContent = totalVal.toLocaleString();
+            document.getElementById('selectedItemCount').textContent = selectedPets.length;
+        }
+
+        async function submitCreateMatch() {
+            if (selectedCreatePetIds.length === 0) {
+                showNotification('error', 'Select at least one pet to create match.');
+                return;
+            }
+
+            const userPets = inventories[currentUser.username] || [];
+            const wagerPets = userPets.filter(p => selectedCreatePetIds.includes(p.id));
+            const totalVal = wagerPets.reduce((sum, p) => sum + p.value, 0);
+
+            inventories[currentUser.username] = userPets.filter(p => !selectedCreatePetIds.includes(p.id));
+            saveState();
+
+            try {
+                await fetch('/api/matches/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        creator: currentUser.username,
+                        creatorAvatar: currentUser.avatar,
+                        side: selectedMatchSide,
+                        pets: wagerPets,
+                        totalValue: totalVal,
+                        minRange: Math.floor(totalVal * 0.8),
+                        maxRange: Math.ceil(totalVal * 1.2),
+                        petLimit: 50
+                    })
+                });
+                closeCreateMatchModal();
+                fetchServerMatches();
+                showNotification('success', 'Match created successfully!');
+            } catch (e) {}
+        }
+
         function openSpectateModal(matchId) {
             const match = publicMatches.find(m => m.id === matchId);
             if (!match) return;
@@ -610,12 +760,10 @@
             document.getElementById('specJoinerAvatar').src = match.joinerAvatar || 'https://via.placeholder.com/150';
             document.getElementById('specJoinerVal').textContent = (match.joinerValue || match.totalValue).toLocaleString();
 
-            // Hash formatting
             document.getElementById('specHash1').textContent = match.id + '46bb6dfc54ce42...';
             document.getElementById('specHash2').textContent = '8c2239c9dab207fee5dc...';
             document.getElementById('specHash3').textContent = '? 1ed3c85df666dd6d78bc...';
 
-            // Items List
             const creatorItemsBox = document.getElementById('specCreatorItems');
             creatorItemsBox.innerHTML = '';
             match.pets.forEach(p => {
@@ -631,7 +779,7 @@
             });
 
             const joinerItemsBox = document.getElementById('specJoinerItems');
-            joinerItemsBox.innerHTML = match.joinerPets ? '' : `<div class="text-center text-xs text-gray-500 py-4">Waiting for opponent to join duel...</div>`;
+            joinerItemsBox.innerHTML = match.joinerPets ? '' : `<div class="text-center text-xs text-gray-500 py-4">Waiting for opponent...</div>`;
             if (match.joinerPets) {
                 match.joinerPets.forEach(p => {
                     joinerItemsBox.innerHTML += `
@@ -693,92 +841,6 @@
         }
         function closeInventoryModal() { document.getElementById('inventoryModal').classList.add('hidden'); }
 
-        function openCreateMatchModal() {
-            if (!currentUser) { openLoginModal(); return; }
-            selectedCreatePetIds = [];
-            document.getElementById('createMatchModal').classList.remove('hidden');
-            renderCreateMatchInventory();
-            updateCreateMatchSummary();
-        }
-        function closeCreateMatchModal() { document.getElementById('createMatchModal').classList.add('hidden'); }
-
-        function renderCreateMatchInventory() {
-            const container = document.getElementById('createMatchInventory');
-            container.innerHTML = '';
-            const userPets = inventories[currentUser.username] || [];
-            if (userPets.length === 0) {
-                container.innerHTML = `<div class="col-span-3 text-center text-xs text-gray-500 py-4">No pets in inventory!</div>`;
-                return;
-            }
-            userPets.forEach(pet => {
-                const card = document.createElement('div');
-                const isSelected = selectedCreatePetIds.includes(pet.id);
-                card.className = `bg-cardBg p-2 rounded-lg border border-panelBorder cursor-pointer transition text-center ${isSelected ? 'pet-card-selected' : ''}`;
-                card.onclick = () => {
-                    const idx = selectedCreatePetIds.indexOf(pet.id);
-                    if (idx > -1) selectedCreatePetIds.splice(idx, 1);
-                    else selectedCreatePetIds.push(pet.id);
-                    renderCreateMatchInventory();
-                    updateCreateMatchSummary();
-                };
-                card.innerHTML = `
-                    <img src="${pet.image}" class="w-10 h-10 mx-auto object-contain mb-1">
-                    <span class="font-bold text-[10px] text-white block truncate">${escapeHtml(pet.name)}</span>
-                    <span class="text-[10px] text-amber-400 font-bold">${pet.value} R$</span>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function setMatchSide(side) {
-            selectedMatchSide = side;
-            document.getElementById('matchSideBlue').className = side === 'blue' ? 'py-3 rounded-xl font-bold border-2 border-blueCoin bg-blueCoin/20 text-blue-400 flex items-center justify-center space-x-2' : 'py-3 rounded-xl font-bold border-2 border-panelBorder bg-cardBg text-gray-400 flex items-center justify-center space-x-2';
-            document.getElementById('matchSidePink').className = side === 'pink' ? 'py-3 rounded-xl font-bold border-2 border-pinkCoin bg-pinkCoin/20 text-pinkCoin flex items-center justify-center space-x-2' : 'py-3 rounded-xl font-bold border-2 border-panelBorder bg-cardBg text-gray-400 flex items-center justify-center space-x-2';
-        }
-
-        function updateCreateMatchSummary() {
-            const userPets = inventories[currentUser.username] || [];
-            const selectedPets = userPets.filter(p => selectedCreatePetIds.includes(p.id));
-            const totalVal = selectedPets.reduce((sum, p) => sum + p.value, 0);
-            document.getElementById('selectedWagerValue').textContent = totalVal.toLocaleString() + ' R$';
-            document.getElementById('minRangeInput').value = Math.floor(totalVal * 0.8);
-            document.getElementById('maxRangeInput').value = Math.ceil(totalVal * 1.2);
-        }
-
-        async function submitCreateMatch() {
-            if (selectedCreatePetIds.length === 0) return;
-            const minRange = parseInt(document.getElementById('minRangeInput').value) || 0;
-            const maxRange = parseInt(document.getElementById('maxRangeInput').value) || 0;
-            const petLimit = parseInt(document.getElementById('petLimitSelect').value) || 50;
-
-            const userPets = inventories[currentUser.username] || [];
-            const wagerPets = userPets.filter(p => selectedCreatePetIds.includes(p.id));
-            const totalVal = wagerPets.reduce((sum, p) => sum + p.value, 0);
-
-            inventories[currentUser.username] = userPets.filter(p => !selectedCreatePetIds.includes(p.id));
-            saveState();
-
-            try {
-                await fetch('/api/matches/create', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        creator: currentUser.username,
-                        creatorAvatar: currentUser.avatar,
-                        side: selectedMatchSide,
-                        pets: wagerPets,
-                        totalValue: totalVal,
-                        minRange,
-                        maxRange,
-                        petLimit
-                    })
-                });
-                closeCreateMatchModal();
-                fetchServerMatches();
-                showNotification('success', 'Match created!');
-            } catch (e) {}
-        }
-
         function openJoinMatchModal(matchId) {
             if (!currentUser) { openLoginModal(); return; }
             const match = publicMatches.find(m => m.id === matchId);
@@ -791,7 +853,6 @@
                     <span class="text-gray-300">Opponent: ${escapeHtml(match.creator)}</span>
                     <span class="text-amber-400">Wager: ${match.totalValue} R$</span>
                 </div>
-                <div class="text-[10px] text-gray-400">Range: ${match.minRange} R$ - ${match.maxRange} R$ | Max Pets: ${match.petLimit}</div>
             `;
             document.getElementById('joinMatchModal').classList.remove('hidden');
             renderJoinMatchInventory();
@@ -841,16 +902,6 @@
             const userPets = inventories[currentUser.username] || [];
             const wagerPets = userPets.filter(p => selectedJoinPetIds.includes(p.id));
             const joinValue = wagerPets.reduce((sum, p) => sum + p.value, 0);
-
-            if (wagerPets.length > match.petLimit) {
-                showNotification('error', `Max ${match.petLimit} pet(s) allowed.`);
-                return;
-            }
-
-            if (joinValue < match.minRange || joinValue > match.maxRange) {
-                showNotification('error', `Outside range (${match.minRange}-${match.maxRange} R$).`);
-                return;
-            }
 
             inventories[currentUser.username] = userPets.filter(p => !selectedJoinPetIds.includes(p.id));
             saveState();
