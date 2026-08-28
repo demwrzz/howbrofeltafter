@@ -1,0 +1,399 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: #0d1117;
+    color: #e6edf3;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 18px;
+    overflow-x: hidden;
+}
+
+/* Yükleme Ekranı */
+#loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #090d12;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease;
+}
+
+#loader h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 3rem;
+    color: #ff4655;
+    letter-spacing: 4px;
+    margin-bottom: 20px;
+    text-shadow: 0 0 15px rgba(255, 70, 85, 0.6);
+}
+
+.loading-bar {
+    width: 250px;
+    height: 4px;
+    background: #1c2430;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.loading-fill {
+    width: 0%;
+    height: 100%;
+    background: #ff4655;
+    box-shadow: 0 0 10px #ff4655;
+    animation: load 1.8s ease-in-out forwards;
+}
+
+@keyframes load {
+    0% { width: 0%; }
+    100% { width: 100%; }
+}
+
+/* Navbar */
+header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    padding: 20px 8%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(13, 17, 23, 0.9);
+    backdrop-filter: blur(10px);
+    border-b: 1px solid rgba(255, 70, 85, 0.2);
+    z-index: 1000;
+}
+
+.logo {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 2px;
+}
+
+.logo span {
+    color: #ff4655;
+}
+
+nav a {
+    color: #c9d1d9;
+    text-decoration: none;
+    margin-left: 25px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+    transition: 0.3s;
+}
+
+nav a:hover {
+    color: #ff4655;
+    text-shadow: 0 0 8px rgba(255, 70, 85, 0.5);
+}
+
+/* Section Başlıkları */
+.section-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.2rem;
+    text-align: center;
+    margin-bottom: 40px;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    position: relative;
+}
+
+.section-title::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: #ff4655;
+    margin: 10px auto 0;
+    box-shadow: 0 0 10px #ff4655;
+}
+
+/* Hero Section */
+.hero {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    background: linear-gradient(135deg, #090d12 0%, #161b22 100%);
+    padding: 0 20px;
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle, rgba(255,70,85,0.08) 0%, rgba(0,0,0,0.8) 100%);
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+}
+
+.hero-content h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 4.5rem;
+    color: #fff;
+    letter-spacing: 6px;
+    margin-bottom: 10px;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+.hero-content h2 {
+    font-size: 2rem;
+    color: #ff4655;
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+
+.hero-content p {
+    font-size: 1.2rem;
+    color: #8b949e;
+    margin-bottom: 30px;
+}
+
+.hero-content button, #apply button {
+    background: #ff4655;
+    color: #fff;
+    border: none;
+    padding: 14px 40px;
+    font-size: 1.1rem;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+    transition: 0.3s ease;
+    box-shadow: 0 0 15px rgba(255, 70, 85, 0.4);
+}
+
+.hero-content button:hover, #apply button:hover {
+    background: #e03e4c;
+    transform: translateY(-3px);
+    box-shadow: 0 0 25px rgba(255, 70, 85, 0.7);
+}
+
+/* Sectionlar */
+section {
+    padding: 100px 8%;
+}
+
+/* Hakkımızda */
+.about-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.about-card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    padding: 30px;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+
+.about-card:hover {
+    border-color: #ff4655;
+    transform: translateY(-5px);
+}
+
+.about-card h3 {
+    font-family: 'Orbitron', sans-serif;
+    color: #ff4655;
+    margin-bottom: 15px;
+}
+
+.about-card p {
+    color: #8b949e;
+    line-height: 1.6;
+}
+
+/* İstatistikler */
+.stats {
+    background: #090d12;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+    text-align: center;
+    border-y: 1px solid #21262d;
+}
+
+.stat-box h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 3rem;
+    color: #ff4655;
+}
+
+.stat-box p {
+    color: #8b949e;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+/* Kadro */
+.players {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 30px;
+}
+
+.player-card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    padding: 20px;
+    text-align: center;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+
+.player-card:hover {
+    border-color: #ff4655;
+    transform: translateY(-5px);
+}
+
+.player-card img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-cover: cover;
+    border: 3px solid #ff4655;
+    margin-bottom: 15px;
+}
+
+.player-card h3 {
+    font-family: 'Orbitron', sans-serif;
+    color: #fff;
+}
+
+.player-card p {
+    color: #8b949e;
+    font-weight: 600;
+}
+
+/* Turnuvalar */
+.tournament-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
+}
+
+.tournament-card {
+    background: #161b22;
+    border-left: 4px solid #ff4655;
+    padding: 25px;
+    border-radius: 4px;
+}
+
+.tournament-card h3 {
+    color: #fff;
+    margin-bottom: 8px;
+}
+
+.tournament-card p {
+    color: #ff4655;
+    font-weight: 700;
+}
+
+/* Şartlar */
+.requirements {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.req-card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    padding: 25px;
+    text-align: center;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    color: #fff;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+.req-card i {
+    font-size: 2rem;
+    color: #ff4655;
+}
+
+/* Başvuru Formu */
+#apply form {
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#apply input, #apply textarea {
+    width: 100%;
+    padding: 15px;
+    background: #161b22;
+    border: 1px solid #30363d;
+    color: #fff;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    border-radius: 6px;
+    outline: none;
+    transition: 0.3s;
+}
+
+#apply input:focus, #apply textarea:focus {
+    border-color: #ff4655;
+    box-shadow: 0 0 10px rgba(255, 70, 85, 0.3);
+}
+
+/* İletişim & Footer */
+.contact-box {
+    text-align: center;
+    background: #161b22;
+    padding: 30px;
+    border-radius: 8px;
+    max-width: 500px;
+    margin: 0 auto;
+    border: 1px solid #30363d;
+}
+
+.contact-box p {
+    font-size: 1.3rem;
+    margin: 10px 0;
+    color: #fff;
+}
+
+.contact-box i {
+    color: #ff4655;
+    margin-right: 10px;
+}
+
+footer {
+    text-align: center;
+    padding: 30px;
+    background: #090d12;
+    border-t: 1px solid #21262d;
+    color: #8b949e;
+    font-size: 0.9rem;
+}
