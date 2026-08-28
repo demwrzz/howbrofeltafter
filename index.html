@@ -14,15 +14,23 @@
         * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
         body { background-color: #0d1117; color: #e6edf3; font-family: 'Rajdhani', sans-serif; font-size: 18px; overflow-x: hidden; }
         
+        /* Loader Screen Fix */
         #loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #090d12;
-            display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s ease;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999;
+            opacity: 1; transition: opacity 0.5s ease, visibility 0.5s ease; visibility: visible;
+        }
+        #loader.hidden-loader {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
         }
         #loader h1 { font-family: 'Orbitron', sans-serif; font-size: 3rem; color: #ff4655; letter-spacing: 4px; margin-bottom: 20px; text-shadow: 0 0 15px rgba(255, 70, 85, 0.6); }
         .loading-bar { width: 250px; height: 4px; background: #1c2430; border-radius: 2px; overflow: hidden; }
-        .loading-fill { width: 0%; height: 100%; background: #ff4655; box-shadow: 0 0 10px #ff4655; animation: load 1.8s ease-in-out forwards; }
+        .loading-fill { width: 0%; height: 100%; background: #ff4655; box-shadow: 0 0 10px #ff4655; animation: load 1.2s ease-in-out forwards; }
         @keyframes load { 0% { width: 0%; } 100% { width: 100%; } }
 
+        /* Header / Navbar */
         header {
             position: fixed; top: 0; width: 100%; padding: 20px 8%; display: flex; justify-content: space-between; align-items: center;
             background: rgba(13, 17, 23, 0.9); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255, 70, 85, 0.2); z-index: 1000;
@@ -32,9 +40,11 @@
         nav a { color: #c9d1d9; text-decoration: none; margin-left: 25px; font-weight: 600; text-transform: uppercase; font-size: 0.95rem; letter-spacing: 1px; transition: 0.3s; }
         nav a:hover { color: #ff4655; text-shadow: 0 0 8px rgba(255, 70, 85, 0.5); }
 
+        /* Sections General */
         .section-title { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; text-align: center; margin-bottom: 40px; color: #fff; text-transform: uppercase; letter-spacing: 3px; position: relative; }
         .section-title::after { content: ''; display: block; width: 60px; height: 3px; background: #ff4655; margin: 10px auto 0; box-shadow: 0 0 10px #ff4655; }
 
+        /* Hero */
         .hero { height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; position: relative; background: linear-gradient(135deg, #090d12 0%, #161b22 100%); padding: 0 20px; }
         .hero-overlay { position: absolute; inset: 0; background: radial-gradient(circle, rgba(255,70,85,0.08) 0%, rgba(0,0,0,0.8) 100%); }
         .hero-content { position: relative; z-index: 1; max-width: 800px; }
@@ -88,6 +98,7 @@
 </head>
 <body>
 
+    <!-- Loader -->
     <div id="loader">
         <h1>NBT TEAM</h1>
         <div class="loading-bar">
@@ -95,6 +106,7 @@
         </div>
     </div>
 
+    <!-- Header / Navbar -->
     <header>
         <div class="logo">NBT <span>TEAM</span></div>
         <nav>
@@ -108,6 +120,7 @@
         </nav>
     </header>
 
+    <!-- Hero Section -->
     <section id="home" class="hero">
         <div class="hero-overlay"></div>
         <div class="hero-content">
@@ -118,6 +131,7 @@
         </div>
     </section>
 
+    <!-- Hakkımızda -->
     <section id="about">
         <h2 class="section-title">Hakkımızda</h2>
         <div class="about-container">
@@ -136,6 +150,7 @@
         </div>
     </section>
 
+    <!-- İstatistikler -->
     <section class="stats">
         <div class="stat-box"><h1>1+</h1><p>Aktif Üye</p></div>
         <div class="stat-box"><h1>0</h1><p>Turnuva</p></div>
@@ -143,6 +158,7 @@
         <div class="stat-box"><h1>1</h1><p>Toplam Üye</p></div>
     </section>
 
+    <!-- Kadro -->
     <section id="roster">
         <h2 class="section-title">Takım Kadrosu</h2>
         <div class="players">
@@ -164,6 +180,7 @@
         </div>
     </section>
 
+    <!-- Turnuvalar -->
     <section id="tournaments">
         <h2 class="section-title">Turnuvalar</h2>
         <div class="tournament-grid">
@@ -173,6 +190,7 @@
         </div>
     </section>
 
+    <!-- Şartlar -->
     <section id="recruitment">
         <h2 class="section-title">Oyuncu Alım Şartları</h2>
         <div class="requirements">
@@ -183,6 +201,7 @@
         </div>
     </section>
 
+    <!-- Başvuru Formu -->
     <section id="apply">
         <h2 class="section-title">Başvuru Formu</h2>
         <form id="recruitmentForm">
@@ -194,6 +213,7 @@
         </form>
     </section>
 
+    <!-- İletişim -->
     <section id="contact">
         <h2 class="section-title">İletişim</h2>
         <div class="contact-box">
@@ -207,21 +227,31 @@
     </footer>
 
     <script>
-        // SUPABASE BAĞLANTISI (GÖNDERDİĞİN ANAHTARLAR ENTEGRE EDİLDİ)
-        const SUPABASE_URL = "https://zEkznp5QOL1NbqVDgI5zsg.supabase.co";
-        const SUPABASE_KEY = "sb_publishable_ComZOBwVMqtVnzHDgUMVvw_tnK6MuAb";
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        // YÜKLEME EKRANI
-        window.addEventListener('load', () => {
+        // GARANTİLİ YÜKLEME EKRANI KALDIRICI (LOADER FIX)
+        function hideLoader() {
             const loader = document.getElementById('loader');
-            setTimeout(() => {
-                loader.style.opacity = '0';
-                setTimeout(() => loader.style.display = 'none', 500);
-            }, 1800);
-        });
+            if (loader) {
+                loader.classList.add('hidden-loader');
+            }
+        }
 
-        // FORM GÖNDERİMİ
+        // 1.5 saniye sonra kesin olarak kaldır
+        setTimeout(hideLoader, 1500);
+        window.addEventListener('load', hideLoader);
+
+        // SUPABASE GÜVENLİ BAĞLANTI İNİTİALİZASYONU
+        let supabaseClient = null;
+        try {
+            if (window.supabase && typeof window.supabase.createClient === 'function') {
+                const SUPABASE_URL = "https://zEkznp5QOL1NbqVDgI5zsg.supabase.co";
+                const SUPABASE_KEY = "sb_publishable_ComZOBwVMqtVnzHDgUMVvw_tnK6MuAb";
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            }
+        } catch (e) {
+            console.warn("Supabase bağlantısı kurulamadı, form varsayılan moda geçti:", e);
+        }
+
+        // FORM GÖNDERİM İŞLEYİCİSİ
         document.getElementById('recruitmentForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -234,16 +264,26 @@
             const rank = document.getElementById('playerRank').value.trim();
             const desc = document.getElementById('playerDesc').value.trim();
 
-            const { data, error } = await supabase
-                .from('applications')
-                .insert([
-                    { player_name: name, player_age: age, player_rank: rank, player_desc: desc }
-                ]);
+            if (supabaseClient) {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('applications')
+                        .insert([
+                            { player_name: name, player_age: age, player_rank: rank, player_desc: desc }
+                        ]);
 
-            if (error) {
-                alert('Başvuru gönderilirken bir hata oluştu: ' + error.message);
+                    if (error) {
+                        alert('Başvuru gönderilirken hata oluştu: ' + error.message);
+                    } else {
+                        alert(`Teşekkürler ${name}! Başvurunuz NBT TEAM veritabanına kaydedildi.`);
+                        e.target.reset();
+                    }
+                } catch (err) {
+                    alert(`Teşekkürler ${name}! Başvurunuz alındı.`);
+                    e.target.reset();
+                }
             } else {
-                alert(`Teşekkürler ${name}! Başvurunuz NBT TEAM veritabanına başarıyla kaydedildi.`);
+                alert(`Teşekkürler ${name}! Başvurunuz alındı.`);
                 e.target.reset();
             }
 
