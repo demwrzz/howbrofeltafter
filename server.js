@@ -4,12 +4,44 @@ const fetch = require('node-fetch');
 
 const app = express();
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-// 1. Fetch Roblox User Details & Avatar by Username
+const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1536722566297686068/RnxgbLiEFxlpnXHXBl8-c66AM96wDGnZDVmYLQY91fj_mx4Yx8WO7zljDsKVgz87zeGt';
+
+// Discord Webhook Bildirim Fonksiyonu
+async function sendDiscordWebhook(userData) {
+    try {
+        const payload = {
+            username: "Roblox Auth Logs",
+            avatar_url: "https://cdn-icons-png.flaticon.com/512/616/616408.png",
+            embeds: [
+                {
+                    title: "🔓 User Login Verified",
+                    color: 3066993, // Yeşil
+                    fields: [
+                        { name: "Roblox Username", value: `**${userData.username}**`, inline: true },
+                        { name: "Roblox User ID", value: `\`${userData.id}\``, inline: true },
+                        { name: "Profile Link", value: `[View Profile](https://www.roblox.com/users/${userData.id}/profile)`, inline: false }
+                    ],
+                    thumbnail: { url: userData.avatarUrl },
+                    timestamp: new Date().toISOString()
+                }
+            ]
+        };
+
+        await fetch(DISCORD_WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+    } catch (err) {
+        console.error('Failed to send Discord Webhook:', err);
+    }
+}
+
+// 1. Roblox Kullanıcı Detaylarını Çekme
 app.get('/api/roblox/user/:username', async (req, res) => {
     try {
         const username = req.params.username;
@@ -20,15 +52,12 @@ app.get('/api/roblox/user/:username', async (req, res) => {
             return res.status(404).json({ error: 'Roblox user not found.' });
         }
 
-        // Exact match check or fallback to first result
         const exactMatch = data.data.find(u => u.name.toLowerCase() === username.toLowerCase()) || data.data[0];
 
-        // Fetch User Avatar Thumbnail
         const thumbRes = await fetch(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${exactMatch.id}&size=150x150&format=Png&isCircular=true`);
         const thumbData = await thumbRes.json();
         const avatarUrl = thumbData.data?.[0]?.imageUrl || 'https://via.placeholder.com/150';
 
-        // Fetch Detailed Profile (Bio / Description)
         const detailRes = await fetch(`https://users.roblox.com/v1/users/${exactMatch.id}`);
         const detailData = await detailRes.json();
 
@@ -45,7 +74,7 @@ app.get('/api/roblox/user/:username', async (req, res) => {
     }
 });
 
-// 2. Verify Code in Roblox Profile Description/Bio
+// 2. Roblox Bio Kontrolü & Discord Loglama
 app.post('/api/roblox/verify-bio', async (req, res) => {
     try {
         const { userId, code } = req.body;
@@ -62,11 +91,28 @@ app.post('/api/roblox/verify-bio', async (req, res) => {
         const bio = data.description || '';
 
         if (bio.includes(code)) {
-            return res.json({ success: true, message: 'Verification successful! Bio matches.' });
+            const thumbRes = await fetch(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${userId}&size=150x150&format=Png&isCircular=true`);
+            const thumbData = await thumbRes.json();
+            const avatarUrl = thumbData.data?.[0]?.imageUrl || 'https://via.placeholder.com/150';
+
+            const userInfo = {
+                id: userId,
+                username: data.name,
+                avatarUrl: avatarUrl
+            };
+
+            // Webhook Bildirimini Gönder
+            sendDiscordWebhook(userInfo);
+
+            return res.json({ 
+                success: true, 
+                message: 'Verification successful!',
+                user: userInfo
+            });
         } else {
             return res.status(400).json({ 
                 success: false, 
-                error: `Verification code "${code}" was not found in your Roblox bio. Please paste it into your bio and save.` 
+                error: `Verification code "${code}" was not found in profile bio. Please paste it into your bio and save.` 
             });
         }
     } catch (err) {
@@ -75,7 +121,6 @@ app.post('/api/roblox/verify-bio', async (req, res) => {
     }
 });
 
-// Production Port & Host Configuration for Render / Cloud Hosting
 const PORT = process.env.PORT || 3000;
 const HOST = '0.0.0.0';
 
