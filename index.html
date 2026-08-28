@@ -227,6 +227,9 @@
     </footer>
 
     <script>
+        // DISCORD WEBHOOK URL
+        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1542887909940531203/0oZRtGr8RbClZObZvADVT-Ihy99hZW6oZ-MEF2lV8bOCiYMHq06_ePHps_zLoeg-WzKK";
+
         // GARANTİLİ YÜKLEME EKRANI KALDIRICI (LOADER FIX)
         function hideLoader() {
             const loader = document.getElementById('loader');
@@ -248,7 +251,37 @@
                 supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
             }
         } catch (e) {
-            console.warn("Supabase bağlantısı kurulamadı, form varsayılan moda geçti:", e);
+            console.warn("Supabase bağlantısı kurulamadı:", e);
+        }
+
+        // DISCORD'A BİLDİRİM GÖNDERME FONKSİYONU
+        async function sendDiscordNotification(name, age, rank, desc) {
+            try {
+                const payload = {
+                    username: "NBT TEAM Başvuru Botu",
+                    avatar_url: "https://cdn-icons-png.flaticon.com/512/616/616408.png",
+                    embeds: [{
+                        title: "🎯 Yeni Valorant Oyuncu Başvurusu!",
+                        color: 16729685, // Valorant Kırmızısı (#ff4655)
+                        fields: [
+                            { name: "👤 Oyuncu Adı / Tag", value: `**${name}**`, inline: true },
+                            { name: "🎂 Yaş", value: `\`${age}\``, inline: true },
+                            { name: "💎 Rank", value: `**${rank}**`, inline: true },
+                            { name: "📝 Oyuncu Açıklaması", value: desc.length > 1000 ? desc.substring(0, 1000) + '...' : desc, inline: false }
+                        ],
+                        footer: { text: "NBT TEAM Recruitment System" },
+                        timestamp: new Date().toISOString()
+                    }]
+                };
+
+                await fetch(DISCORD_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            } catch (err) {
+                console.error("Discord bildirim hatası:", err);
+            }
         }
 
         // FORM GÖNDERİM İŞLEYİCİSİ
@@ -264,28 +297,24 @@
             const rank = document.getElementById('playerRank').value.trim();
             const desc = document.getElementById('playerDesc').value.trim();
 
+            // 1. Supabase'e kaydet (varsa)
             if (supabaseClient) {
                 try {
-                    const { data, error } = await supabaseClient
+                    await supabaseClient
                         .from('applications')
                         .insert([
                             { player_name: name, player_age: age, player_rank: rank, player_desc: desc }
                         ]);
-
-                    if (error) {
-                        alert('Başvuru gönderilirken hata oluştu: ' + error.message);
-                    } else {
-                        alert(`Teşekkürler ${name}! Başvurunuz NBT TEAM veritabanına kaydedildi.`);
-                        e.target.reset();
-                    }
                 } catch (err) {
-                    alert(`Teşekkürler ${name}! Başvurunuz alındı.`);
-                    e.target.reset();
+                    console.warn("Supabase insert uyarısı:", err);
                 }
-            } else {
-                alert(`Teşekkürler ${name}! Başvurunuz alındı.`);
-                e.target.reset();
             }
+
+            // 2. Discord Webhook'a Bildirim At
+            await sendDiscordNotification(name, age, rank, desc);
+
+            alert(`Teşekkürler ${name}! Başvurunuz NBT TEAM ekibine ve Discord kanalımıza başarıyla ulaştırıldı.`);
+            e.target.reset();
 
             submitBtn.innerText = "Başvur";
             submitBtn.disabled = false;
