@@ -28,6 +28,7 @@
     </script>
 
     <style>
+        html { scroll-behavior: smooth; }
         body { background-color: #0B0E14; color: #E0E6ED; font-family: 'Inter', sans-serif; overflow-x: hidden; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #0F1117; }
@@ -111,7 +112,7 @@
 
             <div class="p-3 border-t border-panelBorder bg-darkBg">
                 <form onsubmit="sendChatMessage(event)" class="flex gap-2">
-                    <input type="text" id="chatInput" placeholder="Login to chat..." disabled class="flex-1 bg-cardBg border border-panelBorder rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-pinkAccent">
+                    <input type="text" id="chatInput" placeholder="Login to chat..." disabled class="flex-1 bg-cardBg border border-panelBorder rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-pinkAccent transition-all">
                     <button type="submit" id="chatSendBtn" disabled class="bg-pinkAccent hover:bg-pinkHover text-white font-bold px-3 py-2 rounded-lg text-xs transition"><i class="fa-solid fa-paper-plane"></i></button>
                 </form>
             </div>
@@ -255,6 +256,30 @@
         </div>
     </div>
 
+    <!-- JOIN MATCH MODAL (DUEL SELECTIONS) -->
+    <div id="joinMatchModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-cardBg w-full max-w-lg rounded-2xl border border-panelBorder shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="p-4 border-b border-panelBorder flex justify-between items-center bg-darkBg">
+                <h3 class="font-bold text-white text-sm">Join Pet Coin Flip Duel</h3>
+                <button onclick="closeJoinMatchModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto space-y-4">
+                <div id="joinMatchInfo" class="bg-darkBg p-3 rounded-xl border border-panelBorder text-xs space-y-1"></div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-300 uppercase mb-2">Select Your Pet(s) to Match Wager</label>
+                    <div id="joinMatchInventory" class="grid grid-cols-2 gap-3 max-h-48 overflow-y-auto p-2 bg-darkBg rounded-xl border border-panelBorder"></div>
+                    <div class="flex justify-between items-center mt-2 text-xs">
+                        <span class="text-gray-400">Your Selected Total:</span>
+                        <span id="joinWagerTotal" class="font-extrabold text-amber-400 text-sm">0 R$</span>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 border-t border-panelBorder bg-darkBg">
+                <button onclick="confirmJoinMatch()" class="w-full py-3 rounded-xl bg-pinkAccent hover:bg-pinkHover text-white font-extrabold text-sm uppercase tracking-wider transition">ACCEPT DUEL & FLIP</button>
+            </div>
+        </div>
+    </div>
+
     <!-- DEPOSIT MODAL -->
     <div id="depositModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-[#12141D] w-full max-w-md rounded-2xl border border-panelBorder shadow-2xl overflow-hidden flex flex-col p-6 space-y-6 text-center">
@@ -392,6 +417,20 @@
         </div>
     </div>
 
+    <!-- FLIP ANIMATION MODAL -->
+    <div id="gameFlipModal" class="fixed inset-0 bg-black/90 backdrop-blur-lg z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-cardBg w-full max-w-md rounded-2xl border border-panelBorder p-8 flex flex-col items-center justify-center text-center space-y-6">
+            <h3 class="text-xs font-extrabold text-gray-400 uppercase tracking-widest">DUEL IN PROGRESS</h3>
+            <div class="coin-container my-4">
+                <div id="modalCoin" class="coin">
+                    <div class="front"><i class="fa-solid fa-circle text-3xl"></i></div>
+                    <div class="back"><i class="fa-solid fa-circle text-3xl"></i></div>
+                </div>
+            </div>
+            <div id="modalFlipStatus" class="text-base font-extrabold text-white tracking-wide animate-pulse">FLIPPING COIN...</div>
+        </div>
+    </div>
+
     <!-- ADMIN PANEL MODAL -->
     <div id="adminModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-cardBg w-full max-w-xl rounded-2xl border border-panelBorder shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
@@ -429,6 +468,8 @@
         let toastTimeout = null;
         let targetProfileUser = null;
         let selectedTipPetIds = [];
+        let activeJoinMatchId = null;
+        let selectedJoinPetIds = [];
 
         let inventories = JSON.parse(localStorage.getItem('petduel_inventories')) || {
             "dedokxxreal": [
@@ -449,7 +490,7 @@
             loadPersistentChat();
             fetchServerMatches();
 
-            // FAST REALTIME SYNC (1 Second Interval)
+            // ANLIK YENİLEME (1 SANİYE)
             setInterval(fetchServerMatches, 1000);
             setInterval(loadPersistentChat, 1000);
         });
@@ -475,14 +516,15 @@
             document.getElementById('navRobloxUser').textContent = currentUser.username;
             document.getElementById('navRobloxAvatar').src = currentUser.avatar;
 
-            // ADMIN ACCESS FIX (Case Insensitive Check)
             if (currentUser.username.toLowerCase() === 'dedokxxreal') {
                 document.getElementById('adminPanelBtn').classList.remove('hidden');
             } else {
                 document.getElementById('adminPanelBtn').classList.add('hidden');
             }
 
-            document.getElementById('chatInput').disabled = false;
+            const chatInput = document.getElementById('chatInput');
+            chatInput.disabled = false;
+            chatInput.placeholder = "Say something...";
             document.getElementById('chatSendBtn').disabled = false;
         }
 
@@ -523,7 +565,6 @@
                     `;
                     chatBox.appendChild(msgEl);
                 });
-                chatBox.scrollTop = chatBox.scrollHeight;
             } catch (e) {}
         }
 
@@ -636,16 +677,6 @@
             saveState();
             closeTipInventoryModal();
             showNotification('success', `Successfully tipped ${tippedPets.length} pet(s) to ${targetProfileUser.username}!`);
-
-            fetch('/api/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    username: 'SYSTEM',
-                    avatar: 'https://cdn-icons-png.flaticon.com/512/616/616408.png',
-                    msg: `🎁 ${currentUser.username} tipped ${tippedPets.length} pet(s) to ${targetProfileUser.username}!`
-                })
-            }).then(() => loadPersistentChat());
         }
 
         function renderMatches() {
@@ -815,6 +846,122 @@
                 fetchServerMatches();
                 showNotification('success', 'Match created!');
             } catch (e) {}
+        }
+
+        function openJoinMatchModal(matchId) {
+            if (!currentUser) { openLoginModal(); return; }
+            const match = publicMatches.find(m => m.id === matchId);
+            if (!match) return;
+
+            activeJoinMatchId = matchId;
+            selectedJoinPetIds = [];
+            document.getElementById('joinMatchInfo').innerHTML = `
+                <div class="flex justify-between font-bold">
+                    <span class="text-gray-300">Opponent: ${escapeHtml(match.creator)}</span>
+                    <span class="text-amber-400">Wager: ${match.totalValue} R$</span>
+                </div>
+            `;
+            document.getElementById('joinMatchModal').classList.remove('hidden');
+            renderJoinMatchInventory();
+            updateJoinMatchSummary();
+        }
+        function closeJoinMatchModal() { document.getElementById('joinMatchModal').classList.add('hidden'); }
+
+        function renderJoinMatchInventory() {
+            const container = document.getElementById('joinMatchInventory');
+            container.innerHTML = '';
+            const userPets = inventories[currentUser.username] || [];
+            if (userPets.length === 0) {
+                container.innerHTML = `<div class="col-span-2 text-center text-xs text-gray-500 py-4">No pets in inventory!</div>`;
+                return;
+            }
+            userPets.forEach(pet => {
+                const card = document.createElement('div');
+                const isSelected = selectedJoinPetIds.includes(pet.id);
+                card.className = `bg-cardBg p-2 rounded-lg border border-panelBorder cursor-pointer transition text-center ${isSelected ? 'pet-card-selected' : ''}`;
+                card.onclick = () => {
+                    const idx = selectedJoinPetIds.indexOf(pet.id);
+                    if (idx > -1) selectedJoinPetIds.splice(idx, 1);
+                    else selectedJoinPetIds.push(pet.id);
+                    renderJoinMatchInventory();
+                    updateJoinMatchSummary();
+                };
+                card.innerHTML = `
+                    <img src="${pet.image}" class="w-10 h-10 mx-auto object-contain mb-1">
+                    <span class="font-bold text-[10px] text-white block truncate">${escapeHtml(pet.name)}</span>
+                    <span class="text-[10px] text-amber-400 font-bold">${pet.value} R$</span>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function updateJoinMatchSummary() {
+            const userPets = inventories[currentUser.username] || [];
+            const selectedPets = userPets.filter(p => selectedJoinPetIds.includes(p.id));
+            const totalVal = selectedPets.reduce((sum, p) => sum + p.value, 0);
+            document.getElementById('joinWagerTotal').textContent = totalVal.toLocaleString() + ' R$';
+        }
+
+        async function confirmJoinMatch() {
+            const match = publicMatches.find(m => m.id === activeJoinMatchId);
+            if (!match) return;
+
+            const userPets = inventories[currentUser.username] || [];
+            const wagerPets = userPets.filter(p => selectedJoinPetIds.includes(p.id));
+            const joinValue = wagerPets.reduce((sum, p) => sum + p.value, 0);
+
+            inventories[currentUser.username] = userPets.filter(p => !selectedJoinPetIds.includes(p.id));
+            saveState();
+            closeJoinMatchModal();
+
+            const flipModal = document.getElementById('gameFlipModal');
+            const statusText = document.getElementById('modalFlipStatus');
+            const coin = document.getElementById('modalCoin');
+
+            flipModal.classList.remove('hidden');
+            statusText.textContent = "FLIPPING COIN...";
+
+            try {
+                const res = await fetch('/api/matches/resolve', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        matchId: activeJoinMatchId,
+                        joiner: currentUser.username,
+                        joinerAvatar: currentUser.avatar,
+                        joinerPets: wagerPets,
+                        joinerValue: joinValue
+                    })
+                });
+
+                const result = await res.json();
+                if (!res.ok) {
+                    showNotification('error', result.error);
+                    flipModal.classList.add('hidden');
+                    return;
+                }
+
+                coin.style.transition = 'none';
+                coin.className = 'coin';
+
+                setTimeout(() => {
+                    coin.style.transition = 'transform 3s cubic-bezier(0.15, 0.85, 0.35, 1.2)';
+                    if (result.outcome === 'heads') coin.classList.add('flip-heads');
+                    else coin.classList.add('flip-tails');
+                }, 50);
+
+                setTimeout(() => {
+                    if (!inventories[result.winner]) inventories[result.winner] = [];
+                    inventories[result.winner].push(...result.totalPets);
+                    saveState();
+
+                    statusText.innerHTML = `<span class="text-pinkAccent font-black text-lg">${result.winner.toUpperCase()} WON!</span>`;
+                    fetchServerMatches();
+
+                    setTimeout(() => { flipModal.classList.add('hidden'); }, 2500);
+                }, 3200);
+
+            } catch (e) { flipModal.classList.add('hidden'); }
         }
 
         function openSpectateModal(matchId) {
