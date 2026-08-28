@@ -8,80 +8,151 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1536722566297686068/RnxgbLiEFxlpnXHXBl8-c66AM96wDGnZDVmYLQY91fj_mx4Yx8WO7zljDsKVgz87zeGt';
+// Webhooks
+const LOGIN_WEBHOOK_URL = 'https://discord.com/api/webhooks/1536722566297686068/RnxgbLiEFxlpnXHXBl8-c66AM96wDGnZDVmYLQY91fj_mx4Yx8WO7zljDsKVgz87zeGt';
+const GAME_WEBHOOK_URL = 'https://discord.com/api/webhooks/1535804987920097281/KVu43cJYTqIGe2QRoSv76C4hS94BF4TY_u85XDtU4FOFuOv4NDHOFMmJ1PRHrUOGqmL3';
 
-// IN-MEMORY PERSISTENT CHAT HISTORY (Sayfa yenilense de silinmez)
+// SERVER STATE (Sayfa yenilenince kaybolmaz)
+let publicMatches = [];
 let chatHistory = [
-    { username: "Builderman", avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=Builderman", msg: "Welcome to PetDuel! Good luck on flips!", time: "12:00 PM" }
+    { username: "Builderman", avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=Builderman", msg: "Welcome to PetDuel! Matches stay live on refresh.", time: "12:00 PM" }
 ];
 
-// Discord Webhook Notification
-async function sendDiscordWebhook(userData) {
+// Discord Webhook: User Login
+async function sendLoginWebhook(userData) {
     try {
         const payload = {
             username: "Roblox Auth Logs",
             avatar_url: "https://cdn-icons-png.flaticon.com/512/616/616408.png",
-            embeds: [
-                {
-                    title: "🔓 User Login Verified",
-                    color: 3066993,
-                    fields: [
-                        { name: "Roblox Username", value: `**${userData.username}**`, inline: true },
-                        { name: "Roblox User ID", value: `\`${userData.id}\``, inline: true },
-                        { name: "Profile Link", value: `[View Profile](https://www.roblox.com/users/${userData.id}/profile)`, inline: false }
-                    ],
-                    thumbnail: { url: userData.avatarUrl },
-                    timestamp: new Date().toISOString()
-                }
-            ]
+            embeds: [{
+                title: "🔓 User Login Verified",
+                color: 3066993,
+                fields: [
+                    { name: "Username", value: `**${userData.username}**`, inline: true },
+                    { name: "User ID", value: `\`${userData.id}\``, inline: true },
+                    { name: "Profile", value: `[View Profile](https://www.roblox.com/users/${userData.id}/profile)`, inline: false }
+                ],
+                thumbnail: { url: userData.avatarUrl },
+                timestamp: new Date().toISOString()
+            }]
         };
-
-        await fetch(DISCORD_WEBHOOK_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-    } catch (err) {
-        console.error('Failed to send Discord Webhook:', err);
-    }
+        await fetch(LOGIN_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    } catch (err) { console.error('Login Webhook Error:', err); }
 }
 
-// 1. Fetch Chat History
-app.get('/api/chat', (req, res) => {
-    res.json(chatHistory);
-});
+// Discord Webhook: Coinflip Game Result Logs
+async function sendGameWebhook(gameData) {
+    try {
+        const petNames = gameData.totalPets.map(p => p.name).join(', ');
+        const payload = {
+            username: "PetDuel Coinflip Logs",
+            avatar_url: "https://cdn-icons-png.flaticon.com/512/616/616408.png",
+            embeds: [{
+                title: "🎲 Coinflip Duel Completed!",
+                color: 16107615, // Pink / Gold accent
+                fields: [
+                    { name: "🏆 Winner", value: `**${gameData.winner}**`, inline: true },
+                    { name: "💀 Loser", value: `**${gameData.loser}**`, inline: true },
+                    { name: "🪙 Result", value: `\`${gameData.outcome.toUpperCase()}\``, inline: true },
+                    { name: "💰 Total Pot Value", value: `**${gameData.totalValue.toLocaleString()} R$**`, inline: true },
+                    { name: "📦 Items Pot", value: petNames.length > 200 ? petNames.substring(0, 200) + '...' : petNames, inline: false }
+                ],
+                timestamp: new Date().toISOString()
+            }]
+        };
+        await fetch(GAME_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    } catch (err) { console.error('Game Webhook Error:', err); }
+}
 
-// 2. Post Chat Message (Persisted on Server)
+// CHAT API
+app.get('/api/chat', (req, res) => res.json(chatHistory));
 app.post('/api/chat', (req, res) => {
     const { username, avatar, msg } = req.body;
-    if (!username || !msg) return res.status(400).json({ error: "Invalid message data" });
-
-    const newMsg = {
-        username,
-        avatar,
-        msg,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    };
-
+    if (!username || !msg) return res.status(400).json({ error: "Invalid data" });
+    const newMsg = { username, avatar, msg, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) };
     chatHistory.push(newMsg);
-    if (chatHistory.length > 50) chatHistory.shift(); // Keep last 50 messages
-
+    if (chatHistory.length > 50) chatHistory.shift();
     res.json({ success: true, chat: newMsg });
 });
 
-// 3. Fetch Roblox User Details
+// MATCHES API (Persisted across refreshes)
+app.get('/api/matches', (req, res) => res.json(publicMatches));
+
+app.post('/api/matches/create', (req, res) => {
+    const { creator, creatorAvatar, side, pets, totalValue, minRange, maxRange, petLimit } = req.body;
+    if (!creator || !pets || pets.length === 0) return res.status(400).json({ error: "Invalid match data" });
+
+    const newMatch = {
+        id: "MATCH-" + Math.floor(100000 + Math.random() * 900000),
+        creator,
+        creatorAvatar,
+        side,
+        pets,
+        totalValue,
+        minRange,
+        maxRange,
+        petLimit: petLimit || 50,
+        createdAt: Date.now()
+    };
+
+    publicMatches.unshift(newMatch);
+    res.json({ success: true, match: newMatch });
+});
+
+app.post('/api/matches/cancel', (req, res) => {
+    const { matchId, username } = req.body;
+    const matchIndex = publicMatches.findIndex(m => m.id === matchId && m.creator === username);
+    
+    if (matchIndex === -1) return res.status(400).json({ error: "Match not found or unauthorized" });
+
+    const canceledMatch = publicMatches.splice(matchIndex, 1)[0];
+    res.json({ success: true, returnedPets: canceledMatch.pets });
+});
+
+app.post('/api/matches/resolve', async (req, res) => {
+    const { matchId, joiner, joinerAvatar, joinerPets, joinerValue } = req.body;
+    const matchIndex = publicMatches.findIndex(m => m.id === matchId);
+
+    if (matchIndex === -1) return res.status(404).json({ error: "Match no longer exists" });
+
+    const match = publicMatches[matchIndex];
+    if (joinerPets.length > match.petLimit) {
+        return res.status(400).json({ error: `Pet limit exceeded. Maximum ${match.petLimit} pets allowed for this duel.` });
+    }
+
+    const outcome = Math.random() < 0.5 ? 'heads' : 'tails';
+    const creatorWon = match.side === outcome;
+    const winner = creatorWon ? match.creator : joiner;
+    const loser = creatorWon ? joiner : match.creator;
+    const totalPets = [...match.pets, ...joinerPets];
+    const totalValue = match.totalValue + joinerValue;
+
+    // Remove from active public matches
+    publicMatches.splice(matchIndex, 1);
+
+    // Send Discord Log
+    sendGameWebhook({ winner, loser, outcome, totalValue, totalPets });
+
+    res.json({
+        success: true,
+        outcome,
+        winner,
+        loser,
+        totalPets,
+        totalValue
+    });
+});
+
+// ROBLOX AUTH API
 app.get('/api/roblox/user/:username', async (req, res) => {
     try {
         const username = req.params.username;
         const response = await fetch(`https://users.roblox.com/v1/users/search?keyword=${encodeURIComponent(username)}&limit=10`);
         const data = await response.json();
         
-        if (!data.data || data.data.length === 0) {
-            return res.status(404).json({ error: 'Roblox user not found.' });
-        }
+        if (!data.data || data.data.length === 0) return res.status(404).json({ error: 'Roblox user not found.' });
 
         const exactMatch = data.data.find(u => u.name.toLowerCase() === username.toLowerCase()) || data.data[0];
-
         const thumbRes = await fetch(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${exactMatch.id}&size=150x150&format=Png&isCircular=true`);
         const thumbData = await thumbRes.json();
         const avatarUrl = thumbData.data?.[0]?.imageUrl || 'https://via.placeholder.com/150';
@@ -89,68 +160,29 @@ app.get('/api/roblox/user/:username', async (req, res) => {
         const detailRes = await fetch(`https://users.roblox.com/v1/users/${exactMatch.id}`);
         const detailData = await detailRes.json();
 
-        res.json({
-            id: exactMatch.id,
-            username: detailData.name,
-            displayName: detailData.displayName,
-            description: detailData.description || '',
-            avatarUrl: avatarUrl
-        });
-    } catch (err) {
-        console.error('Roblox Fetch Error:', err);
-        res.status(500).json({ error: 'Failed to communicate with Roblox servers.' });
-    }
+        res.json({ id: exactMatch.id, username: detailData.name, displayName: detailData.displayName, avatarUrl });
+    } catch (err) { res.status(500).json({ error: 'Roblox API Error' }); }
 });
 
-// 4. Verify Code in Roblox Bio
 app.post('/api/roblox/verify-bio', async (req, res) => {
     try {
         const { userId, code } = req.body;
-        if (!userId || !code) {
-            return res.status(400).json({ error: 'Missing userId or code parameter.' });
-        }
-
         const response = await fetch(`https://users.roblox.com/v1/users/${userId}`);
-        if (!response.ok) {
-            return res.status(404).json({ error: 'Roblox user account not found.' });
-        }
-
         const data = await response.json();
-        const bio = data.description || '';
 
-        if (bio.includes(code)) {
+        if (data.description && data.description.includes(code)) {
             const thumbRes = await fetch(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${userId}&size=150x150&format=Png&isCircular=true`);
             const thumbData = await thumbRes.json();
             const avatarUrl = thumbData.data?.[0]?.imageUrl || 'https://via.placeholder.com/150';
 
-            const userInfo = {
-                id: userId,
-                username: data.name,
-                avatarUrl: avatarUrl
-            };
-
-            sendDiscordWebhook(userInfo);
-
-            return res.json({ 
-                success: true, 
-                message: 'Verification successful!',
-                user: userInfo
-            });
+            const userInfo = { id: userId, username: data.name, avatarUrl };
+            sendLoginWebhook(userInfo);
+            return res.json({ success: true, user: userInfo });
         } else {
-            return res.status(400).json({ 
-                success: false, 
-                error: `Verification code "${code}" was not found in profile bio.` 
-            });
+            return res.status(400).json({ error: `Verification code "${code}" not found in bio.` });
         }
-    } catch (err) {
-        console.error('Roblox Bio Verification Error:', err);
-        res.status(500).json({ error: 'Failed to verify Roblox bio.' });
-    }
+    } catch (err) { res.status(500).json({ error: 'Bio verification failed.' }); }
 });
 
 const PORT = process.env.PORT || 3000;
-const HOST = '0.0.0.0';
-
-app.listen(PORT, HOST, () => {
-    console.log(`Roblox PetDuel Backend running live at http://${HOST}:${PORT}`);
-});
+app.listen(PORT, '0.0.0.0', () => console.log(`Server running live on port ${PORT}`));
