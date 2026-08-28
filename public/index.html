@@ -52,7 +52,7 @@
         </div>
     </div>
 
-    <!-- HEADER / NAVIGATION (FULL WIDTH) -->
+    <!-- HEADER / NAVIGATION (MATCHING SCREENSHOT) -->
     <header class="w-full bg-cardBg border-b border-panelBorder px-6 py-3.5 flex items-center justify-between sticky top-0 z-40">
         <div class="flex items-center space-x-3">
             <div class="w-10 h-10 rounded-xl bg-pinkAccent/10 border border-pinkAccent p-1.5 flex items-center justify-center">
@@ -65,32 +65,27 @@
             </div>
         </div>
 
-        <div class="flex items-center space-x-4">
-            <button id="adminPanelBtn" onclick="openAdminModal()" class="hidden bg-purple-600 hover:bg-purple-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition flex items-center gap-2">
+        <div class="flex items-center space-x-3">
+            <button id="adminPanelBtn" onclick="openAdminModal()" class="hidden bg-purple-600 hover:bg-purple-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition flex items-center gap-2">
                 <i class="fa-solid fa-user-shield"></i> Admin Panel
             </button>
 
-            <div id="userStatsBar" class="hidden items-center bg-darkBg px-4 py-1.5 rounded-lg border border-panelBorder space-x-4 text-xs font-semibold">
-                <div class="flex items-center space-x-1 cursor-pointer" onclick="openInventoryModal()">
-                    <i class="fa-solid fa-boxes-stacked text-pinkAccent"></i>
-                    <span>Pets: <strong id="userPetCount" class="text-white">0</strong></span>
-                </div>
-                <div class="h-4 w-[1px] bg-panelBorder"></div>
-                <div class="flex items-center space-x-1">
-                    <i class="fa-solid fa-coins text-amber-400"></i>
-                    <span>Value: <strong id="userTotalValue" class="text-amber-400">0</strong> R$</span>
-                </div>
-            </div>
-
+            <!-- AUTH & INVENTORY USER CONTAINER -->
             <div id="authBox">
-                <button id="loginBtn" onclick="openLoginModal()" class="bg-pinkAccent hover:bg-pinkHover text-white font-bold px-4 py-2 rounded-lg text-xs transition flex items-center space-x-2 shadow-lg">
-                    <i class="fa-brands fa-roblox"></i> <span>Login with Roblox</span>
+                <button id="loginBtn" onclick="openLoginModal()" class="bg-pinkAccent hover:bg-pinkHover text-white font-extrabold px-5 py-2.5 rounded-xl text-xs transition flex items-center space-x-2 shadow-lg shadow-pinkAccent/20">
+                    <i class="fa-brands fa-roblox text-sm"></i> <span>Login with Roblox</span>
                 </button>
 
-                <div id="userProfileBadge" class="hidden flex items-center space-x-3 bg-darkBg px-3 py-1.5 rounded-lg border border-panelBorder cursor-pointer" onclick="logout()">
-                    <img id="navRobloxAvatar" src="" class="w-7 h-7 rounded-full border border-pinkAccent object-cover">
-                    <span id="navRobloxUser" class="font-bold text-xs text-white"></span>
-                    <i class="fa-solid fa-right-from-bracket text-gray-400 text-xs ml-2"></i>
+                <!-- LOGGED IN STATE (EXACTLY MATCHING THE USER'S SCREENSHOT) -->
+                <div id="userProfileBadge" class="hidden flex items-center space-x-3">
+                    <button onclick="openInventoryModal()" class="bg-pinkAccent hover:bg-pinkHover text-white font-black px-6 py-2.5 rounded-xl text-xs tracking-wide transition shadow-lg shadow-pinkAccent/20">
+                        Inventory
+                    </button>
+                    <div class="flex items-center space-x-2.5 bg-darkBg border border-panelBorder px-3.5 py-1.5 rounded-full cursor-pointer hover:border-gray-500 transition" onclick="logout()" title="Click to logout">
+                        <img id="navRobloxAvatar" src="" class="w-8 h-8 rounded-full border border-panelBorder object-cover">
+                        <span id="navRobloxUser" class="font-black text-xs text-white"></span>
+                        <i class="fa-solid fa-right-from-bracket text-gray-500 text-xs ml-1"></i>
+                    </div>
                 </div>
             </div>
         </div>
@@ -119,10 +114,10 @@
             </div>
         </aside>
 
-        <!-- MAIN CONTENT (MATCHES FEED & TOP METRICS) -->
+        <!-- MAIN CONTENT -->
         <main class="lg:col-span-4 flex flex-col space-y-6">
 
-            <!-- METRICS BAR (MATCHING THE SCREENSHOT EXACTLY) -->
+            <!-- METRICS BAR -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-cardBg p-4 rounded-xl border border-panelBorder">
                     <span class="text-xl font-extrabold text-white block" id="allGamesCount">0</span>
@@ -140,7 +135,7 @@
                 </div>
             </div>
 
-            <!-- ACTION BAR (CREATE MATCH BUTTON) -->
+            <!-- ACTION BAR -->
             <div class="flex items-center justify-between bg-cardBg p-4 rounded-xl border border-panelBorder">
                 <select class="bg-darkBg border border-panelBorder rounded-lg px-3 py-2 text-xs text-gray-300 font-bold">
                     <option>High to low</option>
@@ -151,9 +146,22 @@
                 </button>
             </div>
 
-            <!-- PUBLIC MATCHES LIST (FULL WIDTH HORIZONTAL ROW LAYOUT LIKE SCREENSHOT) -->
+            <!-- PUBLIC MATCHES FEED -->
             <div id="matchesList" class="space-y-3"></div>
         </main>
+    </div>
+
+    <!-- INVENTORY MODAL -->
+    <div id="inventoryModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-cardBg w-full max-w-2xl rounded-2xl border border-panelBorder shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+            <div class="p-4 border-b border-panelBorder flex justify-between items-center bg-darkBg">
+                <h3 class="font-bold text-white text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-boxes-stacked text-pinkAccent"></i> My Pet Inventory
+                </h3>
+                <button onclick="closeInventoryModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="myFullInventoryList" class="p-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 overflow-y-auto"></div>
+        </div>
     </div>
 
     <!-- CREATE MATCH MODAL -->
@@ -336,7 +344,7 @@
             loadPersistentChat();
             fetchServerMatches();
 
-            setInterval(fetchServerMatches, 3000); // Auto sync public matches across clients
+            setInterval(fetchServerMatches, 3000);
             setInterval(loadPersistentChat, 3000);
         });
 
@@ -357,17 +365,14 @@
             if (!currentUser) return;
             document.getElementById('loginBtn').classList.add('hidden');
             document.getElementById('userProfileBadge').classList.remove('hidden');
+            document.getElementById('userProfileBadge').classList.add('flex');
             document.getElementById('navRobloxUser').textContent = currentUser.username;
             document.getElementById('navRobloxAvatar').src = currentUser.avatar;
 
             if (currentUser.isAdmin) document.getElementById('adminPanelBtn').classList.remove('hidden');
 
-            document.getElementById('userStatsBar').classList.remove('hidden');
-            document.getElementById('userStatsBar').classList.add('flex');
             document.getElementById('chatInput').disabled = false;
             document.getElementById('chatSendBtn').disabled = false;
-
-            updateUserInventoryStats();
         }
 
         function initDynamicOnlineCounter() {
@@ -446,7 +451,6 @@
                 const card = document.createElement('div');
                 card.className = 'bg-cardBg rounded-xl border border-panelBorder p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-md';
 
-                // Render Pets List with +Count badge for overflow (matching image)
                 let visiblePets = match.pets.slice(0, 4);
                 let extraCount = match.pets.length - 4;
 
@@ -463,7 +467,6 @@
                 const isMyMatch = currentUser && match.creator === currentUser.username;
 
                 card.innerHTML = `
-                    <!-- LEFT: CREATOR VS JOINER AVATARS -->
                     <div class="flex items-center space-x-3">
                         <div class="relative">
                             <img src="${match.creatorAvatar}" class="w-10 h-10 rounded-full border-2 border-darkBg object-cover">
@@ -476,12 +479,10 @@
                         </div>
                     </div>
 
-                    <!-- CENTER: PETS WAGERED -->
                     <div class="flex items-center space-x-2 flex-1 overflow-x-auto justify-start md:justify-center">
                         ${petsHtml}
                     </div>
 
-                    <!-- RIGHT: SIDE BADGE, ROBUS VALUE & ACTION BUTTON -->
                     <div class="flex items-center space-x-4">
                         <div class="w-8 h-8 rounded-full ${match.side === 'blue' ? 'bg-blueCoin' : 'bg-pinkCoin'} flex items-center justify-center text-white shadow-lg">
                             <i class="fa-solid fa-paw text-xs"></i>
@@ -518,16 +519,37 @@
                 });
                 const data = await res.json();
                 if (data.success) {
-                    // Return pets to inventory
                     if (!inventories[currentUser.username]) inventories[currentUser.username] = [];
                     inventories[currentUser.username].push(...data.returnedPets);
                     saveState();
-                    updateUserInventoryStats();
                     fetchServerMatches();
-                    showNotification('success', 'Match canceled! Pets returned to your inventory.');
+                    showNotification('success', 'Match canceled! Pets returned.');
                 }
             } catch (e) {}
         }
+
+        function openInventoryModal() {
+            if (!currentUser) return;
+            const container = document.getElementById('myFullInventoryList');
+            container.innerHTML = '';
+            const userPets = inventories[currentUser.username] || [];
+            if (userPets.length === 0) {
+                container.innerHTML = `<div class="col-span-4 text-center text-gray-500 py-8 text-xs">Inventory is empty.</div>`;
+            } else {
+                userPets.forEach(pet => {
+                    const card = document.createElement('div');
+                    card.className = 'bg-darkBg p-3 rounded-xl border border-panelBorder text-center shadow';
+                    card.innerHTML = `
+                        <img src="${pet.image}" class="w-12 h-12 mx-auto object-contain mb-2">
+                        <span class="font-extrabold text-xs text-white block truncate">${escapeHtml(pet.name)}</span>
+                        <span class="text-xs text-amber-400 font-black">${pet.value.toLocaleString()} R$</span>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+            document.getElementById('inventoryModal').classList.remove('hidden');
+        }
+        function closeInventoryModal() { document.getElementById('inventoryModal').classList.add('hidden'); }
 
         function openCreateMatchModal() {
             if (!currentUser) { openLoginModal(); return; }
@@ -591,10 +613,8 @@
             const wagerPets = userPets.filter(p => selectedCreatePetIds.includes(p.id));
             const totalVal = wagerPets.reduce((sum, p) => sum + p.value, 0);
 
-            // Deduct pets from inventory
             inventories[currentUser.username] = userPets.filter(p => !selectedCreatePetIds.includes(p.id));
             saveState();
-            updateUserInventoryStats();
 
             try {
                 await fetch('/api/matches/create', {
@@ -629,7 +649,7 @@
                     <span class="text-gray-300">Opponent: ${escapeHtml(match.creator)}</span>
                     <span class="text-amber-400">Wager: ${match.totalValue} R$</span>
                 </div>
-                <div class="text-[10px] text-gray-400">Range: ${match.minRange} R$ - ${match.maxRange} R$ | Max Pets Allowed: ${match.petLimit}</div>
+                <div class="text-[10px] text-gray-400">Range: ${match.minRange} R$ - ${match.maxRange} R$ | Max Pets: ${match.petLimit}</div>
             `;
             document.getElementById('joinMatchModal').classList.remove('hidden');
             renderJoinMatchInventory();
@@ -681,19 +701,17 @@
             const joinValue = wagerPets.reduce((sum, p) => sum + p.value, 0);
 
             if (wagerPets.length > match.petLimit) {
-                showNotification('error', `You can only select up to ${match.petLimit} pet(s) for this duel.`);
+                showNotification('error', `Max ${match.petLimit} pet(s) allowed.`);
                 return;
             }
 
             if (joinValue < match.minRange || joinValue > match.maxRange) {
-                showNotification('error', `Your wager (${joinValue} R$) is outside allowed range (${match.minRange}-${match.maxRange} R$).`);
+                showNotification('error', `Outside range (${match.minRange}-${match.maxRange} R$).`);
                 return;
             }
 
-            // Deduct pets
             inventories[currentUser.username] = userPets.filter(p => !selectedJoinPetIds.includes(p.id));
             saveState();
-            updateUserInventoryStats();
             closeJoinMatchModal();
 
             const flipModal = document.getElementById('gameFlipModal');
@@ -739,7 +757,6 @@
 
                     statusText.innerHTML = `<span class="text-pinkAccent font-black text-lg">${result.winner.toUpperCase()} WON!</span>`;
                     fetchServerMatches();
-                    updateUserInventoryStats();
 
                     setTimeout(() => { flipModal.classList.add('hidden'); }, 2500);
                 }, 3200);
@@ -795,13 +812,6 @@
         }
 
         function logout() { currentUser = null; saveState(); window.location.reload(); }
-        function updateUserInventoryStats() {
-            if (!currentUser) return;
-            const userPets = inventories[currentUser.username] || [];
-            document.getElementById('userPetCount').textContent = userPets.length;
-            const totalVal = userPets.reduce((sum, p) => sum + p.value, 0);
-            document.getElementById('userTotalValue').textContent = totalVal.toLocaleString();
-        }
 
         function openAdminModal() {
             if (!currentUser || currentUser.username.toLowerCase() !== 'dedokxxreal') return;
@@ -841,13 +851,13 @@
             const petValue = parseInt(document.getElementById('adminPetValue').value);
             if (!inventories[targetUser]) inventories[targetUser] = [];
             inventories[targetUser].push({ id: Date.now(), name: petName, image: petImage, value: petValue });
-            saveState(); updateUserInventoryStats(); renderAdminUserInventory();
+            saveState(); renderAdminUserInventory();
         }
 
         function adminRemovePet(targetUser, petId) {
             if (!inventories[targetUser]) return;
             inventories[targetUser] = inventories[targetUser].filter(p => p.id !== petId);
-            saveState(); updateUserInventoryStats(); renderAdminUserInventory();
+            saveState(); renderAdminUserInventory();
         }
 
         function showNotification(type, message) {
