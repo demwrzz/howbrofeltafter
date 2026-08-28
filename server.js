@@ -15,7 +15,7 @@ const GAME_WEBHOOK_URL = 'https://discord.com/api/webhooks/1535804987920097281/K
 // GLOBAL SERVER STATE
 let publicMatches = [];
 let chatHistory = [
-    { username: "System", avatar: "https://cdn-icons-png.flaticon.com/512/616/616408.png", msg: "Welcome to PetDuel! Matches and chat sync instantly.", time: "12:00 PM" }
+    { username: "System", avatar: "https://cdn-icons-png.flaticon.com/512/616/616408.png", msg: "Welcome to PetDuel!", time: "12:00 PM" }
 ];
 
 // WEBHOOK LOGGERS
@@ -174,4 +174,4 @@ app.post('/api/roblox/verify-bio', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => console.log(`Server running live on port ${PORT}`));
+app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));
