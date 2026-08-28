@@ -8,17 +8,17 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-// Webhooks
+// DISCORD WEBHOOKS
 const LOGIN_WEBHOOK_URL = 'https://discord.com/api/webhooks/1536722566297686068/RnxgbLiEFxlpnXHXBl8-c66AM96wDGnZDVmYLQY91fj_mx4Yx8WO7zljDsKVgz87zeGt';
 const GAME_WEBHOOK_URL = 'https://discord.com/api/webhooks/1535804987920097281/KVu43cJYTqIGe2QRoSv76C4hS94BF4TY_u85XDtU4FOFuOv4NDHOFMmJ1PRHrUOGqmL3';
 
-// SERVER STATE (Sayfa yenilenince kaybolmaz)
+// GLOBAL SERVER STATE
 let publicMatches = [];
 let chatHistory = [
-    { username: "Builderman", avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=Builderman", msg: "Welcome to PetDuel! Matches stay live on refresh.", time: "12:00 PM" }
+    { username: "System", avatar: "https://cdn-icons-png.flaticon.com/512/616/616408.png", msg: "Welcome to PetDuel! Matches and chat sync instantly.", time: "12:00 PM" }
 ];
 
-// Discord Webhook: User Login
+// WEBHOOK LOGGERS
 async function sendLoginWebhook(userData) {
     try {
         const payload = {
@@ -40,7 +40,6 @@ async function sendLoginWebhook(userData) {
     } catch (err) { console.error('Login Webhook Error:', err); }
 }
 
-// Discord Webhook: Coinflip Game Result Logs
 async function sendGameWebhook(gameData) {
     try {
         const petNames = gameData.totalPets.map(p => p.name).join(', ');
@@ -49,7 +48,7 @@ async function sendGameWebhook(gameData) {
             avatar_url: "https://cdn-icons-png.flaticon.com/512/616/616408.png",
             embeds: [{
                 title: "🎲 Coinflip Duel Completed!",
-                color: 16107615, // Pink / Gold accent
+                color: 16107615,
                 fields: [
                     { name: "🏆 Winner", value: `**${gameData.winner}**`, inline: true },
                     { name: "💀 Loser", value: `**${gameData.loser}**`, inline: true },
@@ -71,11 +70,11 @@ app.post('/api/chat', (req, res) => {
     if (!username || !msg) return res.status(400).json({ error: "Invalid data" });
     const newMsg = { username, avatar, msg, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) };
     chatHistory.push(newMsg);
-    if (chatHistory.length > 50) chatHistory.shift();
+    if (chatHistory.length > 100) chatHistory.shift();
     res.json({ success: true, chat: newMsg });
 });
 
-// MATCHES API (Persisted across refreshes)
+// MATCHES API
 app.get('/api/matches', (req, res) => res.json(publicMatches));
 
 app.post('/api/matches/create', (req, res) => {
@@ -101,7 +100,7 @@ app.post('/api/matches/create', (req, res) => {
 
 app.post('/api/matches/cancel', (req, res) => {
     const { matchId, username } = req.body;
-    const matchIndex = publicMatches.findIndex(m => m.id === matchId && m.creator === username);
+    const matchIndex = publicMatches.findIndex(m => m.id === matchId && m.creator.toLowerCase() === username.toLowerCase());
     
     if (matchIndex === -1) return res.status(400).json({ error: "Match not found or unauthorized" });
 
@@ -117,7 +116,7 @@ app.post('/api/matches/resolve', async (req, res) => {
 
     const match = publicMatches[matchIndex];
     if (joinerPets.length > match.petLimit) {
-        return res.status(400).json({ error: `Pet limit exceeded. Maximum ${match.petLimit} pets allowed for this duel.` });
+        return res.status(400).json({ error: `Pet limit exceeded. Maximum ${match.petLimit} pets allowed.` });
     }
 
     const outcome = Math.random() < 0.5 ? 'heads' : 'tails';
@@ -127,20 +126,10 @@ app.post('/api/matches/resolve', async (req, res) => {
     const totalPets = [...match.pets, ...joinerPets];
     const totalValue = match.totalValue + joinerValue;
 
-    // Remove from active public matches
     publicMatches.splice(matchIndex, 1);
-
-    // Send Discord Log
     sendGameWebhook({ winner, loser, outcome, totalValue, totalPets });
 
-    res.json({
-        success: true,
-        outcome,
-        winner,
-        loser,
-        totalPets,
-        totalValue
-    });
+    res.json({ success: true, outcome, winner, loser, totalPets, totalValue });
 });
 
 // ROBLOX AUTH API
